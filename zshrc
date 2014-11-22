@@ -46,12 +46,19 @@ export PATH=/usr/local/sbin:$PATH
 export PATH=/usr/local/go/bin:$PATH
 export GOPATH=~/go
 export PATH=$PATH:$GOPATH/bin
-
+export PATH=/usr/local/heroku/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/Users/manu/go/bin:/Users/manu/.ec2/bin:/usr/local/libxls/bin
 # For proper encoding with jekyll
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-# vim mode
+
+### Vi mode
+
 set -o vi
+bindkey -v
+# Delay after <ESC> press in milisec (defaul = 4)>
+export KEYTIMEOUT=2
+
+###
 
 # EC2 stuffs
 export EC2_HOME=~/.ec2
@@ -62,6 +69,10 @@ export EC2_URL=https://ec2.eu-west-1.amazonaws.com
 export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home/
 
 # Search
-bindkey -v
-bindkey '^R' history-incremental-search-backward
-export PATH=/usr/local/heroku/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/Users/manu/go/bin:/Users/manu/.ec2/bin:/usr/local/libxls/bin
+#bindkey '^R' history-incremental-search-backward
+
+# cycle throug arg history
+bindkey '^O' insert-last-word
+
+
+
