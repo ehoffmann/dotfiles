@@ -110,6 +110,14 @@ au BufNewFile,BufRead *.styl set filetype=stylus
 
 
 "------------------------------------------------------------------------------
+" Per filetype config
+"------------------------------------------------------------------------------
+autocmd Filetype html setlocal ts=2 sts=2 sw=2
+autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
+autocmd Filetype javascript setlocal ts=4 sts=4 sw=4
+autocmd Filetype php setlocal ts=4 sts=4 sw=4
+
+"------------------------------------------------------------------------------
 " misc
 "------------------------------------------------------------------------------
 " Disable error bell
@@ -132,7 +140,7 @@ let g:ack_default_options = ' -s -H --nocolor --nogroup --column --ignore-dir=di
 
 
 
-" NerdTree on mvim 
+" NerdTree on mvim
 if has("gui_running")
   autocmd VimEnter * NERDTreeToggle
 endif
