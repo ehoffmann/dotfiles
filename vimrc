@@ -43,6 +43,7 @@ Plugin 'lunaru/vim-less'
 Plugin 'wavded/vim-stylus'
 Plugin 'digitaltoad/vim-jade'
 Plugin 'vim-scripts/applescript.vim'
+Plugin 'ehoffmann/smarty-syntax'
 Plugin 'fatih/vim-go'
 
 call vundle#end()
@@ -71,7 +72,7 @@ set tabstop=2                     " a tab is two spaces
 set shiftwidth=2                  " an autoindent (with <<) is two spaces
 set expandtab                     " use spaces, not tabs
 set backspace=indent,eol,start    " backspace through everything in insert mode
-set iskeyword-=_                  " jump stop on underscore.
+""set iskeyword-=_                  " jump stop on underscore.
 
 ""
 "" Color
@@ -94,10 +95,16 @@ nmap <leader>t :Ack<SPACE>-i<SPACE>''<LEFT>
 
 " Save current buffer
 imap <C-s> <ESC>:update<CR>
-""
 
 " Save time
 nmap <SPACE> :
+
+" Press F12 to switch to UTF-8 encoding
+nnoremap <F12> :e ++enc=utf-8<CR>
+" Press F11 to switch to cp1252 encoding
+nnoremap <F11> :e ++enc=cp1252<CR>
+" Clean dirty file
+nnoremap <F10> :retab<CR>:%s/\s*$//<CR>
 
 :runtime macros/matchit.vim
 
@@ -105,6 +112,8 @@ nmap <SPACE> :
 " File mapping
 "------------------------------------------------------------------------------
 au BufNewFile,BufRead *.md set filetype=html
+"au BufNewFile,BufRead *.tpl set filetype=html
+au BufRead,BufNewFile *.tpl set filetype=smarty.html
 au BufNewFile,BufRead Guardfile set filetype=ruby
 au BufNewFile,BufRead *.styl set filetype=stylus
 
@@ -122,8 +131,8 @@ autocmd Filetype php setlocal ts=4 sts=4 sw=4
 "------------------------------------------------------------------------------
 " Disable error bell
 set noeb vb t_vb=
-" CtrlP will not index tmp
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip
+" CtrlP will not index tmp and co
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/Cache/*
 
 
 " Show end line space
@@ -136,7 +145,8 @@ highlight SpecialKey term=standout ctermbg=yellow guibg=yellow
 " Sane Ignore For ctrlp
 let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|log\|tmp$', 'file': '\.exe$\|\.so$\|\.dat$' }
 
-let g:ack_default_options = ' -s -H --nocolor --nogroup --column --ignore-dir=dist'
+"let g:ack_default_options = ' -s -H --nocolor --nogroup --column --ignore-dir=dist'
+let g:ack_default_options = ' -s -H --nocolor --nogroup --column --ignore-dir=dist --ignore-dir=Dev --ignore-dir=systemeold --ignore-dir=Cache'
 
 
 
@@ -148,6 +158,12 @@ endif
 " Ctags
 set tags=./tags;
 
+" Allow per project config
+if filereadable(".vim.custom")
+  so .vim.custom
+endif
+
+
 "------------------------------------------------------------------------------
 " GO, GOLANG "
 "------------------------------------------------------------------------------
@@ -155,3 +171,5 @@ set tags=./tags;
 au BufNewFile,BufRead *.go set filetype=go
 " no tab display
 autocmd BufnewFile,BufRead *.go set nolist
+
+

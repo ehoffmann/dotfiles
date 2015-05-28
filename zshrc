@@ -14,9 +14,19 @@ alias vimconf="vim ~/.vimrc"
 alias be='bundle exec'
 alias brake='bundle exec rake'
 alias glo='git log --oneline'
+alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
+alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 alias gpnew='git push origin new'
-#alias current='cd ~/apps/activeandco.github.com && mvim . && jekyll serve -w'
-alias current='cd ~/go/src/github.com/ehof'
+alias vagrash='vagrant up && vagrant ssh'
+# alias current='cd ~/apps/activeandco.github.com && mvim . && jekyll serve -w'
+# alias current='cd ~/go/src/github.com/ehof'
+#alias current='cd ~/code/cci_digne/volet2/www'
+alias current='cd ~/code/comlink/eurlirent'
+
+# Finder show hidden files
+alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
+alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
+
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
 
