@@ -172,4 +172,5 @@ au BufNewFile,BufRead *.go set filetype=go
 " no tab display
 autocmd BufnewFile,BufRead *.go set nolist
 
-
+" Search for visually selected text
+vnoremap // y/<C-R>"<CR>
