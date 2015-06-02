@@ -18,10 +18,13 @@ alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=f
 alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 alias gpnew='git push origin new'
 alias vagrash='vagrant up && vagrant ssh'
+alias -g gpi='| grep -i'
 # alias current='cd ~/apps/activeandco.github.com && mvim . && jekyll serve -w'
 # alias current='cd ~/go/src/github.com/ehof'
 #alias current='cd ~/code/cci_digne/volet2/www'
-alias current='cd ~/code/comlink/eurlirent'
+alias eurli='cd ~/code/comlink/eurlirent'
+alias crm='cd ~/code/maranatha_crm/'
+alias cci='cd ~/code/cci_digne/volet2/'
 
 # Finder show hidden files
 alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
@@ -45,7 +48,7 @@ alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall F
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git osx npm brew)
+plugins=(git osx npm brew vagrant rails vi-mode history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -62,9 +65,14 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 ### Vi mode
-
 set -o vi
 bindkey -v
+# cycle throug arg history
+bindkey '^O' insert-last-word
+# bind k and j for VI mode
+ bindkey -M vicmd 'k' history-substring-search-up
+ bindkey -M vicmd 'j' history-substring-search-down
+
 # Delay after <ESC> press in milisec (defaul = 4)>
 export KEYTIMEOUT=2
 
@@ -80,9 +88,3 @@ export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home/
 
 # Search
 #bindkey '^R' history-incremental-search-backward
-
-# cycle throug arg history
-bindkey '^O' insert-last-word
-
-
-
