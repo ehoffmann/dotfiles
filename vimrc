@@ -45,6 +45,7 @@ Plugin 'digitaltoad/vim-jade'
 Plugin 'vim-scripts/applescript.vim'
 Plugin 'ehoffmann/smarty-syntax'
 Plugin 'fatih/vim-go'
+Plugin 'rust-lang/rust.vim'
 
 call vundle#end()
 filetype plugin indent on     " required!
@@ -122,6 +123,7 @@ au BufNewFile,BufRead *.styl set filetype=stylus
 " Per filetype config
 "------------------------------------------------------------------------------
 autocmd Filetype html setlocal ts=2 sts=2 sw=2
+autocmd Filetype rust setlocal ts=2 sts=2 sw=2
 autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
 autocmd Filetype javascript setlocal ts=4 sts=4 sw=4
 autocmd Filetype php setlocal ts=4 sts=4 sw=4
@@ -174,3 +176,11 @@ autocmd BufnewFile,BufRead *.go set nolist
 
 " Search for visually selected text
 vnoremap // y/<C-R>"<CR>
+
+"------------------------------------------------------------------------------
+" RUST, rust
+"------------------------------------------------------------------------------
+"
+" Save and cargo run
+"au BufNewFile,BufRead *.rs imap <C-s> <ESC>:update<CR>:! cargo run
+autocmd Filetype rust imap <C-s> <ESC>:update<CR>:! cargo run<CR>
