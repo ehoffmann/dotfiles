@@ -24,7 +24,7 @@ Plugin 'kien/ctrlp.vim'
 "Snipmate dependencies:
 Plugin 'MarcWeber/vim-addon-mw-utils'
 Plugin 'tomtom/tlib_vim'
-Plugin 'ehoffmann/snipmate-snippets'
+Plugin 'honza/vim-snippets'
 Plugin 'garbas/vim-snipmate'
 "
 " vim-scripts repos
@@ -100,12 +100,16 @@ imap <C-s> <ESC>:update<CR>
 " Save time
 nmap <SPACE> :
 
-" Press F12 to switch to UTF-8 encoding
-nnoremap <F12> :e ++enc=utf-8<CR>
-" Press F11 to switch to cp1252 encoding
-nnoremap <F11> :e ++enc=cp1252<CR>
 " Clean dirty file
 nnoremap <F10> :retab<CR>:%s/\s*$//<CR>
+" Press F11 to switch to cp1252 encoding
+nnoremap <F11> :e ++enc=cp1252<CR>
+" Press F12 to switch to UTF-8 encoding
+nnoremap <F12> :e ++enc=utf-8<CR>
+
+" Switch to alternate file
+nmap <leader>f :bnext<cr>
+nmap <leader>b :bprevious<cr>
 
 :runtime macros/matchit.vim
 
@@ -184,3 +188,4 @@ vnoremap // y/<C-R>"<CR>
 " Save and cargo run
 "au BufNewFile,BufRead *.rs imap <C-s> <ESC>:update<CR>:! cargo run
 autocmd Filetype rust imap <C-s> <ESC>:update<CR>:! cargo run<CR>
+

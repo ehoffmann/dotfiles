@@ -22,12 +22,24 @@ alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold b
 alias gpnew='git push origin new'
 alias vagrash='vagrant up && vagrant ssh'
 alias -g gpi='| grep -i'
+alias code="cd ~/code/activeandco"
+
+# docker
+alias dco='docker-compose'
+alias drm='docker rm $(docker ps -a -q)'
+alias dms='docker-machine start default'
+alias dip='docker-machine ip default'
+drmi() {
+  docker rmi $(docker images | grep '^<none>' | awk '{print $3}')
+}
+
 # alias current='cd ~/apps/activeandco.github.com && mvim . && jekyll serve -w'
 # alias current='cd ~/go/src/github.com/ehof'
 #alias current='cd ~/code/cci_digne/volet2/www'
 alias eurli='cd ~/code/comlink/eurlirent'
 alias crm='cd ~/code/maranatha_crm/'
 alias cci='cd ~/code/cci_digne/volet2/'
+alias aby='cd ~/code/activeandco/rails/abyssal'
 
 # Finder show hidden files
 alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
@@ -91,3 +103,6 @@ export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home/
 
 # Search
 #bindkey '^R' history-incremental-search-backward
+
+# Docker stuffs
+eval "$(docker-machine env default)"
