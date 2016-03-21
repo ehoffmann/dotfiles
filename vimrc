@@ -27,7 +27,6 @@ Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'vim-scripts/applescript.vim'
-Plugin 'vim-utils/vim-ruby-fold'
 Plugin 'wavded/vim-stylus'
 call vundle#end()
 
