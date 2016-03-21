@@ -143,6 +143,8 @@ let g:ctrlp_by_filename = 1
 let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|log\|tmp$',
       \ 'file': '\.exe$\|\.so$\|\.dat$' }
 
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+
 "------------------------------------------------------------------------------
 " Ack
 "------------------------------------------------------------------------------
