@@ -80,6 +80,18 @@ dcdbreset_dev() {
   docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
 }
 
+dcdb_load_tco_dev() {
+  docker-compose start mysql
+  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  echo $container
+  echo "clear database"
+  docker exec -ti $container mysql -uroot -pfoo -e 'drop database tco_development; create database tco_development'
+  echo "loading dump"
+  docker exec -i $container mysql tco_development -uroot -pfoo < $1
+  echo "running migrations"
+  docker-compose run --rm web bundle exec rake db:migrate
+}
+
 dcbe() {
   docker-compose run --rm web bundle exec $@
 }
