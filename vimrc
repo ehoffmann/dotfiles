@@ -28,6 +28,7 @@ Plugin 'tpope/vim-surround'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'vim-scripts/applescript.vim'
 Plugin 'wavded/vim-stylus'
+Plugin 'altercation/vim-colors-solarized'
 call vundle#end()
 
 filetype plugin indent on     " required!
@@ -50,18 +51,21 @@ set backspace=indent,eol,start    " backspace through everything in insert mode
 "------------------------------------------------------------------------------
 " Color
 "------------------------------------------------------------------------------
-colorscheme molokai
+"colo summerfruit256
+"let g:solarized_termcolors=256
+set background=light
+colorscheme solarized
 
 " Better comments for molokai theme
-:hi Comment guifg=#708090
+":hi Comment guifg=#708090
 
 " Highlight 81 and onwardd
 let &colorcolumn=join(range(81,999),",")
-highlight ColorColumn ctermbg=235 guibg=#2c2d27
+highlight ColorColumn ctermbg=255 guibg=#2c2d27
 
 " highlight tabs and trailing spaces
 set list listchars=tab:>-,trail:-
-highlight SpecialKey term=standout ctermbg=yellow guibg=yellow
+highlight SpecialKey term=standout ctermbg=black guibg=yellow
 
 " Keyword highlighting bonus
 au BufWinEnter * let w:m1=matchadd('Error', 'BROKEN\|WTF', -1)
@@ -103,7 +107,7 @@ inoremap jk <ESC>
 " Search for visually selected text
 vnoremap // y/<C-R>"<CR>
 
-" Type "visual" yourself !!!
+" Type "visual" yourself!
 nnoremap Q <Nop>
 
 "------------------------------------------------------------------------------
@@ -137,20 +141,24 @@ autocmd Filetype javascript setlocal ts=4 sts=4 sw=4
 let g:ctrlp_cmd = 'CtrlPMixed'
 
 " Search by filename only by default
-let g:ctrlp_by_filename = 1
+" let g:ctrlp_by_filename = 1
 
 " Sane Ignore
-let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|log\|tmp$',
+let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|coverage\|log\|tmp$',
       \ 'file': '\.exe$\|\.so$\|\.dat$' }
 
+" Use git file searching
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+
+" Do not display MRU files from other directory
+let g:ctrlp_mruf_relative = 1
 
 "------------------------------------------------------------------------------
 " Ack
 "------------------------------------------------------------------------------
 let g:ack_default_options = " -s -H --nocolor --nogroup --column --ignore-dir=dist
-      \ --ignore-dir=Cache --ignore-dir=log --ignore-dir=tmp
-      \ --ignore-file=is:tags"
+      \ --ignore-dir=Cache --ignore-dir=log --ignore-dir=tmp --ignore-dir=coverage
+      \ --ignore-dir=doc --ignore-file=is:tags"
 
 "------------------------------------------------------------------------------
 " NerdTree on mvim
@@ -196,3 +204,6 @@ set path+=./app/services;
 
 " Global ignore
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/Cache/*
+
+set clipboard=unnamed
+

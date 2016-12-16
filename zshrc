@@ -21,6 +21,7 @@ alias tmuxconf="vim ~/.tmux.conf"
 # -----------------------------------------------------------------------------
 alias be='bundle exec'
 alias brake='bundle exec rake'
+alias rubytag='ctags -R --languages=ruby --exclude=.git --exclude=log .'
 
 # -----------------------------------------------------------------------------
 # Git
@@ -52,8 +53,16 @@ dcr() {
   docker-compose run --rm web $@
 }
 
+railsc() {
+  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bundle exec rails c"
+}
+
 dcba() {
   docker-compose run --rm web bash
+}
+
+dcbe() {
+  docker-compose run --rm web bundle exec $@
 }
 
 dcguard() {
@@ -67,17 +76,39 @@ dcguard_xfvb() {
   docker exec -ti guard sh -c 'export DISPLAY=:99; bundle exec guard'
 }
 
-dcmigrate() {
+dcmigrate_all() {
   docker-compose run --rm web bundle exec rake db:migrate
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
 }
 
+dcmigrate_test() {
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
+}
+
 dcdbreset_test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:schema:load
 }
 
 dcdbreset_dev() {
   docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
+}
+
+db_shell_mysql() {
+  docker-compose start mysql
+  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  docker exec -ti $container mysql -uroot -pfoo tco_development
+}
+
+db_shell() {
+  docker-compose start db
+  container=$(docker-compose ps db | grep Up | awk  '{print $1}')
+  docker exec -ti $container psql -U postgres -W postgres
+}
+
+dcdb_mysqldump() {
+  docker-compose start mysql
+  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  docker exec -ti $container mysqldump -uroot -pfoo tco_development
 }
 
 dcdb_load_tco_dev() {
@@ -92,10 +123,13 @@ dcdb_load_tco_dev() {
   docker-compose run --rm web bundle exec rake db:migrate
 }
 
-dcbe() {
-  docker-compose run --rm web bundle exec $@
-}
+# -----------------------------------------------------------------------------
+# linters
+# -----------------------------------------------------------------------------
 
+rubs() {
+  git diff --name-only --cached | grep '.rb$' | xargs -r rubocop
+}
 # -----------------------------------------------------------------------------
 # ssh and forward auto
 # -----------------------------------------------------------------------------
@@ -173,4 +207,4 @@ export KEYTIMEOUT=2
 
 # chruby
 source /usr/local/share/chruby/chruby.sh
-chruby 2.3.0
+chruby 2.3.1
