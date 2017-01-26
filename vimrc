@@ -29,6 +29,8 @@ Plugin 'vim-ruby/vim-ruby'
 Plugin 'vim-scripts/applescript.vim'
 Plugin 'wavded/vim-stylus'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'vim-airline/vim-airline'
+Plugin 'christoomey/vim-tmux-navigator'
 call vundle#end()
 
 filetype plugin indent on     " required!
@@ -53,15 +55,16 @@ set backspace=indent,eol,start    " backspace through everything in insert mode
 "------------------------------------------------------------------------------
 "colo summerfruit256
 "let g:solarized_termcolors=256
-set background=light
+"set background=light
+set background=dark
 colorscheme solarized
 
 " Better comments for molokai theme
 ":hi Comment guifg=#708090
 
-" Highlight 81 and onwardd
+" Highlight col 81 and onward
 let &colorcolumn=join(range(81,999),",")
-highlight ColorColumn ctermbg=255 guibg=#2c2d27
+highlight ColorColumn ctermbg=0 guibg=#2c2d27
 
 " highlight tabs and trailing spaces
 set list listchars=tab:>-,trail:-
@@ -101,7 +104,7 @@ nnoremap <F12> :e ++enc=utf-8<CR>
 nmap <leader>f :bnext<cr>
 nmap <leader>b :bprevious<cr>
 
-" The best shortcup of all time!
+" The best shortcut of all time!
 inoremap jk <ESC>
 
 " Search for visually selected text
