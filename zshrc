@@ -180,6 +180,7 @@ esac
 source $ZSH/oh-my-zsh.sh
 
 alias -g gpi='| grep -i'
+alias mto='curl -4 http://wttr.in/Marseille'
 
 export PATH=/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 export PATH=/usr/local/sbin:$PATH
