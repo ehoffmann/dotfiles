@@ -25,6 +25,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-rails.git'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-abolish'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'vim-scripts/applescript.vim'
 Plugin 'wavded/vim-stylus'
@@ -82,11 +83,11 @@ let mapleader = ","
 
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 
-" require and call debugger
-nmap <leader>id Obinding.pry<Esc>
-
 " Ack vim shortcut
 nmap <leader>t :Ack<SPACE>-i<SPACE>''<LEFT>
+
+" Fugitive
+nmap <leader>gs :Gstatus
 
 " Save time
 nmap <SPACE> :
@@ -94,10 +95,10 @@ nmap <SPACE> :
 " Clean dirty file
 nnoremap <F10> :retab<CR>:%s/\s*$//<CR>
 
-" Press F11 to switch to cp1252 encoding
+" F11 switch to cp1252 encoding
 nnoremap <F11> :e ++enc=cp1252<CR>
 
-" Press F12 to switch to UTF-8 encoding
+" F12 switch to UTF-8 encoding
 nnoremap <F12> :e ++enc=utf-8<CR>
 
 " Switch to alternate file
@@ -209,4 +210,3 @@ set path+=./app/services;
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/Cache/*
 
 set clipboard=unnamed
-
