@@ -87,7 +87,7 @@ nmap <silent> <leader>nt :NERDTreeToggle<CR>
 nmap <leader>t :Ack<SPACE>-i<SPACE>''<LEFT>
 
 " Fugitive
-nmap <leader>gs :Gstatus
+nnoremap <leader>gs :Gstatus<CR>
 
 " Save time
 nmap <SPACE> :
