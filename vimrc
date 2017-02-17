@@ -190,6 +190,26 @@ autocmd BufnewFile,BufRead *.go set nolist
 autocmd Filetype rust imap <C-s> <ESC>:update<CR>:! cargo run<CR>
 
 "------------------------------------------------------------------------------
+" Rails-vim
+"------------------------------------------------------------------------------
+let g:rails_projections = {
+      \    "app/services/*_service.rb": {
+      \      "command": "service",
+      \      "template":
+      \        ["module {camelcase|capitalize|dirname}",
+      \         "  class {camelcase|capitalize|basename}Service",
+      \         "    def call",
+      \         "    end",
+      \         "  end",
+      \         "end"],
+      \      "test": [
+      \        "spec/services/{}_service_spec.rb"
+      \      ]
+      \     }
+      \ }
+
+
+"------------------------------------------------------------------------------
 " misc
 "------------------------------------------------------------------------------
 " case insensitive search
