@@ -161,9 +161,6 @@ case $OSTYPE in
     # Java
     export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home/
 
-    # Not to be disturbed by Ctrl-S Ctrl-Q in terminals
-    stty -ixon
-
     # Docker stuffs
     eval "$(docker-machine env default)"
     alias dip='docker-machine ip default'
@@ -205,6 +202,10 @@ bindkey -M vicmd 'j' history-substring-search-down
 
 # Delay after <ESC> press in milisec (defaul = 4)
 export KEYTIMEOUT=2
+
+# Not to be disturbed by Ctrl-S Ctrl-Q in terminals
+stty -ixon
+
 
 # chruby
 source /usr/local/share/chruby/chruby.sh
