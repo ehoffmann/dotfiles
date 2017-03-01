@@ -147,7 +147,7 @@ ssha;
 # -----------------------------------------------------------------------------
 # zsh plugins
 # -----------------------------------------------------------------------------
-plugins=(git npm vagrant rails vi-mode history-substring-search)
+plugins=(git npm vagrant rails vi-mode history-substring-search zsh-syntax-highlighting)
 
 # -----------------------------------------------------------------------------
 # OSX specific
@@ -204,6 +204,10 @@ bindkey '^O' insert-last-word
 # bind k and j for VI mode
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
+
+# with up or down key
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
 
 # Delay after <ESC> press in milisec (defaul = 4)
 export KEYTIMEOUT=2
