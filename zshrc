@@ -36,6 +36,11 @@ alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold b
 alias vagrash='vagrant up && vagrant ssh'
 
 # -----------------------------------------------------------------------------
+# Spelling
+# -----------------------------------------------------------------------------
+alias tmxu=tmux
+
+# -----------------------------------------------------------------------------
 # Docker
 # -----------------------------------------------------------------------------
 alias dco='docker-compose'
@@ -205,7 +210,6 @@ export KEYTIMEOUT=2
 
 # Not to be disturbed by Ctrl-S Ctrl-Q in terminals
 stty -ixon
-
 
 # chruby
 source /usr/local/share/chruby/chruby.sh
