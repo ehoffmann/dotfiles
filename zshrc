@@ -184,6 +184,9 @@ source $ZSH/oh-my-zsh.sh
 alias -g gpi='| grep -i'
 alias mto='curl -4 http://wttr.in/Marseille'
 
+# remove vim swap file, with confirmation
+alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
+
 export PATH=/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 export PATH=/usr/local/sbin:$PATH
 export EDITOR=vim
