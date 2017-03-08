@@ -98,10 +98,11 @@ dcdbreset_dev() {
   docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
 }
 
-db_shell_mysql() {
+tco_mysql() {
+  rails_env=${1:-development}
   docker-compose start mysql
   container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
-  docker exec -ti $container mysql -uroot -pfoo tco_development
+  docker exec -ti $container mysql -uroot -pfoo tco_$rails_env
 }
 
 db_shell() {
