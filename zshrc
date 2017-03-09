@@ -222,3 +222,6 @@ stty -ixon
 # chruby
 source /usr/local/share/chruby/chruby.sh
 chruby 2.3.1
+
+# tmuxinator completion
+source ~/.bin/tmuxinator.zsh
