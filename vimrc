@@ -235,7 +235,7 @@ if filereadable(".vim.custom")
 endif
 
 " Rails project gf goodness
-set path+=./app/services;
+set path+=lib/**
 
 " Global ignore
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/Cache/*
