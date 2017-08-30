@@ -82,8 +82,14 @@ dcguard_xfvb() {
 }
 
 dcmigrate_all() {
+  #docker-compose run --rm web bundle exec rake db:migrate
+  #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
+  dcmigrate_dev
+  dcmigrate_test
+}
+
+dcmigrate_dev() {
   docker-compose run --rm web bundle exec rake db:migrate
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
 }
 
 dcmigrate_test() {
@@ -105,15 +111,36 @@ tco_mysql() {
   docker exec -ti $container mysql -uroot -pfoo tco_$rails_env
 }
 
+db_catalog() {
+  rails_env=${1:-development}
+  docker-compose start postgresql
+  container=$(docker-compose ps postgresql | grep Up | awk  '{print $1}')
+  docker exec -ti $container psql -U postgres catalog_$rails_env
+}
+
 db_shell() {
   docker-compose start db
   container=$(docker-compose ps db | grep Up | awk  '{print $1}')
   docker exec -ti $container psql -U postgres -W postgres
 }
 
-dcdb_mysqldump() {
-  docker-compose start mysql
-  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+# reload with gunzip < outputfile.sql.gz | mysql < mysql options>
+tz_dump() {
+  branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
+  file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
+  db_dump mysql teezily_dev | gzip > $file_path
+  echo "Dump OK -> $file_path"
+}
+
+db_dump() {
+  docker-compose start $1
+  container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
+  docker exec -ti $container mysqldump -uroot -pfoo $2
+}
+
+keep_db_dump() {
+  docker-compose start $1
+  container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump -uroot -pfoo tco_development
 }
 
