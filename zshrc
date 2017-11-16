@@ -29,6 +29,7 @@ alias rubytag='ctags -R --languages=ruby --exclude=.git --exclude=log .'
 alias gloo='git --no-pager log --oneline --decorate --color | head '
 alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
 alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
+alias git-clean-branch='git branch --merged | egrep -v "(^\*|master|staging)" | xargs git branch -d'
 
 # -----------------------------------------------------------------------------
 # Vagrant
@@ -50,8 +51,15 @@ de() {
   docker exec -ti $1 bash
 }
 
+# Remove untaged images
 drmi() {
   docker rmi $(docker images | grep '^<none>' | awk '{print $3}')
+}
+
+# Remove all docker containers and images
+drmall() {
+  docker rm $(docker ps -a -q)
+  docker rmi $(docker images -q)
 }
 
 dcr() {
@@ -124,7 +132,6 @@ db_shell() {
   docker exec -ti $container psql -U postgres -W postgres
 }
 
-# reload with gunzip < outputfile.sql.gz | mysql < mysql options>
 tz_dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
@@ -214,6 +221,7 @@ alias mto='curl -4 http://wttr.in/Marseille'
 
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
+alias deschedule="sed -i 's/^\([^#]\)/#\1/g' config/schedule.rb"
 
 export PATH=/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 export PATH=/usr/local/sbin:$PATH
