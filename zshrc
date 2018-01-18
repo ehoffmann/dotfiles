@@ -105,7 +105,7 @@ dcmigrate_test() {
 }
 
 dcdbreset_test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:schema:load
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
 }
 
 dcdbreset_dev() {
