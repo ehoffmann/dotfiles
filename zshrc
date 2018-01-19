@@ -167,8 +167,16 @@ dcdb_load_tco_dev() {
 # linters
 # -----------------------------------------------------------------------------
 
+rubo() {
+  git diff --name-only | grep '.rb$' | xargs -r rubocop
+}
+
 rubs() {
   git diff --name-only --cached | grep '.rb$' | xargs -r rubocop
+}
+
+rubc() {
+  git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop
 }
 # -----------------------------------------------------------------------------
 # ssh and forward auto
