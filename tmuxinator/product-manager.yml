@@ -1,0 +1,14 @@
+# ~/.tmuxinator/product-manager.yml
+
+name: product-manager
+root: ~/teezily/product-manager
+
+pre: rm -f log/development.log && rm -f log/test.log
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
+        - tig
+  - guard: dcguard

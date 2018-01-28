@@ -1,0 +1,16 @@
+# ~/.tmuxinator/tee_analytics.yml
+
+name: tee_analytics
+root: ~/teezily/tee_analytics
+
+# Runs before everything. Use it to start daemons etc.
+pre: rm -f log/development.log && rm -f log/test.log
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
+        -
+  - guard: dcguard
