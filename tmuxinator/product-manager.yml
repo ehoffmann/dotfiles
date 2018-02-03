@@ -10,5 +10,9 @@ windows:
       panes:
         - vim
         -
-        - tig
-  - guard: dcguard
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        - yes | dco rm
+        -
