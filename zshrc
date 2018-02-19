@@ -90,8 +90,6 @@ dcguard_xfvb() {
 }
 
 dcmigrate_all() {
-  #docker-compose run --rm web bundle exec rake db:migrate
-  #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
   dcmigrate_dev
   dcmigrate_test
 }
