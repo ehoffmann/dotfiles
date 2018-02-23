@@ -1,0 +1,14 @@
+# ~/.tmuxinator/aliproxyclient.yml
+
+name: AliProxyClient
+root: ~/teezily/AliProxyClient
+
+pre: rm -f log/development.log && rm -f log/test.log
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
+        - tig
