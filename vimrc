@@ -31,6 +31,7 @@ Plugin 'vim-scripts/applescript.vim'
 Plugin 'wavded/vim-stylus'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'vim-airline/vim-airline'
+Plugin 'jamessan/vim-gnupg'
 
 " allow you to navigate seamlessly between vim and tmux splits
 Plugin 'christoomey/vim-tmux-navigator'
