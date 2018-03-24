@@ -165,17 +165,25 @@ dcdb_load_tco_dev() {
 # linters
 # -----------------------------------------------------------------------------
 
+# Inspect current diff or from $1 commit earlier
 rubo() {
-  git diff --name-only | grep '.rb$' | xargs -r rubocop
+  if [ -n "$1" ]
+    git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 | xargs -r rubocop --rails
+    #git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 
+  then
+    git diff --name-only | grep '.rb$' | xargs -r rubocop --rails
+  else
+  fi
 }
 
 rubs() {
-  git diff --name-only --cached | grep '.rb$' | xargs -r rubocop
+  git diff --name-only --cached | grep '.rb$' | xargs -r rubocop --rails
 }
 
 rubc() {
-  git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop
+  git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop --rails
 }
+
 # -----------------------------------------------------------------------------
 # ssh and forward auto
 # -----------------------------------------------------------------------------
