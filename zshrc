@@ -169,15 +169,14 @@ dcdb_load_tco_dev() {
 rubo() {
   if [ -n "$1" ]
     git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 | xargs -r rubocop --rails
-    #git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 
   then
-    git diff --name-only | grep '.rb$' | xargs -r rubocop --rails
+    git diff --name-only --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
   else
   fi
 }
 
 rubs() {
-  git diff --name-only --cached | grep '.rb$' | xargs -r rubocop --rails
+  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
 }
 
 rubc() {
