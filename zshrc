@@ -102,8 +102,18 @@ dcmigrate_test() {
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
 }
 
+dcrollback_dev() {
+  docker-compose run --rm web bundle exec rake db:rollback
+}
+
+dcrollback_test() {
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:rollback
+}
+
 dcdbreset_test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
+  #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set
+  #bin/rails db:environment:set RAILS_ENV=test
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set db:drop db:create db:schema:load
 }
 
 dcdbreset_dev() {
@@ -130,6 +140,8 @@ db_shell() {
   docker exec -ti $container psql -U postgres -W postgres
 }
 
+# load with
+# zcat ../../dumps/teezily-04_23_2018_08_41_11-staging.sql.gz | docker exec -i teezily_mysql_1 mysql teezily_dev -uroot -pfoo
 tz_dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
@@ -169,6 +181,7 @@ dcdb_load_tco_dev() {
 rubo() {
   if [ -n "$1" ]
     git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 | xargs -r rubocop --rails
+    #git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 
   then
     git diff --name-only --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
   else

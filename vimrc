@@ -9,7 +9,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'MarcWeber/vim-addon-mw-utils'
 Plugin 'digitaltoad/vim-jade'
 Plugin 'ehoffmann/smarty-syntax'
-Plugin 'fatih/vim-go'
+"Plugin 'fatih/vim-go'
 Plugin 'garbas/vim-snipmate'
 Plugin 'godlygeek/tabular'
 Plugin 'honza/vim-snippets'
@@ -26,18 +26,20 @@ Plugin 'tpope/vim-rails.git'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-abolish'
+Plugin 'tpope/vim-haml'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'vim-scripts/applescript.vim'
 Plugin 'wavded/vim-stylus'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'morhetz/gruvbox'
 Plugin 'vim-airline/vim-airline'
 Plugin 'jamessan/vim-gnupg'
-
-" allow you to navigate seamlessly between vim and tmux splits
+" Navigate seamlessly between vim and tmux splits
 Plugin 'christoomey/vim-tmux-navigator'
-
 " Simplifies the transition between multiline and single-line code
 Plugin 'andrewradev/splitjoin.vim'
+" Toggle ruby block with <Leader>b
+Plugin 'jgdavey/vim-blockle'
 
 call vundle#end()
 
@@ -64,14 +66,14 @@ set backspace=indent,eol,start    " backspace through everything in insert mode
 "colo summerfruit256
 "let g:solarized_termcolors=256
 "set background=light
-set background=dark
-colorscheme solarized
-
+"set background=dark
+"colorscheme solarized
+colorscheme gruvbox
 " Better comments for molokai theme
 ":hi Comment guifg=#708090
 
-" Highlight col 81 and onward
-let &colorcolumn=join(range(81,999),",")
+" Highlight col 101 and onward
+let &colorcolumn=join(range(101,999),",")
 highlight ColorColumn ctermbg=0 guibg=#2c2d27
 
 " highlight tabs and trailing spaces
@@ -120,6 +122,18 @@ vnoremap // y/<C-R>"<CR>
 
 " Type "visual" yourself!
 nnoremap Q <Nop>
+
+" Ruby 1.9 hash
+nmap <leader>h :s/:\([^ ]*\)\(\s*\)=>/\1:/g<cr>
+
+" Hash convert "id"=>"1" to id: "1"
+nmap <leader>hh :s/["']\(\w*\)["']\(\s*\)=>\s*/\1: /g<cr>
+
+" Swap " for '
+nmap <leader>q :s/"/'/g<cr>
+
+" Normalize space between curly (depends on Surround.vim)
+nmap <leader>cr cs{}cs}{
 
 "------------------------------------------------------------------------------
 " Navigation

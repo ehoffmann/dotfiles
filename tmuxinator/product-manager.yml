@@ -3,7 +3,7 @@
 name: product-manager
 root: ~/teezily/product-manager
 
-pre: rm -f log/development.log && rm -f log/test.log
+pre: rm -f log/development.log && rm -f log/test.log && rm -f log/newrelic_agent.log && rm -f core
 windows:
   - main:
       layout: main-horizontal
