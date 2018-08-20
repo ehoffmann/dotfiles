@@ -4,7 +4,7 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="granutark"
+ZSH_THEME="ehoffmann"
 
 # zsh builtin
 autoload -U zmv
@@ -113,11 +113,13 @@ dcrollback_test() {
 dcdbreset_test() {
   #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set
   #bin/rails db:environment:set RAILS_ENV=test
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set db:drop db:create db:schema:load
+  #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set db:drop db:create db:schema:load
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
 }
 
 dcdbreset_dev() {
-  docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
+  echo "You don't want to do that"
+  #docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
 }
 
 tco_mysql() {
@@ -146,6 +148,15 @@ tz_dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
   db_dump mysql teezily_dev | gzip > $file_path
+  echo "Dump OK -> $file_path"
+}
+
+pm_dump() {
+  branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
+  file_path=/home/vagrant/dumps/pm-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
+  docker-compose start postgresql
+  container=$(docker-compose ps postgresql | grep Up | awk  '{print $1}')
+  docker exec -ti $container pg_dump -U postgres product_manager_development | gzip > $file_path
   echo "Dump OK -> $file_path"
 }
 
@@ -256,6 +267,8 @@ export PATH=/usr/local/go/bin:$PATH
 export GOPATH=~/go
 export PATH=$PATH:$GOPATH/bin
 export PATH=/usr/local/heroku/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/Users/manu/go/bin:/Users/manu/.ec2/bin:/usr/local/libxls/bin
+export PATH="/home/vagrant/.gem/ruby/2.5.0/bin:$PATH"
+export PATH=/usr/bin/vendor_perl:$PATH
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
@@ -281,8 +294,9 @@ export KEYTIMEOUT=2
 stty -ixon
 
 # chruby
-source /usr/local/share/chruby/chruby.sh
-chruby 2.3.1
+#source /usr/local/share/chruby/chruby.sh
+source /usr/share/chruby/chruby.sh
+chruby 2.5.1
 
 # tmuxinator completion
 source ~/.bin/tmuxinator.zsh
