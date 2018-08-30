@@ -1,0 +1,16 @@
+# ~/.tmuxinator/fulfillment.yml
+name: fulfillment
+root: ~/teezily/fulfillment
+on_project_start: rm -f log/development.log && rm -f log/test.log
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
