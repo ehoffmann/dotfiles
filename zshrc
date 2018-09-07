@@ -82,6 +82,11 @@ dcguard() {
   docker-compose run --rm web bundle exec guard
 }
 
+tzguard() {
+  # Disable guard interaction to get term input echo with binding.pry
+  docker-compose run --rm web bundle exec guard -i
+}
+
 dcguard_xfvb() {
   docker rm -f guard
   docker-compose run -d --rm --name guard web tail -f /dev/null
@@ -249,16 +254,25 @@ case $OSTYPE in
 esac
 
 # -----------------------------------------------------------------------------
+# Project related
+# -----------------------------------------------------------------------------
+alias deschedule="sed -i 's/^\([^#]\)/#\1/g' config/schedule.rb"
+alias tz="mux teezily"
+alias tza="mux tza"
+alias pm="mux pm"
+alias catalog="mux catalog"
+# in tz
+alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
+
+# -----------------------------------------------------------------------------
 # Misc
 # -----------------------------------------------------------------------------
 source $ZSH/oh-my-zsh.sh
-
 alias -g gpi='| grep -i'
 alias mto='curl -4 http://wttr.in/Marseille'
 
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
-alias deschedule="sed -i 's/^\([^#]\)/#\1/g' config/schedule.rb"
 
 export PATH=/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 export PATH=/usr/local/sbin:$PATH
@@ -294,7 +308,6 @@ export KEYTIMEOUT=2
 stty -ixon
 
 # chruby
-#source /usr/local/share/chruby/chruby.sh
 source /usr/share/chruby/chruby.sh
 chruby 2.5.1
 
