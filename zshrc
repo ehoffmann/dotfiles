@@ -66,8 +66,12 @@ dcr() {
   docker-compose run --rm web $@
 }
 
-railsc() {
+rb() {
   docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bundle exec rails c"
+}
+
+tza-rb() {
+docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web rails c
 }
 
 dcba() {
@@ -94,69 +98,75 @@ dcguard_xfvb() {
   docker exec -ti guard sh -c 'export DISPLAY=:99; bundle exec guard'
 }
 
-dcmigrate_all() {
+dcmigrate-all() {
   dcmigrate_dev
   dcmigrate_test
 }
 
-dcmigrate_dev() {
+dcmigrate-dev() {
   docker-compose run --rm web bundle exec rake db:migrate
 }
 
-dcmigrate_test() {
+dcmigrate-test() {
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
 }
 
-dcrollback_dev() {
+dcrollback-dev() {
   docker-compose run --rm web bundle exec rake db:rollback
 }
 
-dcrollback_test() {
+dcrollback-test() {
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:rollback
 }
 
-dcdbreset_test() {
+dcdbreset-test() {
   #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set
   #bin/rails db:environment:set RAILS_ENV=test
   #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set db:drop db:create db:schema:load
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
 }
 
-dcdbreset_dev() {
+dcdbreset-dev() {
   echo "You don't want to do that"
   #docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
 }
 
-tco_mysql() {
+tco-mysql() {
   rails_env=${1:-development}
   docker-compose start mysql
   container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
   docker exec -ti $container mysql -uroot -pfoo tco_$rails_env
 }
 
-db_catalog() {
+db-catalog() {
   rails_env=${1:-development}
   docker-compose start postgresql
   container=$(docker-compose ps postgresql | grep Up | awk  '{print $1}')
   docker exec -ti $container psql -U postgres catalog_$rails_env
 }
 
-db_shell() {
+pg-shell() {
   docker-compose start db
   container=$(docker-compose ps db | grep Up | awk  '{print $1}')
   docker exec -ti $container psql -U postgres -W postgres
 }
 
+tz-mysql-upgrade() {
+  docker-compose start mysql
+  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  docker exec -ti $container mysql_upgrade --user=root --password=foo
+}
+
 # load with
 # zcat ../../dumps/teezily-04_23_2018_08_41_11-staging.sql.gz | docker exec -i teezily_mysql_1 mysql teezily_dev -uroot -pfoo
-tz_dump() {
+tz-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
   db_dump mysql teezily_dev | gzip > $file_path
   echo "Dump OK -> $file_path"
 }
 
-pm_dump() {
+pm-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=/home/vagrant/dumps/pm-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
   docker-compose start postgresql
@@ -165,7 +175,7 @@ pm_dump() {
   echo "Dump OK -> $file_path"
 }
 
-db_dump() {
+db-dump() {
   docker-compose start $1
   container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump -uroot -pfoo $2
@@ -193,21 +203,22 @@ dcdb_load_tco_dev() {
 # linters
 # -----------------------------------------------------------------------------
 
-# Inspect current diff or from $1 commit earlier
+# Lint current diff or from $1 commit earlier
 rubo() {
   if [ -n "$1" ]
-    git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 | xargs -r rubocop --rails
-    #git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 
   then
-    git diff --name-only --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
+    git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 | xargs -r rubocop --rails
   else
+    git diff --name-only --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
   fi
 }
 
+# Lint cached
 rubs() {
   git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
 }
 
+# Not sure about the relevance of this one
 rubc() {
   git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop --rails
 }
@@ -261,8 +272,8 @@ alias tz="mux teezily"
 alias tza="mux tza"
 alias pm="mux pm"
 alias catalog="mux catalog"
-# in tz
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
+alias retake="sudo chown -R vagrant:vagrant db/migrate"
 
 # -----------------------------------------------------------------------------
 # Misc
