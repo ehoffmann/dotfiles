@@ -63,18 +63,24 @@ set backspace=indent,eol,start    " backspace through everything in insert mode
 "------------------------------------------------------------------------------
 " Color
 "------------------------------------------------------------------------------
+set termguicolors
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 "colo summerfruit256
 "let g:solarized_termcolors=256
 "set background=light
-"set background=dark
+set background=dark
 "colorscheme solarized
 colorscheme gruvbox
 " Better comments for molokai theme
 ":hi Comment guifg=#708090
 
 " Highlight col 101 and onward
-let &colorcolumn=join(range(101,999),",")
-highlight ColorColumn ctermbg=0 guibg=#2c2d27
+let &colorcolumn=join(range(101,6999),",")
+"highlight ColorColumn ctermbg=0 guibg=#2c2d27
+"highlight ColorColumn ctermbg=24 guibg=#2c2d27
+"let g:gruvbox_number_column='bg2'
+let g:gruvbox_color_column='bg3'
 
 " highlight tabs and trailing spaces
 set list listchars=tab:>-,trail:-
@@ -135,6 +141,10 @@ nmap <leader>q :s/"/'/g<cr>
 " Normalize space between curly (depends on Surround.vim)
 nmap <leader>cr cs{}cs}{
 
+" Copy current file path + line num in buffer
+"nmap cp :let @" = "https://github.com/teezily/" . expand('%:p:h:t') . "/tree/" . FugitiveHead() . "/" . expand("%") . "#L" . line(".")<cr>
+nmap cp :let @" = "https://github.com/teezily/" . systemlist("basename `git rev-parse --show-toplevel`")[0] . "/tree/" . FugitiveHead() . "/" . expand("%") . "#L" . line(".")<cr>
+
 "------------------------------------------------------------------------------
 " Navigation
 "------------------------------------------------------------------------------
@@ -166,7 +176,7 @@ autocmd Filetype javascript setlocal ts=4 sts=4 sw=4
 let g:ctrlp_cmd = 'CtrlPMixed'
 
 " Search by filename only by default
-" let g:ctrlp_by_filename = 1
+let g:ctrlp_by_filename = 1
 
 " Sane Ignore
 let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|coverage\|log\|tmp$',
@@ -175,8 +185,14 @@ let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|cover
 " Use git file searching
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 
-" Do not display MRU files from other directory
+" Do not display MRU files from other directory (above project root)
 let g:ctrlp_mruf_relative = 1
+
+" 'c' - the directory of the current file.
+" 'r' - the nearest ancestor that contains one of these directories or files: .git .hg .svn .bzr _darcs
+" 'a' - like c, but only if the current working directory outside of CtrlP is not a direct ancestor of the directory of the current file.
+"  0 or '' (empty string) - disable this feature.
+let g:ctrlp_working_path_mode = 'ra'
 
 "------------------------------------------------------------------------------
 " Ack
