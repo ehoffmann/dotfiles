@@ -87,8 +87,9 @@ dcguard() {
 }
 
 tzguard() {
-  # Disable guard interaction to get term input echo with binding.pry
-  docker-compose run --rm web bundle exec guard -i
+  # Mysql with tmpfs
+  # guard -i => get term input echo with binding.pry
+  docker-compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec guard -i"
 }
 
 dcguard_xfvb() {
@@ -108,7 +109,7 @@ dcmigrate-dev() {
 }
 
 dcmigrate-test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:migrate
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:test:prepare
 }
 
 dcrollback-dev() {
@@ -162,7 +163,7 @@ tz-mysql-upgrade() {
 tz-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
-  db_dump mysql teezily_dev | gzip > $file_path
+  db-dump mysql teezily_dev | gzip > $file_path
   echo "Dump OK -> $file_path"
 }
 
@@ -179,12 +180,6 @@ db-dump() {
   docker-compose start $1
   container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump -uroot -pfoo $2
-}
-
-keep_db_dump() {
-  docker-compose start $1
-  container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
-  docker exec -ti $container mysqldump -uroot -pfoo tco_development
 }
 
 dcdb_load_tco_dev() {
