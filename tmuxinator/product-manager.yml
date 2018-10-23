@@ -3,12 +3,12 @@
 name: product-manager
 root: ~/teezily/product-manager
 
-pre: rm -f log/development.log && rm -f log/test.log && rm -f log/newrelic_agent.log && rm -f core
+on_project_start: rm -f log/development.log && rm -f log/test.log && rm -f log/newrelic_agent.log && rm -f core
 windows:
   - main:
       layout: main-horizontal
       panes:
-        - vim
+        - sleep 1 && vim
         -
         -
   - guard:

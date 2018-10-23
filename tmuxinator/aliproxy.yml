@@ -3,7 +3,7 @@
 name: AliProxy
 root: ~/teezily/AliProxy
 
-pre: rm -f log/development.log && rm -f log/test.log
+on_project_start: rm -f log/development.log && rm -f log/test.log
 
 windows:
   - main:

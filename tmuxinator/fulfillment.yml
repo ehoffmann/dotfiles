@@ -6,7 +6,7 @@ windows:
   - main:
       layout: main-horizontal
       panes:
-        - vim
+        - sleep 1 && vim
         -
         -
   - guard:
