@@ -262,10 +262,11 @@ esac
 # -----------------------------------------------------------------------------
 # Project related
 # -----------------------------------------------------------------------------
-alias deschedule="sed -i 's/^\([^#]\)/#\1/g' config/schedule.rb"
+alias devops="mux devops"
 alias tz="mux teezily"
 alias tza="mux tza"
 alias pm="mux pm"
+alias ali="mux aliproxy"
 alias catalog="mux catalog"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R vagrant:vagrant db/migrate"
