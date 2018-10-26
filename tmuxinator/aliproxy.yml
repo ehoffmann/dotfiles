@@ -9,6 +9,11 @@ windows:
   - main:
       layout: main-horizontal
       panes:
-        - vim
+        - sleep 1 && vim
         -
         - tig
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
