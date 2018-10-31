@@ -34,7 +34,11 @@ windows:
   - main:
       layout: main-horizontal
       panes:
-        - vim
+        - sleep 1 && vim
         -
         - tig
-  - guard: dcguard
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
