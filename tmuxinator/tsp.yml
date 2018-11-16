@@ -1,0 +1,16 @@
+# ~/.tmuxinator/tshirt-previewer.yml
+name: Tshirt Previewer
+root: ~/teezily/tshirt-previewer
+on_project_start: rm -f log/development.log && rm -f log/test.log
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -

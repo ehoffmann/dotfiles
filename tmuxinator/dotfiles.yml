@@ -1,0 +1,10 @@
+# ~/.tmuxinator/dotfiles.yml
+name: dotfiles
+root: ~/dotfiles
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+        -
