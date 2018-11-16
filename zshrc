@@ -109,7 +109,7 @@ dcmigrate-dev() {
 }
 
 dcmigrate-test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:test:prepare
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set RAILS_ENV=test db:drop db:create db:test:prepare
 }
 
 dcrollback-dev() {
