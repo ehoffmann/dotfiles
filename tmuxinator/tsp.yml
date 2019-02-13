@@ -1,6 +1,6 @@
 # ~/.tmuxinator/tshirt-previewer.yml
 name: Tshirt Previewer
-root: ~/teezily/tshirt-previewer
+root: ~/code/tz/tshirt-previewer
 on_project_start: rm -f log/development.log && rm -f log/test.log
 windows:
   - main:

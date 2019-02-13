@@ -1,7 +1,7 @@
 # ~/.tmuxinator/product-manager.yml
 
 name: product-manager
-root: ~/teezily/product-manager
+root: ~/code/tz/product-manager
 
 on_project_start: rm -f log/development.log && rm -f log/test.log && rm -f log/newrelic_agent.log && rm -f core
 windows:

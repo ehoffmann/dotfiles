@@ -1,7 +1,7 @@
 # ~/.tmuxinator/catalog_client.yml
 
 name: catalog_client
-root: ~/teezily/catalog_client
+root: ~/code/tz/catalog_client
 
 # Optional tmux socket
 # socket_name: foo

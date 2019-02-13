@@ -1,7 +1,7 @@
 # ~/.tmuxinator/aliproxyclient.yml
 
 name: AliProxyClient
-root: ~/teezily/AliProxyClient
+root: ~/code/tz/AliProxyClient
 
 on_project_start: rm -f log/development.log && rm -f log/test.log
 

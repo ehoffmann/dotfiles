@@ -1,7 +1,7 @@
 # ~/.tmuxinator/tz_aeoon.yml
 
 name: tz_aeoon
-root: ~/teezily/TZ_AEOON
+root: ~/code/tz/TZ_AEOON
 
 # Optional tmux socket
 # socket_name: foo

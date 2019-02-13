@@ -1,6 +1,6 @@
 # ~/.tmuxinator/fulfillment.yml
 name: fulfillment
-root: ~/teezily/fulfillment
+root: ~/code/tz/fulfillment
 on_project_start: rm -f log/development.log && rm -f log/test.log
 windows:
   - main:

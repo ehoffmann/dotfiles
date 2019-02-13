@@ -1,7 +1,7 @@
 # ~/.tmuxinator/tco.yml
 
 name: tco
-root: ~/teezily/tco
+root: ~/code/tz/tco
 
 # Optional tmux socket
 # socket_name: foo
@@ -37,4 +37,4 @@ windows:
         - vim
         -
         - tig
-  - guard: dcguard
+  - guard:

@@ -1,7 +1,7 @@
 # ~/.tmuxinator/devops.yml
 
 name: devops
-root: ~/teezily/devops
+root: ~/code/tz/devops
 
 # Optional tmux socket
 # socket_name: foo
