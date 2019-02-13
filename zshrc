@@ -1,5 +1,7 @@
 ZSH=$HOME/.oh-my-zsh
 
+TERM=xterm-256color
+
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
@@ -265,11 +267,12 @@ esac
 alias devops="mux devops"
 alias tz="mux teezily"
 alias tza="mux tza"
-alias pm="mux pm"
+alias pm="mux product-manager"
 alias dot="mux dotfiles"
 alias ali="mux aliproxy"
 alias ful="mux fulfillment"
 alias catalog="mux catalog"
+alias tco= "mux tco"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R vagrant:vagrant db/migrate"
 
@@ -317,7 +320,7 @@ export KEYTIMEOUT=2
 stty -ixon
 
 # chruby
-source /usr/share/chruby/chruby.sh
+source /usr/local/share/chruby/chruby.sh
 chruby 2.5.1
 
 # tmuxinator completion
