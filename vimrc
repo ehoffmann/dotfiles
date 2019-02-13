@@ -63,9 +63,10 @@ set backspace=indent,eol,start    " backspace through everything in insert mode
 "------------------------------------------------------------------------------
 " Color
 "------------------------------------------------------------------------------
-set termguicolors
-let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+"set termguicolors
+"let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+"let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
 "colo summerfruit256
 "let g:solarized_termcolors=256
 "set background=light
@@ -79,7 +80,7 @@ colorscheme gruvbox
 let &colorcolumn=join(range(101,6999),",")
 "highlight ColorColumn ctermbg=0 guibg=#2c2d27
 "highlight ColorColumn ctermbg=24 guibg=#2c2d27
-"let g:gruvbox_number_column='bg2'
+let g:gruvbox_number_column='bg2'
 let g:gruvbox_color_column='bg3'
 
 " highlight tabs and trailing spaces
