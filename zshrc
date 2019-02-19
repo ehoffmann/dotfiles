@@ -273,6 +273,7 @@ alias ali="mux aliproxy"
 alias ful="mux fulfillment"
 alias catalog="mux catalog"
 alias tco= "mux tco"
+alias kb="mux kb"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R vagrant:vagrant db/migrate"
 
@@ -301,6 +302,15 @@ export LC_ALL=en_US.UTF-8
 # Vi mode
 set -o vi
 bindkey -v
+bindkey -M viins 'jk' vi-cmd-mode # require KEYTIMEOUT >= 10
+
+function zle-line-init zle-keymap-select {
+    RPS1="${${KEYMAP/vicmd/[CMD]}/(main|viins)/}"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
 
 # cycle through arg history
 bindkey '^O' insert-last-word
@@ -314,7 +324,7 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # Delay after <ESC> press in milisec (defaul = 4)
-export KEYTIMEOUT=2
+export KEYTIMEOUT=10
 
 # Not to be disturbed by Ctrl-S Ctrl-Q in terminals
 stty -ixon
