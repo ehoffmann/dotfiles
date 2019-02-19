@@ -1,0 +1,18 @@
+# ~/.tmuxinator/kb.yml
+
+name: kb
+root: ~/work
+
+#on_project_start:
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+        -
+  - prod:
+      layout: even-vertical
+      panes:
+        -
+        -
