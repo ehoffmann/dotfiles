@@ -22,6 +22,7 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'tomtom/tlib_vim'
 Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-rhubarb'
 Plugin 'tpope/vim-rails.git'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
@@ -63,15 +64,16 @@ set backspace=indent,eol,start    " backspace through everything in insert mode
 "------------------------------------------------------------------------------
 " Color
 "------------------------------------------------------------------------------
-"set termguicolors
-"let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-"let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
+" Tmux background bug
+set t_ut=
 
-"colo summerfruit256
-"let g:solarized_termcolors=256
-"set background=light
 set background=dark
-"colorscheme solarized
+let g:gruvbox_italic=1
 colorscheme gruvbox
 " Better comments for molokai theme
 ":hi Comment guifg=#708090
@@ -231,20 +233,48 @@ autocmd Filetype rust imap <C-s> <ESC>:update<CR>:! cargo run<CR>
 " Rails-vim
 "------------------------------------------------------------------------------
 let g:rails_projections = {
-      \    "app/services/*_service.rb": {
-      \      "command": "service",
-      \      "template":
-      \        ["module {camelcase|capitalize|dirname}",
-      \         "  class {camelcase|capitalize|basename}Service",
-      \         "    def call",
-      \         "    end",
-      \         "  end",
-      \         "end"],
-      \      "test": [
-      \        "spec/services/{}_service_spec.rb"
-      \      ]
-      \     }
-      \ }
+      \  "app/services/*_service.rb": {
+      \    "command": "service",
+      \    "template":
+      \      ["module {camelcase|capitalize|dirname}",
+      \       "  class {camelcase|capitalize|basename}Service",
+      \       "    def call",
+      \       "    end",
+      \       "  end",
+      \       "end"],
+      \    "test": [
+      \      "spec/services/{}_service_spec.rb"
+      \    ]
+      \  },
+      \  "app/controllers/*_controller.rb": {
+      \    "test": [
+      \      "spec/requests/{}_spec.rb",
+      \      "spec/requests/{}/index_spec.rb",
+      \      "spec/requests/{}/create_spec.rb",
+      \      "spec/requests/{}/update_spec.rb",
+      \      "spec/requests/{}/update_published.rb",
+      \      "spec/requests/{}/delete_spec.rb",
+      \    ]
+      \  },
+      \  "spec/requests/*_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
+      \  "spec/requests/*/index_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
+      \  "spec/requests/*/create_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
+      \  "spec/requests/*/update_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
+      \  "spec/requests/*/update_published_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
+      \  "spec/requests/*/delete_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
+      \}
 
 "------------------------------------------------------------------------------
 " vim-airline
