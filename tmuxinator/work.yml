@@ -1,6 +1,6 @@
-# ~/.tmuxinator/kb.yml
+# ~/.tmuxinator/work.yml
 
-name: kb
+name: work
 root: ~/work
 
 #on_project_start:
