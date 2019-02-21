@@ -1,6 +1,7 @@
 ZSH=$HOME/.oh-my-zsh
 
-TERM=xterm-256color
+export TERM=xterm-256color
+#export TERM=screen-256color-bce
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -39,9 +40,9 @@ alias git-clean-branch='git branch --merged | egrep -v "(^\*|master|staging)" | 
 alias vagrash='vagrant up && vagrant ssh'
 
 # -----------------------------------------------------------------------------
-# Spelling
+# TMUX
 # -----------------------------------------------------------------------------
-alias tmxu=tmux
+alias tmxu='tmux'
 
 # -----------------------------------------------------------------------------
 # Docker
@@ -273,9 +274,9 @@ alias ali="mux aliproxy"
 alias ful="mux fulfillment"
 alias catalog="mux catalog"
 alias tco= "mux tco"
-alias kb="mux kb"
+alias wk="mux work"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
-alias retake="sudo chown -R vagrant:vagrant db/migrate"
+alias retake="sudo chown -R manu:manu db/migrate"
 
 # -----------------------------------------------------------------------------
 # Misc
@@ -304,8 +305,9 @@ set -o vi
 bindkey -v
 bindkey -M viins 'jk' vi-cmd-mode # require KEYTIMEOUT >= 10
 
+# !! override theme
 function zle-line-init zle-keymap-select {
-    RPS1="${${KEYMAP/vicmd/[CMD]}/(main|viins)/}"
+    RPS1="$(git_prompt_info) ${${KEYMAP/vicmd/[CMD]}/(main|viins)/}"
     RPS2=$RPS1
     zle reset-prompt
 }
@@ -335,3 +337,6 @@ chruby 2.5.1
 
 # tmuxinator completion
 source ~/.bin/tmuxinator.zsh
+
+#source ~/code/gruvbox/gruvbox_256palette.sh
+source ~/code/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
