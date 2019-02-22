@@ -1,0 +1,13 @@
+# ~/.tmuxinator/prod.yml
+
+name: prod
+root: ~/code/tz
+
+windows:
+  - main:
+      layout: tiled
+      panes:
+        - catalog-prod
+        - pm-prod
+        - ful-prod
+        - ali-prod
