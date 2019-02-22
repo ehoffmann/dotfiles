@@ -251,6 +251,7 @@ let g:rails_projections = {
       \      "spec/requests/{}_spec.rb",
       \      "spec/requests/{}/index_spec.rb",
       \      "spec/requests/{}/create_spec.rb",
+      \      "spec/requests/{}/show.rb",
       \      "spec/requests/{}/update_spec.rb",
       \      "spec/requests/{}/update_published.rb",
       \      "spec/requests/{}/delete_spec.rb",
@@ -265,13 +266,16 @@ let g:rails_projections = {
       \  "spec/requests/*/create_spec.rb": {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
+      \  "spec/requests/*/show_spec.rb": {
+      \    "alternate": "app/controllers/{}_controller.rb",
+      \  },
       \  "spec/requests/*/update_spec.rb": {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
       \  "spec/requests/*/update_published_spec.rb": {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
-      \  "spec/requests/*/delete_spec.rb": {
+      \  "spec/requests/*/destroy_spec.rb": {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
       \}
