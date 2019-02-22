@@ -303,6 +303,7 @@ alias ful="mux fulfillment"
 alias catalog="mux catalog"
 alias tco= "mux tco"
 alias wk="mux work"
+alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R manu:manu db/migrate"
 
