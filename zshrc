@@ -50,6 +50,34 @@ alias tmxu='tmux'
 alias dco='docker-compose'
 alias drm='docker rm $(docker ps -a -q)'
 
+# -----------------------------------------------------------------------------
+# Prod rails console (k8s)
+# -----------------------------------------------------------------------------
+catalog-prod() {
+  rails-k8s catalog-prod
+}
+
+pm-prod() {
+  rails-k8s product-manager-prod
+}
+
+ful-prod() {
+  rails-k8s fulfillment-prod
+}
+
+ali-prod() {
+  rails-k8s aliproxy-prod
+}
+
+tco-prod() {
+  rails-k8s tco-prod
+}
+
+rails-k8s() {
+  host=$(cat ~/.prod-k8s)
+  ssh -t $host "kubectl -n $1 get pods | grep toolbox | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} rails c"
+}
+
 de() {
   docker exec -ti $1 bash
 }
