@@ -51,31 +51,63 @@ alias dco='docker-compose'
 alias drm='docker rm $(docker ps -a -q)'
 
 # -----------------------------------------------------------------------------
+# Staging rails console (k8s)
+# -----------------------------------------------------------------------------
+catalog-staging() {
+  _k8s "catalog-staging" "worker" "rails c"
+}
+
+pm-staging() {
+  _k8s "catalog-staging" "worker" "rails c"
+}
+
+ali-staging() {
+  _k8s "aliproxy-staging" "worker" "rails c"
+}
+
+# -----------------------------------------------------------------------------
 # Prod rails console (k8s)
 # -----------------------------------------------------------------------------
 catalog-prod() {
-  rails-k8s catalog-prod
+  _k8s "catalog-prod" "toolbox" "rails c"
 }
 
 pm-prod() {
-  rails-k8s product-manager-prod
+  _k8s "product-manager-prod" "toolbox" "rails c"
+}
+
+pm-prod-bash() {
+  _k8s "product-manager-prod" "toolbox" "bash"
 }
 
 ful-prod() {
-  rails-k8s fulfillment-prod
+  _k8s "fulfillment-prod" "worker" "rails c"
 }
 
 ali-prod() {
-  rails-k8s aliproxy-prod
+  _k8s "aliproxy-prod" "toolbox" "rails c"
 }
 
 tco-prod() {
-  rails-k8s tco-prod
+  _k8s "tco-prod" "toolbox" "rails c"
 }
 
-rails-k8s() {
+# -----------------------------------------------------------------------------
+# k8s tools
+# -----------------------------------------------------------------------------
+#rails-k8s() {
+  #host=$(cat ~/.prod-k8s)
+  #ssh -t $host "kubectl -n $1 get pods | grep toolbox | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} rails c"
+#}
+
+# bash-k8s() {
+  #host=$(cat ~/.prod-k8s)
+  #ssh -t $host "kubectl -n $1 get pods | grep toolbox | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} bash"
+#}
+
+_k8s() {
   host=$(cat ~/.prod-k8s)
-  ssh -t $host "kubectl -n $1 get pods | grep toolbox | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} rails c"
+  ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
 }
 
 de() {
@@ -313,6 +345,7 @@ alias retake="sudo chown -R manu:manu db/migrate"
 source $ZSH/oh-my-zsh.sh
 alias -g gpi='| grep -i'
 alias mto='curl -4 http://wttr.in/Marseille'
+alias postman=~/bin/Postman
 
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
