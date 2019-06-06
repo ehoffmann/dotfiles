@@ -58,7 +58,7 @@ catalog-staging() {
 }
 
 pm-staging() {
-  _k8s "catalog-staging" "worker" "rails c"
+  _k8s "product-manager-staging" "web" "rails c"
 }
 
 ali-staging() {
@@ -90,6 +90,10 @@ ali-prod() {
 
 tco-prod() {
   _k8s "tco-prod" "toolbox" "rails c"
+}
+
+tco-bash() {
+  _k8s "tco-prod" "toolbox" "bash"
 }
 
 # -----------------------------------------------------------------------------
@@ -222,10 +226,11 @@ tz-mysql-upgrade() {
 }
 
 # load with
+# rake db:create
 # zcat ../../dumps/teezily-04_23_2018_08_41_11-staging.sql.gz | docker exec -i teezily_mysql_1 mysql teezily_dev -uroot -pfoo
 tz-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
-  file_path=/home/vagrant/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
+  file_path=~/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
   db-dump mysql teezily_dev | gzip > $file_path
   echo "Dump OK -> $file_path"
 }
@@ -333,6 +338,7 @@ alias dot="mux dotfiles"
 alias ali="mux aliproxy"
 alias ful="mux fulfillment"
 alias catalog="mux catalog"
+alias catalogc="mux catalog_client"
 alias tco= "mux tco"
 alias wk="mux work"
 alias prod="mux prod"
@@ -397,7 +403,7 @@ stty -ixon
 source /usr/local/share/chruby/chruby.sh
 chruby 2.5.1
 
-# tmuxinator completion
+# tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
 
 #source ~/code/gruvbox/gruvbox_256palette.sh
