@@ -41,7 +41,8 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'andrewradev/splitjoin.vim'
 " Toggle ruby block with <Leader>b
 Plugin 'jgdavey/vim-blockle'
-
+" Perform an interactive diff on two blocks of text 
+Plugin 'AndrewRadev/linediff.vim'
 call vundle#end()
 
 filetype plugin indent on     " required!
@@ -69,10 +70,12 @@ if exists('+termguicolors')
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
 endif
+
 " Tmux background bug
 set t_ut=
 
-set background=dark
+"set background=dark
+set background=light
 let g:gruvbox_italic=1
 colorscheme gruvbox
 " Better comments for molokai theme
@@ -111,7 +114,7 @@ nnoremap <leader>gs :Gstatus<CR>
 nmap <SPACE> :
 
 " Clean dirty file
-nnoremap <F10> :retab<CR>:%s/\s*$//<CR>
+nnoremap <F9> :retab<CR>:%s/\s*$//<CR>
 
 " F11 switch to cp1252 encoding
 nnoremap <F11> :e ++enc=cp1252<CR>
@@ -132,7 +135,7 @@ vnoremap // y/<C-R>"<CR>
 " Type "visual" yourself!
 nnoremap Q <Nop>
 
-" Ruby 1.9 hash
+" Ruby 1.9 hash: convert from `':test' => 123` to `test: 123`
 nmap <leader>h :s/:\([^ ]*\)\(\s*\)=>/\1:/g<cr>
 
 " Hash convert "id"=>"1" to id: "1"
@@ -179,7 +182,7 @@ autocmd Filetype javascript setlocal ts=4 sts=4 sw=4
 let g:ctrlp_cmd = 'CtrlPMixed'
 
 " Search by filename only by default
-let g:ctrlp_by_filename = 1
+" let g:ctrlp_by_filename = 1
 
 " Sane Ignore
 let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|coverage\|log\|tmp$',
