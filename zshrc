@@ -84,6 +84,10 @@ ful-prod() {
   _k8s "fulfillment-prod" "worker" "rails c"
 }
 
+ful-staging() {
+  _k8s "fulfillment-staging" "toolbox" "rails c"
+}
+
 ali-prod() {
   _k8s "aliproxy-prod" "toolbox" "rails c"
 }
