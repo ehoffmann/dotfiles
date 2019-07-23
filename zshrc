@@ -49,6 +49,7 @@ alias tmxu='tmux'
 # -----------------------------------------------------------------------------
 alias dco='docker-compose'
 alias drm='docker rm $(docker ps -a -q)'
+alias dsc='docker stop $(docker ps -q)'
 
 # -----------------------------------------------------------------------------
 # Staging rails console (k8s)
@@ -239,9 +240,12 @@ tz-dump() {
   echo "Dump OK -> $file_path"
 }
 
+# load with
+# rake db:create
+# zcat ../../../dumps/pm-07_03_2019_17_18_53-feat_bullet.sql.gz | docker exec -i product-manager_postgresql_1 psql product_manager_development -Upostgres -W foo                                                                │
 pm-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
-  file_path=/home/vagrant/dumps/pm-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
+  file_path=/home/manu/dumps/pm-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
   docker-compose start postgresql
   container=$(docker-compose ps postgresql | grep Up | awk  '{print $1}')
   docker exec -ti $container pg_dump -U postgres product_manager_development | gzip > $file_path
