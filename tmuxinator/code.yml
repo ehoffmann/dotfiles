@@ -1,0 +1,11 @@
+# ~/.tmuxinator/code.yml
+
+name: code
+root: ~/code
+
+on_project_start: ls
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        -

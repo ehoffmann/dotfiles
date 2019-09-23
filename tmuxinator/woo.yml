@@ -1,0 +1,13 @@
+# ~/.tmuxinator/woo.yml
+
+name: woo
+root: ~/code/tz/woocommerce-dockerfile
+
+#on_project_start: rm -f log/development.log && rm -f log/test.log
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+        -

@@ -138,8 +138,11 @@ nnoremap Q <Nop>
 " Ruby 1.9 hash: convert from `':test' => 123` to `test: 123`
 nmap <leader>h :s/:\([^ ]*\)\(\s*\)=>/\1:/g<cr>
 
-" Hash convert "id"=>"1" to id: "1"
+" Rocket to Hash convert "id"=>"1" to id: "1"
 nmap <leader>hh :s/["']\(\w*\)["']\(\s*\)=>\s*/\1: /g<cr>
+
+" Hash to Rocket id: "1" to "id" => "1"
+nmap <leader>hr :s/\(\w*\):\s*/'\1' => /<cr>
 
 " Swap " for '
 nmap <leader>q :s/"/'/g<cr>

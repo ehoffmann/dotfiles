@@ -66,9 +66,18 @@ ali-staging() {
   _k8s "aliproxy-staging" "worker" "rails c"
 }
 
+t4b-staging() {
+  _k8s "t4b-staging" "worker" "rails c"
+}
+
 # -----------------------------------------------------------------------------
 # Prod rails console (k8s)
 # -----------------------------------------------------------------------------
+
+tz-prod() {
+  _k8s "teezily-prod" "toolbox" "bash"
+}
+
 catalog-prod() {
   _k8s "catalog-prod" "toolbox" "rails c"
 }
@@ -99,6 +108,10 @@ tco-prod() {
 
 tco-bash() {
   _k8s "tco-prod" "toolbox" "bash"
+}
+
+t4b-prod() {
+  _k8s "t4b-prod" "toolbox" "rails c"
 }
 
 # -----------------------------------------------------------------------------
@@ -182,6 +195,10 @@ dcmigrate-dev() {
 
 dcmigrate-test() {
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set RAILS_ENV=test db:drop db:create db:test:prepare
+}
+
+dcmigrate-test-noset() {
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake RAILS_ENV=test db:drop db:create db:test:prepare
 }
 
 dcrollback-dev() {
@@ -289,6 +306,10 @@ rubs() {
   git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
 }
 
+rubsa() {
+  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails --auto-correct
+}
+
 # Not sure about the relevance of this one
 rubc() {
   git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop --rails
@@ -309,33 +330,6 @@ ssha;
 plugins=(git npm vagrant rails vi-mode history-substring-search zsh-syntax-highlighting)
 
 # -----------------------------------------------------------------------------
-# OSX specific
-# -----------------------------------------------------------------------------
-case $OSTYPE in
-  darwin*)
-    plugins+=(osx brew)
-
-    # EC2 stuffs
-    export EC2_HOME=~/.ec2
-    export PATH=$PATH:$EC2_HOME/bin
-    export EC2_PRIVATE_KEY=`ls $EC2_HOME/pk-*.pem`
-    export EC2_CERT=`ls $EC2_HOME/cert-*.pem`
-    export EC2_URL=https://ec2.eu-west-1.amazonaws.com
-
-    # Java
-    export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home/
-
-    # Docker stuffs
-    eval "$(docker-machine env default)"
-    alias dip='docker-machine ip default'
-
-    dms() {
-      docker-machine start default && zsh
-    }
-    ;;
-esac
-
-# -----------------------------------------------------------------------------
 # Project related
 # -----------------------------------------------------------------------------
 alias devops="mux devops"
@@ -350,6 +344,9 @@ alias catalogc="mux catalog_client"
 alias tco= "mux tco"
 alias wk="mux work"
 alias t4b="mux t4b"
+alias tsp="mux tsp"
+alias woo="mux woo"
+alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R manu:manu db/migrate"
