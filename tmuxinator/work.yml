@@ -11,8 +11,3 @@ windows:
         - sleep 1 && vim
         -
         -
-  - prod:
-      layout: even-vertical
-      panes:
-        -
-        -
