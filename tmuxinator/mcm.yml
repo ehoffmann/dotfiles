@@ -1,0 +1,12 @@
+# ~/.tmuxinator/mcm.yml
+
+name: Mockup creator module
+root: ~/code/tz/mockup-creator-module
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+        -
