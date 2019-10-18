@@ -51,6 +51,17 @@ alias dco='docker-compose'
 alias drm='docker rm $(docker ps -a -q)'
 alias dsc='docker stop $(docker ps -q)'
 
+# Remove untaged images
+drmi() {
+  docker rmi $(docker images | grep '^<none>' | awk '{print $3}')
+}
+
+# Remove all docker containers and images
+drmall() {
+  docker rm $(docker ps -a -q)
+  docker rmi $(docker images -q)
+}
+
 # -----------------------------------------------------------------------------
 # Staging rails console (k8s)
 # -----------------------------------------------------------------------------
@@ -136,32 +147,23 @@ de() {
   docker exec -ti $1 bash
 }
 
-# Remove untaged images
-drmi() {
-  docker rmi $(docker images | grep '^<none>' | awk '{print $3}')
-}
-
-# Remove all docker containers and images
-drmall() {
-  docker rm $(docker ps -a -q)
-  docker rmi $(docker images -q)
-}
-
 dcr() {
   docker-compose run --rm web $@
 }
 
 rb() {
-  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bundle exec rails c"
+  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bundle exec rails c"
 }
 
 tza-rb() {
-docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web rails c
+  docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web rails c
 }
 
 dcba() {
-  docker-compose run --rm web bash
+  #docker-compose run --rm web bash -c "set -o vi; bind '\"jk\":vi-movement-mode'"
+  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bash"
 }
+
 
 dcbe() {
   docker-compose run --rm web bundle exec $@
@@ -346,6 +348,7 @@ alias wk="mux work"
 alias t4b="mux t4b"
 alias tsp="mux tsp"
 alias woo="mux woo"
+alias mcm="mux mcm"
 alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
