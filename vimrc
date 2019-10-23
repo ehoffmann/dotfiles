@@ -41,7 +41,7 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'andrewradev/splitjoin.vim'
 " Toggle ruby block with <Leader>b
 Plugin 'jgdavey/vim-blockle'
-" Perform an interactive diff on two blocks of text 
+" Perform an interactive diff on two blocks of text
 Plugin 'AndrewRadev/linediff.vim'
 call vundle#end()
 
@@ -165,7 +165,6 @@ nnoremap <C-H> <C-W><C-H>
 "------------------------------------------------------------------------------
 " File mapping
 "------------------------------------------------------------------------------
-au BufNewFile,BufRead *.md set filetype=html
 au BufRead,BufNewFile *.tpl set filetype=smarty.html
 au BufNewFile,BufRead Guardfile set filetype=ruby
 au BufNewFile,BufRead *.styl set filetype=stylus
