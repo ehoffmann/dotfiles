@@ -7,9 +7,6 @@ set rtp+=~/.vim/bundle/Vundle.vim/
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'MarcWeber/vim-addon-mw-utils'
-Plugin 'digitaltoad/vim-jade'
-Plugin 'ehoffmann/smarty-syntax'
-"Plugin 'fatih/vim-go'
 Plugin 'garbas/vim-snipmate'
 Plugin 'godlygeek/tabular'
 Plugin 'honza/vim-snippets'
