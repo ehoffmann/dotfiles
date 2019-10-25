@@ -147,6 +147,9 @@ nmap <leader>q :s/"/'/g<cr>
 " Normalize space between curly (depends on Surround.vim)
 nmap <leader>cr cs{}cs}{
 
+" Mark task as done
+nmap <leader>x :s/\[ \]/[X]/<cr>
+
 " Copy current file path + line num in buffer
 "nmap cp :let @" = "https://github.com/teezily/" . expand('%:p:h:t') . "/tree/" . FugitiveHead() . "/" . expand("%") . "#L" . line(".")<cr>
 nmap cp :let @" = "https://github.com/teezily/" . systemlist("basename `git rev-parse --show-toplevel`")[0] . "/tree/" . FugitiveHead() . "/" . expand("%") . "#L" . line(".")<cr>
