@@ -3,41 +3,80 @@ filetype on      " fix git commit message error on leopard
 filetype off     " required!
 
 set rtp+=~/.vim/bundle/Vundle.vim/
-
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
+
+" Interpret a file by function and cache file automatically, used by
+" other plugin
 Plugin 'MarcWeber/vim-addon-mw-utils'
+
+" Snippets
 Plugin 'garbas/vim-snipmate'
-Plugin 'godlygeek/tabular'
 Plugin 'honza/vim-snippets'
+
+" Vim script for text filtering and alignment
+Plugin 'godlygeek/tabular'
+
+" CoffeeScript support
 Plugin 'kchmck/vim-coffee-script'
+
+" Fuzzy file, buffer, mru, tag, etc finder
 Plugin 'ctrlpvim/ctrlp.vim'
+
+" LessCSS Syntax support
 Plugin 'lunaru/vim-less'
+
+" Plugin for the Perl module / CLI script 'ack'
 Plugin 'mileszs/ack.vim'
-Plugin 'rust-lang/rust.vim'
+
+" Comment
 Plugin 'scrooloose/nerdcommenter'
+
+" File tree
 Plugin 'scrooloose/nerdtree'
+
+" Some utility functions for VIM
 Plugin 'tomtom/tlib_vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-rhubarb'
-Plugin 'tpope/vim-rails.git'
-Plugin 'tpope/vim-repeat'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-abolish'
-Plugin 'tpope/vim-haml'
+
+" Ruby support
 Plugin 'vim-ruby/vim-ruby'
-Plugin 'vim-scripts/applescript.vim'
-Plugin 'wavded/vim-stylus'
-Plugin 'altercation/vim-colors-solarized'
+
+" Git wrapper
+Plugin 'tpope/vim-fugitive'
+
+" GitHub extension for fugitive.vim, GBrowse, hub, completion in commit msg
+Plugin 'tpope/vim-rhubarb'
+
+" dot repeat at plugin level
+Plugin 'tpope/vim-repeat'
+
+" Quoting/parenthesizing made simple
+Plugin 'tpope/vim-surround'
+
+" Easily search for, substitute, and abbreviate multiple variants of a word
+Plugin 'tpope/vim-abolish'
+
+" Runtime files for Haml, Sass, and SCSS
+Plugin 'tpope/vim-haml'
+
+" Rails
+Plugin 'tpope/vim-rails.git'
+
+" Retro groove color scheme for Vim
 Plugin 'morhetz/gruvbox'
-Plugin 'vim-airline/vim-airline'
+
+" Transparent editing of gpg encrypted files
 Plugin 'jamessan/vim-gnupg'
+
 " Navigate seamlessly between vim and tmux splits
 Plugin 'christoomey/vim-tmux-navigator'
+
 " Simplifies the transition between multiline and single-line code
 Plugin 'andrewradev/splitjoin.vim'
+
 " Toggle ruby block with <Leader>b
 Plugin 'jgdavey/vim-blockle'
+
 " Perform an interactive diff on two blocks of text
 Plugin 'AndrewRadev/linediff.vim'
 call vundle#end()
@@ -284,12 +323,6 @@ let g:rails_projections = {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
       \}
-
-"------------------------------------------------------------------------------
-" vim-airline
-"------------------------------------------------------------------------------
-let g:airline_section_a = ''
-let g:airline_section_b = ''
 
 "------------------------------------------------------------------------------
 " misc
