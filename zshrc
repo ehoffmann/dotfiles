@@ -329,7 +329,7 @@ ssha;
 # -----------------------------------------------------------------------------
 # zsh plugins
 # -----------------------------------------------------------------------------
-plugins=(git npm vagrant rails vi-mode history-substring-search zsh-syntax-highlighting)
+plugins=(git rails vi-mode history-substring-search zsh-syntax-highlighting)
 
 # -----------------------------------------------------------------------------
 # Project related
