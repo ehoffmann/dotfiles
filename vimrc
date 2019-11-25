@@ -41,6 +41,12 @@ Plugin 'tomtom/tlib_vim'
 " Ruby support
 Plugin 'vim-ruby/vim-ruby'
 
+" Required for 'nelstrom/vim-textobj-rubyblock'
+Plugin 'kana/vim-textobj-user'
+
+" Ruby text object
+Plugin 'nelstrom/vim-textobj-rubyblock'
+
 " Git wrapper
 Plugin 'tpope/vim-fugitive'
 
