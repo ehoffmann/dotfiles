@@ -1,6 +1,4 @@
-require: rubocop-rails
 AllCops:
-  TargetRubyVersion: 2.3
   Exclude:
    - 'bin/*'
    - 'db/seeds.rb'
