@@ -85,6 +85,13 @@ Plugin 'jgdavey/vim-blockle'
 
 " Perform an interactive diff on two blocks of text
 Plugin 'AndrewRadev/linediff.vim'
+
+" Speed up Vim by updating folds only when called-for
+Plugin 'Konfekt/FastFold'
+
+" A git diff in the gutter (sign column), stages/undoes hunks and partial hunks.
+Plugin 'airblade/vim-gitgutter'
+
 call vundle#end()
 
 filetype plugin indent on     " required!
@@ -186,7 +193,7 @@ nmap <leader>hh :s/["']\(\w*\)["']\(\s*\)=>\s*/\1: /g<cr>
 " Hash to Rocket id: "1" to "id" => "1"
 nmap <leader>hr :s/\(\w*\):\s*/'\1' => /<cr>
 
-" Swap " for '
+" Swap quotes " for '
 nmap <leader>q :s/"/'/g<cr>
 
 " Normalize space between curly (depends on Surround.vim)
@@ -195,12 +202,8 @@ nmap <leader>cr cs{}cs}{
 " Mark task as done
 nmap <leader>x :s/\[ \]/[X]/<cr>
 
-" Copy current file path + line num in buffer
-"nmap cp :let @" = "https://github.com/teezily/" . expand('%:p:h:t') . "/tree/" . FugitiveHead() . "/" . expand("%") . "#L" . line(".")<cr>
-nmap cp :let @" = "https://github.com/teezily/" . systemlist("basename `git rev-parse --show-toplevel`")[0] . "/tree/" . FugitiveHead() . "/" . expand("%") . "#L" . line(".")<cr>
-
 "------------------------------------------------------------------------------
-" Navigation
+" Split navigation shortcut (same as tmux)
 "------------------------------------------------------------------------------
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -329,6 +332,21 @@ let g:rails_projections = {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
       \}
+
+"------------------------------------------------------------------------------
+" Fold
+"------------------------------------------------------------------------------
+"set foldmethod=syntax
+"set foldnestmax=6
+"set nofoldenable
+"set foldlevel=2
+let ruby_fold = 1
+let ruby_foldable_groups = 'def do'
+
+"------------------------------------------------------------------------------
+" Markdown
+"------------------------------------------------------------------------------
+let g:markdown_fenced_languages = ['ruby', 'javascript', 'json', 'bash=sh']
 
 "------------------------------------------------------------------------------
 " misc
