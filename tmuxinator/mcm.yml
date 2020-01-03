@@ -10,3 +10,8 @@ windows:
         - sleep 1 && vim
         -
         -
+  - back:
+      layout: even-vertical
+      panes:
+        -
+        -
