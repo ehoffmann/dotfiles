@@ -81,9 +81,21 @@ t4b-staging() {
   _k8s "t4b-staging" "worker" "rails c"
 }
 
+pricing-staging() {
+  _k8s "pricing-staging" "web" "bundle exec rails c"
+}
+
+pricing-staging-console() {
+  _k8s "pricing-staging" "web" "bash"
+}
+
 # -----------------------------------------------------------------------------
 # Prod rails console (k8s)
 # -----------------------------------------------------------------------------
+
+pricing-prod() {
+  _k8s "pricing-prod" "web" "bundle exec rails c"
+}
 
 tz-prod() {
   _k8s "teezily-prod" "toolbox" "bash"
@@ -117,6 +129,10 @@ tco-prod() {
   _k8s "tco-prod" "toolbox" "rails c"
 }
 
+tco-staging() {
+  _k8s "tco-staging" "worker" "rails c"
+}
+
 tco-bash() {
   _k8s "tco-prod" "toolbox" "bash"
 }
@@ -125,30 +141,39 @@ t4b-prod() {
   _k8s "t4b-prod" "toolbox" "rails c"
 }
 
+tsp-prod() {
+  _k8s "tshirt-previewer-prod" "web" "rails c"
+}
+
+tsp-bash() {
+  _k8s "tshirt-previewer-prod" "web" "bash"
+}
+
 # -----------------------------------------------------------------------------
 # k8s tools
 # -----------------------------------------------------------------------------
-#rails-k8s() {
-  #host=$(cat ~/.prod-k8s)
-  #ssh -t $host "kubectl -n $1 get pods | grep toolbox | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} rails c"
-#}
-
-# bash-k8s() {
-  #host=$(cat ~/.prod-k8s)
-  #ssh -t $host "kubectl -n $1 get pods | grep toolbox | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} bash"
-#}
-
 _k8s() {
   host=$(cat ~/.prod-k8s)
   ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
 }
 
-de() {
-  docker exec -ti $1 bash
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+alias dco='docker-compose'
+alias dcr='docker-compose stop && docker-compose up'
+alias drm='docker rm $(docker ps -a -q)'
+alias dsc='docker stop $(docker ps -q)'
+
+# Remove untaged images
+drmi() {
+  docker rmi $(docker images | grep '^<none>' | awk '{print $3}')
 }
 
-dcr() {
-  docker-compose run --rm web $@
+# Remove all docker containers and images
+drmall() {
+  docker rm $(docker ps -a -q)
+  docker rmi $(docker images -q)
 }
 
 rb() {
@@ -160,10 +185,8 @@ tza-rb() {
 }
 
 dcba() {
-  #docker-compose run --rm web bash -c "set -o vi; bind '\"jk\":vi-movement-mode'"
   docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bash"
 }
-
 
 dcbe() {
   docker-compose run --rm web bundle exec $@
@@ -212,15 +235,7 @@ dcrollback-test() {
 }
 
 dcdbreset-test() {
-  #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set
-  #bin/rails db:environment:set RAILS_ENV=test
-  #docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set db:drop db:create db:schema:load
   docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
-}
-
-dcdbreset-dev() {
-  echo "You don't want to do that"
-  #docker-compose run --rm web bundle exec rake db:drop db:create db:schema:load
 }
 
 tco-mysql() {
@@ -249,8 +264,7 @@ tz-mysql-upgrade() {
   docker exec -ti $container mysql_upgrade --user=root --password=foo
 }
 
-# load with
-# rake db:create
+# load with `rake db:create`
 # zcat ../../dumps/teezily-04_23_2018_08_41_11-staging.sql.gz | docker exec -i teezily_mysql_1 mysql teezily_dev -uroot -pfoo
 tz-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
@@ -259,19 +273,42 @@ tz-dump() {
   echo "Dump OK -> $file_path"
 }
 
-# load with
-# rake db:create
-# zcat ../../../dumps/pm-07_03_2019_17_18_53-feat_bullet.sql.gz | docker exec -i product-manager_postgresql_1 psql product_manager_development -Upostgres -W foo                                                                │
 pm-dump() {
-  branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
-  file_path=/home/manu/dumps/pm-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
-  docker-compose start postgresql
-  container=$(docker-compose ps postgresql | grep Up | awk  '{print $1}')
-  docker exec -ti $container pg_dump -U postgres product_manager_development | gzip > $file_path
-  echo "Dump OK -> $file_path"
+  _pg-dump product_manager_development
 }
 
-db-dump() {
+tsp-dump() {
+  _pg-dump tshirt-previewer_development
+}
+
+_pg-load() {
+  container=$(docker-compose ps -q postgresql)
+  zcat $1 | docker exec -i $container psql $2 -Upostgres -W foo                                                                │
+}
+
+_pg-dump() {
+  branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
+  file_path=~/dumps/$1-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql
+  docker-compose start postgresql
+  container=$(docker-compose ps -q postgresql)
+  if [ -z "$container" ]
+  then
+    echo "Container is not running"
+    exit 1
+  else
+    docker exec -ti $container pg_dump -U postgres $1 > $file_path
+    if [ $? -eq 0 ]
+    then
+      gzip $file_path
+      echo "Dump OK"
+      echo "$file_path.gz"
+    else
+      echo "Dump KO"
+    fi
+  fi
+}
+
+mysql-dump() {
   docker-compose start $1
   container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump -uroot -pfoo $2
