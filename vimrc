@@ -290,6 +290,12 @@ autocmd Filetype rust imap <C-s> <ESC>:update<CR>:! cargo run<CR>
 "------------------------------------------------------------------------------
 " Rails-vim
 "------------------------------------------------------------------------------
+"
+" Projections:
+" - Navigation between services and specs
+" - Navigation controller and request specs
+" - typing `:Efactory user` will open the user factory
+"
 let g:rails_projections = {
       \  "app/services/*_service.rb": {
       \    "command": "service",
@@ -336,6 +342,15 @@ let g:rails_projections = {
       \  "spec/requests/*/destroy_spec.rb": {
       \    "alternate": "app/controllers/{}_controller.rb",
       \  },
+      \  "spec/factories/*_factory.rb": {
+      \    "command": "factory",
+      \    "affinity": "collection",
+      \    "alternate": "app/models/%i.rb",
+      \    "related": "db/schema.rb#%s",
+      \    "test": "spec/models/%i_spec.rb",
+      \    "template": "FactoryGirl.define do\n  factory :%i do\n  end\nend",
+      \    "keywords": "factory sequence"
+      \  }
       \}
 
 "------------------------------------------------------------------------------
