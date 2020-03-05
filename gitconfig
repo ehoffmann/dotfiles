@@ -1,0 +1,22 @@
+# Local/private config goes in the include
+[include]
+  path = ~/.gitconfig.local
+
+[core]
+  excludesfile = ~/.gitignore
+
+[alias]
+  # Thanks to https://blog.jez.io/cli-code-review/
+
+  # list files which have changed since REVIEW_BASE
+  # (REVIEW_BASE defaults to 'staging' in my zshrc)
+  files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
+
+  # Same as above, but with a diff stat instead of just names
+  # (better for interactive use)
+  stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
+
+  # Open all files changed since REVIEW_BASE in Vim tabs
+  # Then, run fugitive's :Gdiff in each tab, and finally
+  # tell vim-gitgutter to show +/- for changes since REVIEW_BASE
+  review = !vim -p $(git files) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
