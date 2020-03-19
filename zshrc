@@ -45,22 +45,33 @@ alias vagrash='vagrant up && vagrant ssh'
 # -----------------------------------------------------------------------------
 alias tmxu='tmux'
 
-# -----------------------------------------------------------------------------
-# Docker
-# -----------------------------------------------------------------------------
-alias dco='docker-compose'
-alias drm='docker rm $(docker ps -a -q)'
-alias dsc='docker stop $(docker ps -q)'
 
-# Remove untaged images
-drmi() {
-  docker rmi $(docker images | grep '^<none>' | awk '{print $3}')
+# -----------------------------------------------------------------------------
+# TZ Ops
+# -----------------------------------------------------------------------------
+deploy-branch() {
+  REPO=basename `git rev-parse --show-toplevel`
+  if [[ $REPO != teezily ]]
+  then
+    echo Not in teezily
+    exit 1
+  fi
+
+  read REPLY\?"Deploy $1 to teezily-pr$2?"
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    docker-compose run --rm web bin/deploy-branch $1 teezily-pr$2 d
+  fi
 }
 
-# Remove all docker containers and images
-drmall() {
-  docker rm $(docker ps -a -q)
-  docker rmi $(docker images -q)
+enter-branch() {
+  REPO=basename `git rev-parse --show-toplevel`
+  if [[ $REPO != teezily ]]
+  then
+    echo Not in teezily
+    exit 1
+  fi
+  docker-compose run --rm web bin/dokku-staging enter teezily-pr$1 web.1 bash
 }
 
 # -----------------------------------------------------------------------------
@@ -78,8 +89,16 @@ ali-staging() {
   _k8s "aliproxy-staging" "worker" "rails c"
 }
 
+tz-staging() {
+  _k8s "teezily-staging" "toolbox" "rails c"
+}
+
 t4b-staging() {
-  _k8s "t4b-staging" "worker" "rails c"
+  _k8s "t4b-staging" "t4b-web" "rails c"
+}
+
+t4b-staging-pr() {
+  _k8s "t4b-staging" "t4b-pr-web" "rails c"
 }
 
 pricing-staging() {
@@ -343,16 +362,16 @@ rubo() {
 
 # Lint cached
 rubs() {
-  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
+  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop
 }
 
 rubsa() {
-  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails --auto-correct
+  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --auto-correct
 }
 
 # Not sure about the relevance of this one
 rubc() {
-  git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop --rails
+  git diff-tree --no-commit-id --name-only -r `git rev-parse --short HEAD` | grep '.rb$' | xargs -r rubocop
 }
 
 # -----------------------------------------------------------------------------
@@ -381,12 +400,13 @@ alias ali="mux aliproxy"
 alias ful="mux fulfillment"
 alias catalog="mux catalog"
 alias catalogc="mux catalog_client"
-alias tco= "mux tco"
+alias tco="mux tco"
 alias wk="mux work"
 alias t4b="mux t4b"
 alias tsp="mux tsp"
 alias woo="mux woo"
 alias mcm="mux mcm"
+alias pricing="mux pricing"
 alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
@@ -432,13 +452,9 @@ zle -N zle-keymap-select
 # cycle through arg history
 bindkey '^O' insert-last-word
 
-# bind k and j for VI mode
+# bind k and j for VI mode (history-substring-search plugin)
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
-
-# with up or down key
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
 
 # Delay after <ESC> press in milisec (defaul = 4)
 export KEYTIMEOUT=10
