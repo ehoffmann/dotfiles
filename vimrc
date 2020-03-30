@@ -226,6 +226,14 @@ autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
 autocmd Filetype javascript setlocal ts=2 sts=2 sw=2
 
 "------------------------------------------------------------------------------
+" netrw
+"------------------------------------------------------------------------------
+" Disable default gx
+let g:netrw_nogx = 1
+" Remap gx to open any URL under cursor in the browser
+nmap gx yiW:!xdg-open "<C-r>"" & <CR><CR>:redraw!<CR>
+
+"------------------------------------------------------------------------------
 " ctrlp
 "------------------------------------------------------------------------------
 " Start in mixed mode
