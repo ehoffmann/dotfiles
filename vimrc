@@ -205,10 +205,11 @@ nmap <leader>x :s/\[ \]/[X]/<cr>
 "------------------------------------------------------------------------------
 " Split navigation shortcut (same as tmux)
 "------------------------------------------------------------------------------
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+" Aleady set by Plugin 'christoomey/vim-tmux-navigator'
+" nnoremap <C-J> <C-W><C-J>
+" nnoremap <C-K> <C-W><C-K>
+" nnoremap <C-L> <C-W><C-L>
+" nnoremap <C-H> <C-W><C-H>
 
 "------------------------------------------------------------------------------
 " File mapping
