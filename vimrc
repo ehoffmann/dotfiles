@@ -175,9 +175,6 @@ nnoremap <F12> :e ++enc=utf-8<CR>
 nmap <leader>f :bnext<cr>
 nmap <leader>b :bprevious<cr>
 
-" The best shortcut of all time!
-inoremap jk <ESC>
-
 " Search for visually selected text
 vnoremap // y/<C-R>"<CR>
 
