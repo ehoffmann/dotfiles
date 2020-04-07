@@ -1,7 +1,7 @@
 # ~/.tmuxinator/teezily.yml
 name: teezily
 root: ~/code/tz/teezily
-on_project_start: rm -f log/development.log && rm -f log/test.log
+on_project_start: rm -f log/development.log && rm -f log/test.log && ctag -R
 windows:
   - main:
       layout: main-horizontal
