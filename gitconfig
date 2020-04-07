@@ -4,7 +4,6 @@
 
 [core]
   excludesfile = ~/.gitignore
-
 [alias]
   # Thanks to https://blog.jez.io/cli-code-review/
 
@@ -20,3 +19,10 @@
   # Then, run fugitive's :Gdiff in each tab, and finally
   # tell vim-gitgutter to show +/- for changes since REVIEW_BASE
   review = !vim -p $(git files) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+
+[user]
+  signingkey = 9824B2BF22DDA63B
+  email = emmanuel@activeand.co
+
+[commit]
+  gpgsign = true
