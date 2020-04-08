@@ -3,7 +3,7 @@
 name: t4b
 root: ~/code/tz/t4b
 
-on_project_start: rm -f log/development.log && rm -f log/test.log
+on_project_start: rm -f log/development.log && rm -f log/test.log && ctags -R
 windows:
   - main:
       layout: main-horizontal
