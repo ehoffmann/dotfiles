@@ -162,14 +162,14 @@ nnoremap <leader>gs :Gstatus<CR>
 " Save time
 nmap <SPACE> :
 
-" Clean dirty file
-nnoremap <F9> :retab<CR>:%s/\s*$//<CR>
-
 " F11 switch to cp1252 encoding
-nnoremap <F11> :e ++enc=cp1252<CR>
+nnoremap <F7> :e ++enc=cp1252<CR>
 
 " F12 switch to UTF-8 encoding
-nnoremap <F12> :e ++enc=utf-8<CR>
+nnoremap <F8> :e ++enc=utf-8<CR>
+
+" Clean dirty file
+nnoremap <F9> :retab<CR>:%s/\s*$//<CR>
 
 " Switch to alternate file
 nmap <leader>f :bnext<cr>
