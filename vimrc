@@ -360,14 +360,21 @@ let g:rails_projections = {
       \}
 
 "------------------------------------------------------------------------------
-" Fold
+" Ruby
 "------------------------------------------------------------------------------
-"set foldmethod=syntax
-"set foldnestmax=6
-"set nofoldenable
-"set foldlevel=2
-let ruby_fold = 1
-let ruby_foldable_groups = 'def do'
+
+" Fold/unfold all def in Ruby file
+let ruby_foldable_groups = 'def'
+nmap <leader>ff :set foldmethod=syntax<CR>
+nmap <leader>fu :set foldmethod=manual<CR>zR<CR>
+
+" Syntax
+let ruby_space_errors = 1
+let ruby_operators        = 1
+let ruby_pseudo_operators = 1
+let ruby_line_continuation_error = 1
+let ruby_global_variable_error   = 1
+let ruby_spellcheck_strings = 1
 
 "------------------------------------------------------------------------------
 " Markdown
