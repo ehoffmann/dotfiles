@@ -145,6 +145,7 @@ ali-prod() {
   _k8s "aliproxy-prod" "toolbox" "rails c"
 }
 
+# TCO
 tco-prod() {
   _k8s "tco-prod" "toolbox" "rails c"
 }
@@ -153,25 +154,71 @@ tco-staging() {
   _k8s "tco-staging" "worker" "rails c"
 }
 
-tco-bash() {
+tco-prod-bash() {
   _k8s "tco-prod" "toolbox" "bash"
 }
 
+tco-staging-bash() {
+  _k8s "tco-staging" "toolbox" "bash"
+}
+
+# T4B
 t4b-prod() {
   _k8s "t4b-prod" "toolbox" "rails c"
 }
 
+t4b-staging() {
+  _k8s "t4b-staging" "t4b-web" "rails c"
+}
+
+t4b-staging-pr() {
+  _k8s "t4b-staging" "t4b-pr-web" "rails c"
+}
+
+# tsp tshir-previewer
 tsp-prod() {
   _k8s "tshirt-previewer-prod" "web" "rails c"
 }
 
-tsp-bash() {
+# Edit branch name
+# Don't forget to rollback
+tsp-edit-staging() {
+  # REPO=basename `git rev-parse --show-toplevel`
+  # if [[ $REPO != tshirt-previewer ]]
+  # then
+    # echo Not in tsp
+    # exit 1
+  # fi
+  docker-compose run web bin/kubectl-staging edit deployment tshirt-previewer-web
+}
+
+tsp-bash-prod() {
   _k8s "tshirt-previewer-prod" "web" "bash"
+}
+
+tsp-bash-staging() {
+  _k8s "tshirt-previewer-staging" "web" "bash"
+}
+
+# mockup-creator-module mcm
+mcm-edit-staging() {
+  # REPO=basename `git rev-parse --show-toplevel`
+  # if [[ $REPO != tshirt-previewer ]]
+  # then
+    # echo Not in tsp
+    # exit 1
+  # fi
+  docker-compose run web bin/kubectl-staging edit deployment mockup-creator-module-web
+}
+
+mcm-bash-staging() {
+  _k8s "mockup-creator-module-staging" "web" "bash"
 }
 
 # -----------------------------------------------------------------------------
 # k8s tools
 # -----------------------------------------------------------------------------
+
 _k8s() {
   host=$(cat ~/.prod-k8s)
   ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
