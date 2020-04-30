@@ -30,7 +30,7 @@ Plugin 'lunaru/vim-less'
 Plugin 'mileszs/ack.vim'
 
 " Comment
-Plugin 'scrooloose/nerdcommenter'
+Plugin 'tomtom/tcomment_vim'
 
 " File tree
 Plugin 'scrooloose/nerdtree'
