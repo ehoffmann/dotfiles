@@ -98,6 +98,7 @@ filetype plugin indent on     " required!
 
 set number
 set ruler
+set incsearch
 syntax on
 set encoding=utf-8
 :runtime macros/matchit.vim
