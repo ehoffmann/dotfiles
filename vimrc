@@ -44,6 +44,9 @@ Plugin 'vim-ruby/vim-ruby'
 " Required for 'nelstrom/vim-textobj-rubyblock'
 Plugin 'kana/vim-textobj-user'
 
+" New text objects, al 'a line' and il 'inner line'
+Plugin 'kana/vim-textobj-line'
+
 " Ruby text object
 Plugin 'nelstrom/vim-textobj-rubyblock'
 
