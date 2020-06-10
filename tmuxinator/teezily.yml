@@ -4,7 +4,7 @@ root: ~/code/tz/teezily
 on_project_start:
   - rm -f log/development.log
   - rm -f log/test.log
-  - ctag -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
+  - ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
 windows:
   - main:
       layout: main-horizontal
