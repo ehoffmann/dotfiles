@@ -101,10 +101,21 @@ filetype plugin indent on     " required!
 
 set number
 set ruler
-set incsearch
 syntax on
 set encoding=utf-8
 :runtime macros/matchit.vim
+
+"------------------------------------------------------------------------------
+" Search
+"------------------------------------------------------------------------------
+set incsearch
+
+" hlsearch only when cmd
+augroup vimrc-incsearch-highlight
+  autocmd!
+  autocmd CmdlineEnter /,\? :set hlsearch
+  autocmd CmdlineLeave /,\? :set nohlsearch
+augroup END
 
 "------------------------------------------------------------------------------
 " Whitespace
