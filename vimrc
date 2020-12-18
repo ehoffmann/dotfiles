@@ -170,9 +170,6 @@ nmap <silent> <leader>nt :NERDTreeToggle<CR>
 " Ack vim shortcut
 nmap <leader>t :Ack<SPACE>-i<SPACE>''<LEFT>
 
-" Fugitive
-nnoremap <leader>gs :Gstatus<CR>
-
 " Save time
 nmap <SPACE> :
 
@@ -184,10 +181,6 @@ nnoremap <F8> :e ++enc=utf-8<CR>
 
 " Clean dirty file
 nnoremap <F9> :retab<CR>:%s/\s*$//<CR>
-
-" Switch to alternate file
-nmap <leader>f :bnext<cr>
-nmap <leader>b :bprevious<cr>
 
 " Search for visually selected text
 vnoremap // y/<C-R>"<CR>
