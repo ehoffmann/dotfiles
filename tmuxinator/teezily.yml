@@ -1,7 +1,7 @@
 # ~/.tmuxinator/teezily.yml
 name: teezily
 root: ~/code/tz/teezily
-on_project_start:
+on_project_first_start:
   - rm -f log/development.log
   - rm -f log/test.log
   - ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
