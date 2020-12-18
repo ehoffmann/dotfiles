@@ -411,4 +411,5 @@ set path+=lib/**
 " Global ignore
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/Cache/*
 
-set clipboard=unnamed
+" Use clipboard. https://stackoverflow.com/a/30691754/1876625
+set clipboard^=unnamed,unnamedplus
