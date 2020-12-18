@@ -374,7 +374,7 @@ let g:rails_projections = {
 "------------------------------------------------------------------------------
 
 " Fold/unfold all def in Ruby file
-let ruby_foldable_groups = 'def'
+let ruby_foldable_groups = 'def do'
 nmap <leader>ff :set foldmethod=syntax<CR>
 nmap <leader>fu :set foldmethod=manual<CR>zR<CR>
 
