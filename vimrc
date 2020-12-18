@@ -254,8 +254,8 @@ let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|coverage\|log\|tmp$',
       \ 'file': '\.exe$\|\.so$\|\.dat$' }
 
-" Use git file searching
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+" Ignore files in .gitignore
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
 
 " Do not display MRU files from other directory (above project root)
 let g:ctrlp_mruf_relative = 1
