@@ -153,7 +153,6 @@ au BufWinEnter * let w:m1=matchadd('Special', 'DONE', -1)
 "------------------------------------------------------------------------------
 " Mapping
 "------------------------------------------------------------------------------
-let mapleader = ","
 
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 
