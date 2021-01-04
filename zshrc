@@ -46,14 +46,17 @@ alias vagrash='vagrant up && vagrant ssh'
 alias tmxu='tmux'
 
 
+
 # -----------------------------------------------------------------------------
-# TZ Ops
+# k8s deploy & console
 # -----------------------------------------------------------------------------
-deploy-branch() {
+
+# TZ Teezily
+tz-deploy-branch() {
   REPO=basename `git rev-parse --show-toplevel`
   if [[ $REPO != teezily ]]
   then
-    echo Not in teezily
+    echo "Not in teezily"
     exit 1
   fi
 
@@ -64,7 +67,7 @@ deploy-branch() {
   fi
 }
 
-enter-branch() {
+tz-enter-branch() {
   REPO=basename `git rev-parse --show-toplevel`
   if [[ $REPO != teezily ]]
   then
@@ -74,11 +77,24 @@ enter-branch() {
   docker-compose run --rm web bin/dokku-staging enter teezily-pr$1 web.1 bash
 }
 
-# -----------------------------------------------------------------------------
-# Staging rails console (k8s)
-# -----------------------------------------------------------------------------
+# update 2020-05-18 Does not work anymore, try instead:
+# docker-compose run --rm web bin/dokku-staging enter teezily web.1 bash
+# docker-compose run --rm web bin/dokku-staging enter teezily-prX web.1 bash
+tz-staging() {
+  _k8s "teezily-staging" "teezily-web" "bash"
+}
+
+tz-prod() {
+  _k8s "teezily-prod" "toolbox" "bash"
+}
+
+# Catalog
 catalog-staging() {
   _k8s "catalog-staging" "worker" "rails c"
+}
+
+catalog-prod() {
+  _k8s "catalog-prod" "toolbox" "rails c"
 }
 
 pm-staging() {
@@ -89,18 +105,6 @@ ali-staging() {
   _k8s "aliproxy-staging" "worker" "rails c"
 }
 
-tz-staging() {
-  _k8s "teezily-staging" "toolbox" "rails c"
-}
-
-t4b-staging() {
-  _k8s "t4b-staging" "t4b-web" "rails c"
-}
-
-t4b-staging-pr() {
-  _k8s "t4b-staging" "t4b-pr-web" "rails c"
-}
-
 pricing-staging() {
   _k8s "pricing-staging" "web" "bundle exec rails c"
 }
@@ -109,20 +113,8 @@ pricing-staging-console() {
   _k8s "pricing-staging" "web" "bash"
 }
 
-# -----------------------------------------------------------------------------
-# Prod rails console (k8s)
-# -----------------------------------------------------------------------------
-
 pricing-prod() {
   _k8s "pricing-prod" "web" "bundle exec rails c"
-}
-
-tz-prod() {
-  _k8s "teezily-prod" "toolbox" "bash"
-}
-
-catalog-prod() {
-  _k8s "catalog-prod" "toolbox" "rails c"
 }
 
 pm-prod() {
@@ -172,7 +164,7 @@ t4b-staging() {
 }
 
 t4b-staging-pr() {
-  _k8s "t4b-staging" "t4b-pr-web" "rails c"
+  _k8s "t4b-staging" "t4b-pr-web" "bash"
 }
 
 # tsp tshir-previewer
@@ -247,6 +239,17 @@ rb() {
   docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bundle exec rails c"
 }
 
+# In adition, we can use new docker exec feature to work with running container:
+# docker exec -it <container_id> bash -c 'cat > /path/to/container/file' <
+# /path/to/host/file/
+
+rbtz() {
+  docker-compose run --rm web /bin/bash
+}
+cptz() {
+  docker exec -i $1 bash -c 'cat > ~/.irbrc' < ~/.irbrc
+}
+
 tza-rb() {
   docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web rails c
 }
@@ -267,6 +270,12 @@ tzguard() {
   # Mysql with tmpfs
   # guard -i => get term input echo with binding.pry
   docker-compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec guard -i"
+}
+
+tzspec() {
+  # Mysql with tmpfs
+  # guard -i => get term input echo with binding.pry
+  docker-compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec rspec"
 }
 
 dcguard_xfvb() {
@@ -458,7 +467,7 @@ alias pricing="mux pricing"
 alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
-alias retake="sudo chown -R manu:manu db/migrate"
+alias retake="sudo chown -R manu:manu ."
 
 # -----------------------------------------------------------------------------
 # Misc
@@ -467,6 +476,7 @@ source $ZSH/oh-my-zsh.sh
 alias -g gpi='| grep -i'
 alias mto='curl -4 http://wttr.in/Marseille'
 alias postman=~/bin/Postman
+alias gno=gnome-open
 
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
@@ -519,3 +529,8 @@ source ~/.bin/tmuxinator.zsh
 
 #source ~/code/gruvbox/gruvbox_256palette.sh
 source ~/code/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
