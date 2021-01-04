@@ -3,14 +3,14 @@
 name: t4b
 root: ~/code/tz/t4b
 
-on_project_start: rm -f log/*.log && rm -rf tmp/uploads/test && ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
+on_project_first_start: rm -f log/*.log && ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
 
 windows:
   - main:
       layout: main-horizontal
       panes:
         - sleep 1 && vim
-        -
+        - rm -rf tmp/uploads/test
         -
   - guard:
       layout: even-vertical

@@ -1,7 +1,7 @@
 # ~/.tmuxinator/tshirt-previewer.yml
 name: Tshirt Previewer
 root: ~/code/tz/tshirt-previewer
-on_project_start: rm -f log/development.log && rm -f log/test.log
+on_project_first_start: rm -f log/development.log && rm -f log/test.log
 windows:
   - main:
       layout: main-horizontal

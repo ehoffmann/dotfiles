@@ -3,9 +3,9 @@
 name: code
 root: ~/code
 
-on_project_start: ls
+# on_project_start:
 windows:
   - main:
       layout: main-horizontal
       panes:
-        -
+        - ls -l
