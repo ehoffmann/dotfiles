@@ -1,0 +1,18 @@
+# ~/.tmuxinator/valid_address_client.yml
+
+name: valid_address_client
+root: ~/code/tz/valid_address_client
+
+on_project_first_start: rm -f log/*.log && ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
