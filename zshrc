@@ -164,7 +164,22 @@ t4b-staging() {
 }
 
 t4b-staging-pr() {
-  _k8s "t4b-staging" "t4b-pr-web" "bash"
+  _t4b-pr t4b-pr-web-
+}
+
+t4b-staging-pr2() {
+  _t4b-pr t4b-pr2-web-
+}
+
+_t4b-pr() {
+  cd ~/code/tz/t4b || exit 1
+  CONTAINER=`dco run web bin/kubectl-staging get pods | grep $1 | awk '{print $1}'`
+  if [ -n "$CONTAINER" ]; then
+    docker-compose run web bin/kubectl-staging exec -it $CONTAINER  -- bash
+  else
+    echo "No container."
+  fi
+
 }
 
 # tsp tshir-previewer
