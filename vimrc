@@ -56,7 +56,7 @@ Plugin 'tpope/vim-fugitive'
 " GitHub extension for fugitive.vim, GBrowse, hub, completion in commit msg
 Plugin 'tpope/vim-rhubarb'
 
-" dot repeat at plugin level
+" Dot repeat at plugin level
 Plugin 'tpope/vim-repeat'
 
 " Quoting/parenthesizing made simple
@@ -138,12 +138,10 @@ endif
 " Tmux background bug
 set t_ut=
 
-"set background=dark
+" Set background=dark
 set background=light
 let g:gruvbox_italic=1
 colorscheme gruvbox
-" Better comments for molokai theme
-":hi Comment guifg=#708090
 
 " Highlight col 101 and onward
 let &colorcolumn=join(range(101,6999),",")
@@ -152,7 +150,7 @@ let &colorcolumn=join(range(101,6999),",")
 let g:gruvbox_number_column='bg2'
 let g:gruvbox_color_column='bg3'
 
-" highlight tabs and trailing spaces
+" Highlight tabs and trailing spaces
 set list listchars=tab:>-,trail:-
 highlight SpecialKey term=standout ctermbg=black guibg=yellow
 
@@ -164,7 +162,6 @@ au BufWinEnter * let w:m1=matchadd('Special', 'DONE', -1)
 "------------------------------------------------------------------------------
 " Mapping
 "------------------------------------------------------------------------------
-
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 
 " Ack vim shortcut
@@ -274,13 +271,6 @@ let g:ack_default_options = " -s -H --nocolor --nogroup --column --ignore-dir=di
       \ --ignore-dir=doc --ignore-file=is:tags"
 
 "------------------------------------------------------------------------------
-" NerdTree on mvim
-"------------------------------------------------------------------------------
-if has("gui_running")
-  autocmd VimEnter * NERDTreeToggle
-endif
-
-"------------------------------------------------------------------------------
 " Ctags
 "------------------------------------------------------------------------------
 set tags=./tags;
@@ -306,7 +296,6 @@ autocmd Filetype rust imap <C-s> <ESC>:update<CR>:! cargo run<CR>
 "------------------------------------------------------------------------------
 " Rails-vim
 "------------------------------------------------------------------------------
-"
 " Projections:
 " - Navigation between services and specs
 " - Navigation controller and request specs
@@ -372,7 +361,6 @@ let g:rails_projections = {
 "------------------------------------------------------------------------------
 " Ruby
 "------------------------------------------------------------------------------
-
 " Fold/unfold all def in Ruby file
 let ruby_foldable_groups = 'def do'
 nmap <leader>ff :set foldmethod=syntax<CR>
@@ -413,3 +401,6 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/Cache/*
 
 " Use clipboard. https://stackoverflow.com/a/30691754/1876625
 set clipboard^=unnamed,unnamedplus
+
+" Snipmate deprecate v0
+let g:snipMate = { 'snippet_version' : 1 }
