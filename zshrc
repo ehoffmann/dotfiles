@@ -90,23 +90,23 @@ tz-prod() {
 
 # Catalog
 catalog-staging() {
-  _k8s "catalog-staging" "worker" "rails c"
+  _k8s "catalog-staging" "worker" "bash"
 }
 
 catalog-prod() {
-  _k8s "catalog-prod" "toolbox" "rails c"
+  _k8s "catalog-prod" "toolbox" "bash"
 }
 
 pm-staging() {
-  _k8s "product-manager-staging" "web" "rails c"
+  _k8s "product-manager-staging" "web" "bash"
 }
 
 ali-staging() {
-  _k8s "aliproxy-staging" "worker" "rails c"
+  _k8s "aliproxy-staging" "worker" "bash"
 }
 
 pricing-staging() {
-  _k8s "pricing-staging" "web" "bundle exec rails c"
+  _k8s "pricing-staging" "web" "bundle exec bash"
 }
 
 pricing-staging-console() {
@@ -114,11 +114,11 @@ pricing-staging-console() {
 }
 
 pricing-prod() {
-  _k8s "pricing-prod" "web" "bundle exec rails c"
+  _k8s "pricing-prod" "web" "bundle exec bash"
 }
 
 pm-prod() {
-  _k8s "product-manager-prod" "toolbox" "rails c"
+  _k8s "product-manager-prod" "toolbox" "bash"
 }
 
 pm-prod-bash() {
@@ -126,24 +126,24 @@ pm-prod-bash() {
 }
 
 ful-prod() {
-  _k8s "fulfillment-prod" "worker" "rails c"
+  _k8s "fulfillment-prod" "worker" "bash"
 }
 
 ful-staging() {
-  _k8s "fulfillment-staging" "toolbox" "rails c"
+  _k8s "fulfillment-staging" "toolbox" "bash"
 }
 
 ali-prod() {
-  _k8s "aliproxy-prod" "toolbox" "rails c"
+  _k8s "aliproxy-prod" "toolbox" "bash"
 }
 
 # TCO
 tco-prod() {
-  _k8s "tco-prod" "toolbox" "rails c"
+  _k8s "tco-prod" "toolbox" "bash"
 }
 
 tco-staging() {
-  _k8s "tco-staging" "worker" "rails c"
+  _k8s "tco-staging" "worker" "bash"
 }
 
 tco-prod-bash() {
@@ -154,9 +154,18 @@ tco-staging-bash() {
   _k8s "tco-staging" "toolbox" "bash"
 }
 
+# valid-address
+va-prod() {
+  _k8s "valid-address-prod" "web" "bash"
+}
+
+va-staging() {
+  _k8s "valid-address-staging" "web" "bash"
+}
+
 # T4B
 t4b-prod() {
-  _k8s "t4b-prod" "toolbox" "rails c"
+  _k8s "t4b-prod" "toolbox" "bash"
 }
 
 t4b-staging() {
@@ -179,12 +188,11 @@ _t4b-pr() {
   else
     echo "No container."
   fi
-
 }
 
 # tsp tshir-previewer
 tsp-prod() {
-  _k8s "tshirt-previewer-prod" "web" "rails c"
+  _k8s "tshirt-previewer-prod" "web" "bash"
 }
 
 # Edit branch name
@@ -266,7 +274,7 @@ cptz() {
 }
 
 tza-rb() {
-  docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web rails c
+  docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web bash
 }
 
 dcba() {
@@ -479,6 +487,8 @@ alias tsp="mux tsp"
 alias woo="mux woo"
 alias mcm="mux mcm"
 alias pricing="mux pricing"
+alias vac="mux valid_address_client"
+alias va="mux valid_address"
 alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
