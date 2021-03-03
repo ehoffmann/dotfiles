@@ -234,6 +234,14 @@ mcm-bash-staging() {
 # k8s tools
 # -----------------------------------------------------------------------------
 
+staging-images () {
+  for cont in $(bin/kubectl-staging get pods -o name); do
+    cont=${cont#pod/}
+    image=$(bin/kubectl-staging get pod $cont -o yaml | egrep  -o -m 1 '  image: .*')
+    echo "$cont $image"
+  done
+}
+
 _k8s() {
   host=$(cat ~/.prod-k8s)
   ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
