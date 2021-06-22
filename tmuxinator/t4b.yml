@@ -15,5 +15,5 @@ windows:
   - guard:
       layout: even-vertical
       panes:
-        - yes | dco rm
+        -
         -

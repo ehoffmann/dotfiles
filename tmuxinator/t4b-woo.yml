@@ -1,9 +1,8 @@
-# ~/.tmuxinator/pricing.yml
+# ~/.tmuxinator/t4b-woo.yml
 
-name: pricing
-root: ~/code/tz/pricing
+name: t4b for woo
+root: ~/code/tz/teezily-plus-for-woocommerce
 
-on_project_start: rm -f log/development.log && rm -f log/test.log && rm -f log/newrelic_agent.log && rm -f core
 windows:
   - main:
       layout: main-horizontal
