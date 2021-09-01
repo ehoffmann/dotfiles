@@ -169,7 +169,7 @@ t4b-prod() {
 }
 
 t4b-staging() {
-  _k8s "t4b-staging" "t4b-web" "rails c"
+  _t4b-pr t4b-web-
 }
 
 t4b-staging-pr() {
@@ -195,6 +195,10 @@ tsp-prod() {
   _k8s "tshirt-previewer-prod" "web" "bash"
 }
 
+tsp-staging() {
+  _k8s "tshirt-previewer-staging" "web" "bash"
+}
+
 # Edit branch name
 # Don't forget to rollback
 tsp-edit-staging() {
@@ -205,14 +209,6 @@ tsp-edit-staging() {
     # exit 1
   # fi
   docker-compose run web bin/kubectl-staging edit deployment tshirt-previewer-web
-}
-
-tsp-bash-prod() {
-  _k8s "tshirt-previewer-prod" "web" "bash"
-}
-
-tsp-bash-staging() {
-  _k8s "tshirt-previewer-staging" "web" "bash"
 }
 
 # mockup-creator-module mcm
@@ -473,7 +469,13 @@ ssha;
 # -----------------------------------------------------------------------------
 # zsh plugins
 # -----------------------------------------------------------------------------
-plugins=(git rails vi-mode history-substring-search zsh-syntax-highlighting)
+plugins=(git
+  rails
+  web-search
+  vi-mode
+  history-substring-search
+  zsh-syntax-highlighting
+)
 
 # -----------------------------------------------------------------------------
 # Project related
@@ -491,6 +493,7 @@ alias tco="mux tco"
 alias tcoc="mux tco_client"
 alias wk="mux work"
 alias t4b="mux t4b"
+alias t4b-woo="mux t4b-woo"
 alias tsp="mux tsp"
 alias woo="mux woo"
 alias mcm="mux mcm"
@@ -523,6 +526,7 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=/usr/local/heroku/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/Users/manu/go/bin:/Users/manu/.ec2/bin:/usr/local/libxls/bin
 export PATH="/home/vagrant/.gem/ruby/2.5.0/bin:$PATH"
 export PATH=/usr/bin/vendor_perl:$PATH
+export PATH=/usr/games:$PATH
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
