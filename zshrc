@@ -51,6 +51,11 @@ alias tmxu='tmux'
 # k8s deploy & console
 # -----------------------------------------------------------------------------
 
+k8s() {
+  host=$(cat ~/.prod-k8s)
+  ssh $host
+}
+
 # TZ Teezily
 tz-deploy-branch() {
   REPO=basename `git rev-parse --show-toplevel`
@@ -154,6 +159,15 @@ tco-staging-bash() {
   _k8s "tco-staging" "toolbox" "bash"
 }
 
+# PCO
+pco-prod() {
+  _k8s "pco-prod" "toolbox" "bash"
+}
+
+pco-staging() {
+  _k8s "pco-staging" "web" "bash"
+}
+
 # valid-address
 va-prod() {
   _k8s "valid-address-prod" "web" "bash"
@@ -180,6 +194,10 @@ t4b-staging-pr2() {
   _t4b-pr t4b-pr2-web-
 }
 
+t4b-staging-pr3() {
+  _t4b-pr t4b-pr3-web-
+}
+
 _t4b-pr() {
   cd ~/code/tz/t4b || exit 1
   CONTAINER=`dco run web bin/kubectl-staging get pods | grep $1 | awk '{print $1}'`
@@ -192,7 +210,7 @@ _t4b-pr() {
 
 # tsp tshir-previewer
 tsp-prod() {
-  _k8s "tshirt-previewer-prod" "web" "bash"
+  _k8s "tshirt-previewer-prod" "toolbox" "bash"
 }
 
 tsp-staging() {
@@ -491,6 +509,7 @@ alias catalog="mux catalog"
 alias catalogc="mux catalog_client"
 alias tco="mux tco"
 alias tcoc="mux tco_client"
+alias pco="mux pco"
 alias wk="mux work"
 alias t4b="mux t4b"
 alias t4b-woo="mux t4b-woo"
@@ -500,6 +519,7 @@ alias mcm="mux mcm"
 alias pricing="mux pricing"
 alias vac="mux valid_address_client"
 alias va="mux valid_address"
+alias reprint="mux reprint"
 alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
