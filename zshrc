@@ -244,6 +244,15 @@ mcm-bash-staging() {
   _k8s "mockup-creator-module-staging" "web" "bash"
 }
 
+# Reprint
+reprint-prod() {
+  _k8s "reprint-prod" "web" "bash"
+}
+
+reprint-staging() {
+  _k8s "reprint-staging" "web" "bash"
+}
+
 # -----------------------------------------------------------------------------
 # k8s tools
 # -----------------------------------------------------------------------------
