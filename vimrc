@@ -20,8 +20,8 @@ Plugin 'godlygeek/tabular'
 " CoffeeScript support
 Plugin 'kchmck/vim-coffee-script'
 
-" Fuzzy file, buffer, mru, tag, etc finder
-Plugin 'ctrlpvim/ctrlp.vim'
+" Fuzzy file finder
+Plugin 'junegunn/fzf'
 
 " LessCSS Syntax support
 Plugin 'lunaru/vim-less'
@@ -239,46 +239,9 @@ let g:netrw_nogx = 1
 nmap gx yiW:!xdg-open "<C-r>"" & <CR><CR>:redraw!<CR>
 
 "------------------------------------------------------------------------------
-" ctrlp
+" FZF
 "------------------------------------------------------------------------------
-" Start in mixed mode
-let g:ctrlp_cmd = 'CtrlPMixed'
-
-" Search by filename only by default
-" let g:ctrlp_by_filename = 1
-
-" Sane Ignore
-let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|coverage\|log\|tmp$',
-      \ 'file': '\.exe$\|\.so$\|\.dat$' }
-
-" Ignore files in .gitignore
-" -c Show cached files in the output (default)
-" -o Show other (i.e. untracked) files in the output
-" --exclude-standard
-" let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
-" let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
-let g:ctrlp_user_command = {
-\    'types': {
-\      1: [
-\        '.git',
-\        'cd %s &&
-\         git ls-files . -co --exclude-standard
-\         | awk ''{ print length, $0 }''
-\         | sort -n -s
-\         | cut -d" " -f2-'
-\      ],
-\    },
-\    'fallback': 'find %s -type f'
-\  }
-
-" Do not display MRU files from other directory (above project root)
-let g:ctrlp_mruf_relative = 1
-
-" 'c' - the directory of the current file.
-" 'r' - the nearest ancestor that contains one of these directories or files: .git .hg .svn .bzr _darcs
-" 'a' - like c, but only if the current working directory outside of CtrlP is not a direct ancestor of the directory of the current file.
-"  0 or '' (empty string) - disable this feature.
-let g:ctrlp_working_path_mode = 'ra'
+nmap <C-P> :FZF<CR>
 
 "------------------------------------------------------------------------------
 " Ack
