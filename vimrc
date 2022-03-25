@@ -164,9 +164,6 @@ au BufWinEnter * let w:m1=matchadd('Special', 'DONE', -1)
 "------------------------------------------------------------------------------
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 
-" Ack vim shortcut
-nmap <leader>t :Ack<SPACE>-i<SPACE>''<LEFT>
-
 " Save time
 nmap <SPACE> :
 
@@ -244,11 +241,12 @@ nmap gx yiW:!xdg-open "<C-r>"" & <CR><CR>:redraw!<CR>
 nmap <C-P> :FZF<CR>
 
 "------------------------------------------------------------------------------
-" Ack
+" Ack / AG
 "------------------------------------------------------------------------------
-let g:ack_default_options = " -s -H --nocolor --nogroup --column --ignore-dir=dist
-      \ --ignore-dir=Cache --ignore-dir=log --ignore-dir=tmp --ignore-dir=coverage
-      \ --ignore-dir=doc --ignore-file=is:tags"
+" Use ag instead of ack
+let g:ackprg = 'ag --vimgrep'
+
+nmap <leader>a :Ack!<SPACE>''<LEFT>
 
 "------------------------------------------------------------------------------
 " diff
