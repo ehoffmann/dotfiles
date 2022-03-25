@@ -317,7 +317,7 @@ dcbe() {
 }
 
 dcguard() {
-  docker-compose run --rm web bundle exec guard
+  docker-compose run --rm web bundle exec guard -g spec
 }
 
 tzguard() {
