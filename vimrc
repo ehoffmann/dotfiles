@@ -256,7 +256,20 @@ let g:ctrlp_custom_ignore = { 'dir': 'node_modules$\|_site\|dist$\|\.git$\|cover
 " -o Show other (i.e. untracked) files in the output
 " --exclude-standard
 " let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
-let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
+" let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
+let g:ctrlp_user_command = {
+\    'types': {
+\      1: [
+\        '.git',
+\        'cd %s &&
+\         git ls-files . -co --exclude-standard
+\         | awk ''{ print length, $0 }''
+\         | sort -n -s
+\         | cut -d" " -f2-'
+\      ],
+\    },
+\    'fallback': 'find %s -type f'
+\  }
 
 " Do not display MRU files from other directory (above project root)
 let g:ctrlp_mruf_relative = 1
