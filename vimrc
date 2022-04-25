@@ -22,6 +22,7 @@ Plugin 'kchmck/vim-coffee-script'
 
 " Fuzzy file finder
 Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
 
 " LessCSS Syntax support
 Plugin 'lunaru/vim-less'
@@ -239,7 +240,10 @@ nmap gx yiW:!xdg-open "<C-r>"" & <CR><CR>:redraw!<CR>
 "------------------------------------------------------------------------------
 " FZF
 "------------------------------------------------------------------------------
-nmap <C-P> :FZF<CR>
+command! -bang -nargs=? -complete=dir Files
+      \ call fzf#vim#files(<q-args>, {'options': ['--info=inline', '--preview', 'less {}']}, <bang>0)
+nmap <C-P> :Files<CR>
+
 
 "------------------------------------------------------------------------------
 " Ack / AG
