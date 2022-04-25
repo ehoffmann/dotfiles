@@ -200,9 +200,9 @@ t4b-staging-pr3() {
 
 _t4b-pr() {
   cd ~/code/tz/t4b || exit 1
-  CONTAINER=`dco run web bin/kubectl-staging get pods | grep $1 | awk '{print $1}'`
+  CONTAINER=`dco run --rm  web bin/kubectl-staging get pods | grep $1 | awk '{print $1}'`
   if [ -n "$CONTAINER" ]; then
-    docker-compose run web bin/kubectl-staging exec -it $CONTAINER  -- bash
+    docker-compose run --rm web bin/kubectl-staging exec -it $CONTAINER  -- bash
   else
     echo "No container."
   fi
@@ -226,7 +226,7 @@ tsp-edit-staging() {
     # echo Not in tsp
     # exit 1
   # fi
-  docker-compose run web bin/kubectl-staging edit deployment tshirt-previewer-web
+  docker-compose run --rm web bin/kubectl-staging edit deployment tshirt-previewer-web
 }
 
 # mockup-creator-module mcm
@@ -237,7 +237,7 @@ mcm-edit-staging() {
     # echo Not in tsp
     # exit 1
   # fi
-  docker-compose run web bin/kubectl-staging edit deployment mockup-creator-module-web
+  docker-compose run --rm web bin/kubectl-staging edit deployment mockup-creator-module-web
 }
 
 mcm-bash-staging() {
@@ -521,7 +521,6 @@ alias tcoc="mux tco_client"
 alias pco="mux pco"
 alias wk="mux work"
 alias t4b="mux t4b"
-alias t4b2="mux t4b2"
 alias t4b-woo="mux t4b-woo"
 alias tsp="mux tsp"
 alias woo="mux woo"
