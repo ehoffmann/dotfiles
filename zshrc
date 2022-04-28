@@ -272,6 +272,41 @@ _k8s() {
 }
 
 # -----------------------------------------------------------------------------
+# Kubetail
+# -----------------------------------------------------------------------------
+
+kubetail-t4b() {
+  _kubetail-prod "$1" "t4b-prod"
+}
+
+kubetail-tco() {
+  _kubetail-prod "$1" "tco-prod"
+}
+
+kubetail-pco() {
+  _kubetail-prod "$1" "pco-prod"
+}
+
+kubetail-tsp() {
+  _kubetail-prod "$1" "tshirt-previewer-prod"
+}
+
+kubetail-pricing() {
+  _kubetail-prod "$1" "pricing-prod"
+}
+
+_kubetail-prod() {
+  host=$(cat ~/.prod-k8s)
+  ssh -t $host "kubetail $1 -n $2"
+}
+
+# Require ssh access to staging host
+# _kubetail-staging() {
+#   host=$(cat ~/.staging-k8s)
+#   ssh -t $host "kubetail $1 -n $2"
+# }
+
+# -----------------------------------------------------------------------------
 # Docker
 # -----------------------------------------------------------------------------
 alias dco='docker-compose'
