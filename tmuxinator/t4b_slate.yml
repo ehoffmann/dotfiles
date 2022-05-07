@@ -1,0 +1,12 @@
+# ~/.tmuxinator/t4b_slate.yml
+
+name: t4b_slate
+root: ~/code/tz/t4b_slate
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
+        -
