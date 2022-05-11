@@ -625,7 +625,8 @@ stty -ixon
 
 # chruby
 source /usr/local/share/chruby/chruby.sh
-chruby 2.5.1
+# (installed with `sudo ruby-build 2.6.10 /opt/rubies/ruby-2.6.10`)
+chruby 2.6.10
 
 # tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
