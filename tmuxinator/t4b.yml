@@ -9,9 +9,9 @@ windows:
   - main:
       layout: main-horizontal
       panes:
-        - sleep 1 && vim
+        - vim
         - rm -rf tmp/uploads/test
-        -
+        - cd ~/work && vim
   - guard:
       layout: even-vertical
       panes:
