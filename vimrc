@@ -152,7 +152,7 @@ let g:gruvbox_number_column='bg2'
 let g:gruvbox_color_column='bg3'
 
 " Highlight tabs and trailing spaces
-" set listchars=tab:→\ ,space:·,nbsp:␣,trail:•,eol:¶,precedes:«,extends:»
+" set list listchars=tab:→\ ,space:·,nbsp:␣,trail:•,eol:¶,precedes:«,extends:»
 set list listchars=tab:→\ ,nbsp:␣,trail:•,precedes:«,extends:»
 highlight SpecialKey term=standout ctermbg=black guibg=yellow
 
