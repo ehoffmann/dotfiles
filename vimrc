@@ -253,6 +253,9 @@ let g:ackprg = 'ag --vimgrep'
 
 nmap <leader>a :Ack!<SPACE>''<LEFT>
 
+" Visual selection to Ack
+vnoremap <Leader>a "ay:Ack! <C-r>=fnameescape(@a)<CR><CR>
+
 "------------------------------------------------------------------------------
 " diff
 "------------------------------------------------------------------------------
