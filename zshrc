@@ -47,6 +47,11 @@ alias vagrash='vagrant up && vagrant ssh'
 alias tmxu='tmux'
 
 
+# -----------------------------------------------------------------------------
+# fzf
+# -----------------------------------------------------------------------------
+# Default fzf search for vim
+export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 
 # -----------------------------------------------------------------------------
 # k8s deploy & console
