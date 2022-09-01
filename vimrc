@@ -249,7 +249,7 @@ nmap <C-P> :Files<CR>
 " Ack / AG
 "------------------------------------------------------------------------------
 " Use ag instead of ack
-let g:ackprg = 'ag --vimgrep'
+let g:ackprg = 'ag --vimgrep --hidden'
 
 nmap <leader>a :Ack!<SPACE>''<LEFT>
 
