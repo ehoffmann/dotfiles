@@ -1,16 +1,21 @@
 ZSH=$HOME/.oh-my-zsh
 
-export TERM=xterm-256color
-#export TERM=screen-256color-bce
-
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-ZSH_THEME="ehoffmann"
+# ZSH_THEME="agnoster"
+# ZSH_THEME="robbyrussell"
+# ZSH_THEME="gruvbox"
+# ZSH_THEME="terminalparty"
+# ZSH_THEME="ehoffmann"
+ZSH_THEME="spaceship"
 
 # zsh builtin
 autoload -U zmv
+
+# Vi mode
+set -o vi
+bindkey -v
+
+# Not to be disturbed by Ctrl-S Ctrl-Q in terminals
+stty -ixon
 
 # -----------------------------------------------------------------------------
 # Config alias
@@ -18,6 +23,7 @@ autoload -U zmv
 alias zshconf="vim ~/.zshrc"
 alias vimconf="vim ~/.vimrc"
 alias tmuxconf="vim ~/.tmux.conf"
+alias mux=tmuxinator
 
 # -----------------------------------------------------------------------------
 # Rails
@@ -45,7 +51,6 @@ alias vagrash='vagrant up && vagrant ssh'
 # TMUX
 # -----------------------------------------------------------------------------
 alias tmxu='tmux'
-
 
 # -----------------------------------------------------------------------------
 # fzf
@@ -99,53 +104,13 @@ tz-prod() {
   _k8s "teezily-prod" "toolbox" "bash"
 }
 
-# Catalog
-catalog-staging() {
-  _k8s "catalog-staging" "worker" "bash"
-}
-
-catalog-prod() {
-  _k8s "catalog-prod" "toolbox" "bash"
-}
-
-pm-staging() {
-  _k8s "product-manager-staging" "web" "bash"
-}
-
-ali-staging() {
-  _k8s "aliproxy-staging" "worker" "bash"
-}
-
+# Pricing
 pricing-staging() {
   _k8s "pricing-staging" "web" "bundle exec bash"
 }
 
-pricing-staging-console() {
-  _k8s "pricing-staging" "web" "bash"
-}
-
 pricing-prod() {
   _k8s "pricing-prod" "web" "bundle exec bash"
-}
-
-pm-prod() {
-  _k8s "product-manager-prod" "toolbox" "bash"
-}
-
-pm-prod-bash() {
-  _k8s "product-manager-prod" "toolbox" "bash"
-}
-
-ful-prod() {
-  _k8s "fulfillment-prod" "worker" "bash"
-}
-
-ful-staging() {
-  _k8s "fulfillment-staging" "toolbox" "bash"
-}
-
-ali-prod() {
-  _k8s "aliproxy-prod" "toolbox" "bash"
 }
 
 # TCO
@@ -155,14 +120,6 @@ tco-prod() {
 
 tco-staging() {
   _k8s "tco-staging" "worker" "bash"
-}
-
-tco-prod-bash() {
-  _k8s "tco-prod" "toolbox" "bash"
-}
-
-tco-staging-bash() {
-  _k8s "tco-staging" "toolbox" "bash"
 }
 
 # PCO
@@ -542,7 +499,6 @@ plugins=(git
   web-search
   vi-mode
   history-substring-search
-  zsh-syntax-highlighting
 )
 
 # -----------------------------------------------------------------------------
@@ -575,19 +531,21 @@ alias code="mux code"
 alias prod="mux prod"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R manu:manu ."
-
-# -----------------------------------------------------------------------------
-# Misc
-# -----------------------------------------------------------------------------
-source $ZSH/oh-my-zsh.sh
 alias -g gpi='| grep -i'
 alias mto='curl -4 http://wttr.in/Marseille'
 alias postman=~/bin/Postman
 alias gno=gnome-open
-
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
 
+# -----------------------------------------------------------------------------
+# oh-my-zsh
+# -----------------------------------------------------------------------------
+source $ZSH/oh-my-zsh.sh
+
+# -----------------------------------------------------------------------------
+# PATH
+# -----------------------------------------------------------------------------
 export PATH=/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 export PATH=/usr/local/sbin:$PATH
 export EDITOR=vim
@@ -601,20 +559,6 @@ export PATH=/usr/games:$PATH
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-# Vi mode
-set -o vi
-bindkey -v
-bindkey -M viins 'jk' vi-cmd-mode # require KEYTIMEOUT >= 10
-
-# !! override theme
-function zle-line-init zle-keymap-select {
-    RPS1="$(git_prompt_info) ${${KEYMAP/vicmd/[CMD]}/(main|viins)/}"
-    RPS2=$RPS1
-    zle reset-prompt
-}
-zle -N zle-line-init
-zle -N zle-keymap-select
-
 # cycle through arg history
 bindkey '^O' insert-last-word
 
@@ -625,21 +569,17 @@ bindkey -M vicmd 'j' history-substring-search-down
 # Delay after <ESC> press in milisec (defaul = 4)
 export KEYTIMEOUT=10
 
-# Not to be disturbed by Ctrl-S Ctrl-Q in terminals
-stty -ixon
-
 # chruby
 source /usr/local/share/chruby/chruby.sh
-# (installed with `sudo ruby-build 2.6.9 opt/rubies/ruby-2.6.9`)
+# (installed with `sudo ruby-install ruby 2.6.9`)
 chruby 2.6.9
 
 # tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
 
-#source ~/code/gruvbox/gruvbox_256palette.sh
+# Zsh syntax hi
 source ~/code/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
