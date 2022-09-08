@@ -23,6 +23,7 @@ for line in $(cat input.txt | grep $size); do
     echo $link
     docker volume inspect "$id" | jq '.[0].CreatedAt'
     echo "Delete?"
+    read delete
 
     if [ $delete = "y" ]; then
       docker volume remove $id
