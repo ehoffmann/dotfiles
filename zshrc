@@ -67,6 +67,11 @@ k8s() {
   ssh $host
 }
 
+# Launch a command into a themed terminal
+g-term() { # $profile $command
+  gnome-terminal --window-with-profile="$1" -- zsh -ic "$2"
+}
+
 # TZ Teezily
 tz-deploy-branch() {
   REPO=basename `git rev-parse --show-toplevel`
@@ -142,23 +147,23 @@ va-staging() {
 
 # T4B
 t4b-prod() {
-  _k8s "t4b-prod" "toolbox" "bash"
+  g-term Prod "_k8s t4b-prod toolbox bash"
 }
 
 t4b-staging() {
-  _t4b-pr t4b-web-
+  g-term Staging "_t4b-pr t4b-web-"
 }
 
 t4b-staging-pr() {
-  _t4b-pr t4b-pr-web-
+  g-term Staging "_t4b-pr t4b-pr-web-"
 }
 
 t4b-staging-pr2() {
-  _t4b-pr t4b-pr2-web-
+  g-term Staging "_t4b-pr t4b-pr2-web-"
 }
 
 t4b-staging-pr3() {
-  _t4b-pr t4b-pr3-web-
+  g-term Staging "_t4b-pr t4b-pr3-web-"
 }
 
 _t4b-pr() {
