@@ -120,11 +120,11 @@ pricing-prod() {
 
 # TCO
 tco-prod() {
-  _k8s "tco-prod" "toolbox" "bash"
+  g-term Prod "_k8s tco-prod toolbox bash"
 }
 
 tco-staging() {
-  _k8s "tco-staging" "worker" "bash"
+  g-term Staging "_k8s tco-staging worker bash"
 }
 
 # PCO
