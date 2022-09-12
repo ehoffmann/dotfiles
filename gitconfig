@@ -23,6 +23,7 @@
 [user]
   signingkey = 9824B2BF22DDA63B
   email = emmanuel@activeand.co
+  name = ehoffmann
 
 [commit]
   gpgsign = true
