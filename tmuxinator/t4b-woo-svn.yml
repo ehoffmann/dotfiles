@@ -1,7 +1,7 @@
-# ~/.tmuxinator/t4b-woo.yml
+# ~/.tmuxinator/t4b-woo-svn.yml
 
-name: t4b for woo
-root: ~/code/tz/teezilyplus-for-woocommerce
+name: t4b for woo SVN
+root: ~/code/tz/teezilyplus-for-woocommerce-svn
 
 windows:
   - main:
