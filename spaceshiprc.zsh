@@ -5,6 +5,7 @@
 
 # Do not truncate path in repos
 SPACESHIP_DIR_TRUNC_REPO=false
+SPACESHIP_GIT_STATUS_STASHED=
 
 # Add custom Ember section
 # See: https://github.com/spaceship-prompt/spaceship-ember
