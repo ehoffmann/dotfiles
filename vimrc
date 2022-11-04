@@ -367,9 +367,10 @@ let ruby_global_variable_error   = 1
 let ruby_spellcheck_strings = 1
 
 "------------------------------------------------------------------------------
-" Markdown
+" Markdown (tpope vim-markdown, embedeed in vim)
+" https://github.com/tpope/vim-markdown
 "------------------------------------------------------------------------------
-let g:markdown_fenced_languages = ['ruby', 'javascript', 'json', 'bash=sh']
+let g:markdown_fenced_languages = ['ruby', 'js=javascript', 'json', 'yaml', 'bash=sh']
 
 "------------------------------------------------------------------------------
 " misc
