@@ -4,8 +4,8 @@ ZSH=$HOME/.oh-my-zsh
 # ZSH_THEME="robbyrussell"
 # ZSH_THEME="gruvbox"
 # ZSH_THEME="terminalparty"
-# ZSH_THEME="ehoffmann"
-ZSH_THEME="spaceship"
+# ZSH_THEME="spaceship"
+ZSH_THEME="ehoffmann"
 
 # zsh builtin
 autoload -U zmv
