@@ -154,6 +154,10 @@ t4b-staging() {
   g-term Staging "_t4b-pr t4b-web-"
 }
 
+t4b-staging-redis() {
+  g-term Staging "_t4b-pr t4b-redis- redis-cli"
+}
+
 t4b-staging-pr() {
   g-term Staging "_t4b-pr t4b-pr-web-"
 }
@@ -168,9 +172,10 @@ t4b-staging-pr3() {
 
 _t4b-pr() {
   cd ~/code/tz/t4b || exit 1
+  ARG2=${2:-bash}
   CONTAINER=`dco run --rm  web bin/kubectl-staging get pods | grep $1 | awk '{print $1}'`
   if [ -n "$CONTAINER" ]; then
-    docker-compose run --rm web bin/kubectl-staging exec -it $CONTAINER  -- bash
+    docker-compose run --rm web bin/kubectl-staging exec -it $CONTAINER  -- $ARG2
   else
     echo "No container."
   fi
@@ -312,7 +317,7 @@ tza-rb() {
 }
 
 dcba() {
-  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bash"
+  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bash"
 }
 
 dcbe() {
