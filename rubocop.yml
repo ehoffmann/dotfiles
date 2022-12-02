@@ -1,4 +1,6 @@
 AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.6
   Exclude:
    - 'bin/*'
    - 'db/seeds.rb'
@@ -14,18 +16,9 @@ Metrics/BlockLength:
     - 'config/routes.rb'
 
 Metrics/LineLength:
-  Max: 100
-
-Style/ClassAndModuleChildren:
-  Enabled: false
+  Max: 120
 
 Style/Documentation:
-  Enabled: false
-
-#Style/DotPosition:
-  #EnforcedStyle: trailing
-
-Style/FrozenStringLiteralComment:
   Enabled: false
 
 Style/Lambda:
@@ -39,3 +32,36 @@ Style/TrailingCommaInHashLiteral:
 
 Style/TrailingCommaInArrayLiteral:
   Enabled: false
+
+Style/SingleLineMethods:
+  Enabled: false
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
+
+Style/For:
+  Exclude:
+    - '*.haml'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'app/admin/**/*.rb'
+    - 'spec/**/*.rb'
+    - 'config/routes.rb'
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
