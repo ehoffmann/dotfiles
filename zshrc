@@ -67,6 +67,11 @@ k8s() {
   ssh $host
 }
 
+_k8s() {
+  host=$(cat ~/.prod-k8s)
+  ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
+}
+
 # Launch a command into a themed terminal
 g-term() { # $profile $command
   gnome-terminal --window-with-profile="$1" -- zsh -ic "$2"
@@ -236,11 +241,6 @@ staging-images () {
     image=$(bin/kubectl-staging get pod $cont -o yaml | egrep  -o -m 1 '  image: .*')
     echo "$cont $image"
   done
-}
-
-_k8s() {
-  host=$(cat ~/.prod-k8s)
-  ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
 }
 
 # -----------------------------------------------------------------------------
