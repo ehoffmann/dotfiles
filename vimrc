@@ -240,7 +240,7 @@ autocmd Filetype javascript setlocal ts=2 sts=2 sw=2
 " Disable default gx
 let g:netrw_nogx = 1
 " Remap gx to open any URL under cursor in the browser
-nmap gx yiW:!xdg-open "<C-r>"" & <CR><CR>:redraw!<CR>
+nmap gx yiW:!xdg-open "<C-r>"" > /dev/null<CR><CR>
 
 "------------------------------------------------------------------------------
 " FZF
