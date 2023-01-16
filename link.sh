@@ -9,3 +9,5 @@ ln -s ~/dotfiles/tigrc ~/.tigrc
 ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/vimrc ~/.vimrc
 ln -s ~/dotfiles/zshrc ~/.zshrc
+mkdir -p ~/bin
+ln -s ~/dotfiles/pomodoro.sh ~/bin/pomodoro
