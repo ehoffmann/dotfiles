@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Simple pomoro timer
+
 # Set the duration of each pomodoro in seconds
 duration=1500
 
