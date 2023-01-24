@@ -559,16 +559,12 @@ source $ZSH/oh-my-zsh.sh
 # -----------------------------------------------------------------------------
 # PATH
 # -----------------------------------------------------------------------------
-export PATH=/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
-export PATH=/usr/local/sbin:$PATH
+export PATH=~/bin:$PATH
+
+# -----------------------------------------------------------------------------
+# MISC
+# -----------------------------------------------------------------------------
 export EDITOR=vim
-export PATH=/usr/local/go/bin:$PATH
-export GOPATH=~/go
-export PATH=$PATH:$GOPATH/bin
-export PATH=/usr/local/heroku/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/share/npm/bin:/Users/manu/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/Users/manu/go/bin:/Users/manu/.ec2/bin:/usr/local/libxls/bin
-export PATH="/home/vagrant/.gem/ruby/2.5.0/bin:$PATH"
-export PATH=/usr/bin/vendor_perl:$PATH
-export PATH=/usr/games:$PATH
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
