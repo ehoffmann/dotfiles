@@ -580,8 +580,8 @@ export KEYTIMEOUT=10
 
 # chruby
 source /usr/local/share/chruby/chruby.sh
-# (installed with `sudo ruby-install ruby 2.6.9`)
-chruby 2.6.9
+# Installed with `sudo ruby-build 2.7.6 /opt/rubies/ruby-2.7.6`
+chruby 2.7.6
 
 # tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
