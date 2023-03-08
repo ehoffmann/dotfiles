@@ -1,0 +1,15 @@
+# ~/.tmuxinator/tz-front.yml
+name: tz-front
+root: ~/code/tz/tz-front
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - sleep 1 && vim
+        -
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
