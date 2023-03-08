@@ -516,6 +516,7 @@ plugins=(git
 # -----------------------------------------------------------------------------
 alias devops="mux devops"
 alias tz="mux teezily"
+alias tzf="mux tz-front"
 alias tza="mux tza"
 alias pm="mux product-manager"
 alias dot="mux dotfiles"
