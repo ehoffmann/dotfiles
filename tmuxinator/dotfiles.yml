@@ -5,6 +5,6 @@ windows:
   - main:
       layout: main-horizontal
       panes:
-        - sleep 1 && vim
+        - vim
         -
         -
