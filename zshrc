@@ -69,7 +69,7 @@ k8s() {
 
 _k8s() {
   host=$(cat ~/.prod-k8s)
-  ssh -t $host "kubectl -n $1 get pods | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
+  ssh -t $host "kubectl -n $1 get pods | grep -v ImagePullBackOff | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
 }
 
 # Launch a command into a themed terminal
