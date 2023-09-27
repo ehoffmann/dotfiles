@@ -136,9 +136,6 @@ if exists('+termguicolors')
   set termguicolors
 endif
 
-" Tmux background bug
-set t_ut=
-
 " Set background=dark
 set background=light
 let g:gruvbox_italic=1

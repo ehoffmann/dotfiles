@@ -9,6 +9,7 @@ ln -s ~/dotfiles/tigrc ~/.tigrc
 ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/vimrc ~/.vimrc
 ln -s ~/dotfiles/zshrc ~/.zshrc
+ln -s ~/dotfiles/alacritty.yml ~/.alacritty.yml
 mkdir -p ~/bin
 ln -s ~/dotfiles/bin/pomodoro.sh ~/bin/pomodoro
 ln -s ~/dotfiles/bin/sixtify.rb ~/bin/sixtify
