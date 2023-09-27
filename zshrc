@@ -357,11 +357,11 @@ dcmigrate-dev() {
 }
 
 dcmigrate-test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set RAILS_ENV=test db:drop db:create db:test:prepare
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake RAILS_ENV=test db:drop db:create db:test:prepare
 }
 
-dcmigrate-test-noset() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake RAILS_ENV=test db:drop db:create db:test:prepare
+dcmigrate-test-set() {
+  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set RAILS_ENV=test db:drop db:create db:test:prepare
 }
 
 dcrollback-dev() {
