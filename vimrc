@@ -207,6 +207,9 @@ nmap <leader>cr cs{}cs}{
 " Mark task as done
 nmap <leader>x :s/\[ \]/[X]/<cr>
 
+" Copy current file path and line number into system clipboard. Use gF then.
+nnoremap <Leader>cp :let @+ = expand('%:p') . ':' . line('.')<CR>
+
 "------------------------------------------------------------------------------
 " Split navigation shortcut (same as tmux)
 "------------------------------------------------------------------------------
@@ -367,6 +370,30 @@ let ruby_pseudo_operators = 1
 let ruby_line_continuation_error = 1
 let ruby_global_variable_error   = 1
 let ruby_spellcheck_strings = 1
+
+"------------------------------------------------------------------------------
+" Create/open spec file in Rails project
+"------------------------------------------------------------------------------
+function! OpenCorrespondingSpec()
+  " Get the current file's path
+  let l:current_file_path = expand('%:p')
+
+  " Transform the path to the corresponding spec path
+  let l:spec_file_path = substitute(l:current_file_path, 'app/', 'spec/', '')
+  let l:spec_file_path = substitute(l:spec_file_path, '.rb', '_spec.rb', '')
+
+  " Create the directory for the spec file if it doesn't exist
+  execute '!mkdir -p ' . fnamemodify(l:spec_file_path, ':h')
+
+  " Open the spec file
+  execute 'edit ' . l:spec_file_path
+endfunction
+
+" Command
+command! OpenSpec :call OpenCorrespondingSpec()
+
+" Mapping
+" nnoremap <leader>s :call OpenCorrespondingSpec()<cr>
 
 "------------------------------------------------------------------------------
 " Markdown (tpope vim-markdown, embedeed in vim)
