@@ -1,5 +1,4 @@
 set nocompatible " be iMproved
-filetype on      " fix git commit message error on leopard
 filetype off     " required!
 
 set rtp+=~/.vim/bundle/Vundle.vim/
@@ -73,7 +72,7 @@ Plugin 'tpope/vim-haml'
 Plugin 'tpope/vim-rails.git'
 
 " Retro groove color scheme for Vim
-Plugin 'morhetz/gruvbox'
+" Plugin 'morhetz/gruvbox'
 
 " Transparent editing of gpg encrypted files
 Plugin 'jamessan/vim-gnupg'
@@ -128,30 +127,27 @@ set expandtab                     " use spaces, not tabs
 set backspace=indent,eol,start    " backspace through everything in insert mode
 
 "------------------------------------------------------------------------------
-" Color
+" Color / Scheme
 "------------------------------------------------------------------------------
-if exists('+termguicolors')
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-  set termguicolors
-endif
 
-" Set background=dark
-set background=light
-let g:gruvbox_italic=1
-colorscheme gruvbox
+" Solarized (manual install from https://github.com/altercation/vim-colors-solarized/tree/master#option-1-manual-installation
+set background=dark
+" let g:solarized_diffmode="high"
+" let g:solarized_diffmode="low"
+colorscheme solarized
+
+" Gruvbox
+" set background=light
+" colorscheme gruvbox
+" let g:gruvbox_italic=1
+" let g:gruvbox_number_column='bg2'
+" let g:gruvbox_color_column='bg3'
 
 " Highlight col 101 and onward
 let &colorcolumn=join(range(101,6999),",")
-"highlight ColorColumn ctermbg=0 guibg=#2c2d27
-"highlight ColorColumn ctermbg=24 guibg=#2c2d27
-let g:gruvbox_number_column='bg2'
-let g:gruvbox_color_column='bg3'
 
 " Highlight tabs and trailing spaces
-" set list listchars=tab:→\ ,space:·,nbsp:␣,trail:•,eol:¶,precedes:«,extends:»
 set list listchars=tab:→\ ,nbsp:␣,trail:•,precedes:«,extends:»
-highlight SpecialKey term=standout ctermbg=black guibg=yellow
 
 " Keyword highlighting bonus
 au BufWinEnter * let w:m1=matchadd('Error', 'BROKEN\|WTF', -1)
@@ -276,6 +272,7 @@ set tags=./tags;
 " gitgutter
 "------------------------------------------------------------------------------
 set updatetime=750
+highlight! link SignColumn LineNr
 
 "------------------------------------------------------------------------------
 " GO
