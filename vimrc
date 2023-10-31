@@ -97,7 +97,7 @@ Plugin 'airblade/vim-gitgutter'
 
 call vundle#end()
 
-filetype plugin indent on     " required!
+filetype plugin indent on " required!
 
 set number
 set ruler
@@ -108,7 +108,7 @@ set encoding=utf-8
 "------------------------------------------------------------------------------
 " Search
 "------------------------------------------------------------------------------
-set incsearch
+set incsearch " highlight matched string.
 
 " hlsearch only when cmd
 augroup vimrc-incsearch-highlight
@@ -135,6 +135,9 @@ set background=dark
 " let g:solarized_diffmode="high"
 " let g:solarized_diffmode="low"
 colorscheme solarized
+
+" Fix issue with spell check and solarized " https://github.com/altercation/vim-colors-solarized/issues/195
+set t_Cs=
 
 " Gruvbox
 " set background=light
