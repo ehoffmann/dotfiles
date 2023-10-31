@@ -4,6 +4,7 @@
 
 [core]
   excludesfile = ~/.gitignore
+  pager = diffr | less -R
 [alias]
   # Thanks to https://blog.jez.io/cli-code-review/
 
@@ -32,3 +33,5 @@
   rebase = false
 [hub]
 	protocol = https
+[interactive]
+	difffilter = diffr
