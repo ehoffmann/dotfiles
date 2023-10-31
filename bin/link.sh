@@ -14,3 +14,4 @@ mkdir -p ~/bin
 ln -s ~/dotfiles/bin/pomodoro.sh ~/bin/pomodoro
 ln -s ~/dotfiles/bin/sixtify.rb ~/bin/sixtify
 ln -s ~/dotfiles/bin/backup-deploy.rb ~/bin/backup-deploy
+ln -s ~/dotfiles/bin/changelog.rb ~/bin/changelog
