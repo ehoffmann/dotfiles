@@ -5,7 +5,6 @@ root: ~/code/tz/t4b
 
 on_project_first_start:
   - rm -f log/*.log
-  - rm -rf tmp/uploads/test
   - ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
 
 windows:
@@ -13,7 +12,7 @@ windows:
       layout: main-horizontal
       panes:
         - vim
-        - df -h
+        - sudo rm -rf tmp/uploads/test && df -h
         - cd ~/Dropbox/work && vim
   - guard:
       layout: even-vertical
