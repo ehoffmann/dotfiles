@@ -582,6 +582,8 @@ export KEYTIMEOUT=10
 # chruby
 source /usr/local/share/chruby/chruby.sh
 # Installed with `sudo ruby-build 2.7.6 /opt/rubies/ruby-2.7.6`
+# List available builds: `ruby-build --definitions`
+# List locales version : `chruby`
 chruby 2.7.6
 
 # tmuxinator completion/alias
@@ -593,3 +595,6 @@ source ~/code/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Rust
+source "$HOME/.cargo/env"
