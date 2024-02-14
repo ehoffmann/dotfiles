@@ -8,6 +8,7 @@ ln -s ~/dotfiles/spaceshiprc.zsh ~/.spaceshiprc.zsh
 ln -s ~/dotfiles/tigrc ~/.tigrc
 ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/vimrc ~/.vimrc
+ln -s ~/dotfiles/vim_snippets ~/.vim/snippets
 ln -s ~/dotfiles/zshrc ~/.zshrc
 ln -s ~/dotfiles/alacritty.yml ~/.alacritty.yml
 mkdir -p ~/bin

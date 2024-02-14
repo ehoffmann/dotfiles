@@ -1,0 +1,11 @@
+name: helm
+root: ~/code/tz/helm-charts
+
+on_project_first_start:
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
