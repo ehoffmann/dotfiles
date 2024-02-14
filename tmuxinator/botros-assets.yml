@@ -1,0 +1,10 @@
+name: botros-assets
+root: ~/code/tz/botros-assets
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        -
+        -

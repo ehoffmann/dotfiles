@@ -1,0 +1,20 @@
+# ~/.tmuxinator/botros.yml
+
+name: botros
+root: ~/code/tz/botros
+
+on_project_first_start:
+  - rm -f log/*.log
+  - ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        - sudo rm -rf tmp/uploads/test && df -h
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
