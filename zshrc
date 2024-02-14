@@ -43,11 +43,6 @@ alias git-clean-branch='git fetch; git branch --merged staging | egrep -v "(^\*|
 export REVIEW_BASE=staging
 
 # -----------------------------------------------------------------------------
-# Vagrant
-# -----------------------------------------------------------------------------
-alias vagrash='vagrant up && vagrant ssh'
-
-# -----------------------------------------------------------------------------
 # TMUX
 # -----------------------------------------------------------------------------
 alias tmxu='tmux'
@@ -109,6 +104,11 @@ tz-enter-branch() {
 tz-staging() {
   _k8s "teezily-staging" "teezily-web" "bash"
 }
+
+tz-staging-pr2() {
+  _k8s "teezily-staging" "teezily-pr2-web-" "bash"
+}
+
 
 tz-prod() {
   _k8s "teezily-prod" "toolbox" "bash"
@@ -301,23 +301,16 @@ rb() {
   docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bundle exec rails c"
 }
 
-# In adition, we can use new docker exec feature to work with running container:
-# docker exec -it <container_id> bash -c 'cat > /path/to/container/file' <
-# /path/to/host/file/
-
-rbtz() {
-  docker-compose run --rm web /bin/bash
-}
-cptz() {
-  docker exec -i $1 bash -c 'cat > ~/.irbrc' < ~/.irbrc
-}
-
 tza-rb() {
   docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web bash
 }
 
 dcba() {
   docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bash"
+}
+
+dcsh() {
+  docker-compose run --rm web /bin/sh
 }
 
 dcbe() {
@@ -338,13 +331,6 @@ tzspec() {
   # Mysql with tmpfs
   # guard -i => get term input echo with binding.pry
   docker-compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec rspec"
-}
-
-dcguard_xfvb() {
-  docker rm -f guard
-  docker-compose run -d --rm --name guard web tail -f /dev/null
-  docker exec -d guard sh -c 'Xvfb :99 -ac &'
-  docker exec -ti guard sh -c 'export DISPLAY=:99; bundle exec guard'
 }
 
 dcmigrate-all() {
@@ -383,13 +369,6 @@ tco-mysql() {
   docker exec -ti $container mysql -uroot -pfoo tco_$rails_env
 }
 
-db-catalog() {
-  rails_env=${1:-development}
-  docker-compose start postgresql
-  container=$(docker-compose ps postgresql | grep Up | awk  '{print $1}')
-  docker exec -ti $container psql -U postgres catalog_$rails_env
-}
-
 pg-shell() {
   docker-compose start db
   container=$(docker-compose ps db | grep Up | awk  '{print $1}')
@@ -407,7 +386,17 @@ tz-mysql-upgrade() {
 tz-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=~/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql.gz
-  db-dump mysql teezily_dev | gzip > $file_path
+  mysql_dump mysql teezily_dev | gzip > $file_path
+  echo "Dump OK -> $file_path"
+}
+
+# zcat ../../dumps/teezily-04_23_2018_08_41_11-staging.sql.gz | docker exec -i teezily_mysql_1 mysql teezily_dev -uroot -pfoo
+# and use -f if you have to ignore errors
+# docker exec -i teezily_mysql_1 mysql teezily_dev -f -uroot -pfoo
+tz-dump-data() {
+  branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
+  file_path=~/dumps/teezily-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name-data.sql.gz
+  mysql_dump_data_only mysql teezily_dev | gzip > $file_path
   echo "Dump OK -> $file_path"
 }
 
@@ -446,10 +435,16 @@ _pg-dump() {
   fi
 }
 
-mysql-dump() {
+mysql_dump() {
   docker-compose start $1
   container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump -uroot -pfoo $2
+}
+
+mysql_dump_data_only() {
+  docker-compose start $1
+  container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
+  docker exec -ti $container mysqldump  --no-create-info --skip-triggers -uroot -pfoo $2
 }
 
 dcdb_load_tco_dev() {
@@ -514,43 +509,42 @@ plugins=(git
 # -----------------------------------------------------------------------------
 # Project related
 # -----------------------------------------------------------------------------
-alias devops="mux devops"
-alias tz="mux teezily"
-alias tzf="mux tz-front"
-alias tza="mux tza"
-alias pm="mux product-manager"
-alias dot="mux dotfiles"
 alias ali="mux aliproxy"
-alias ful="mux fulfillment"
-alias catalog="mux catalog"
+alias bass="mux botros-assets"
+alias botros="mux botros"
 alias catalogc="mux catalog_client"
-alias tco="mux tco"
-alias tcoc="mux tco_client"
+alias catalog="mux catalog"
+alias code="mux code"
 alias delc="mux delivengo_client"
+alias devops="mux devops"
+alias dot="mux dotfiles"
+alias ful="mux fulfillment"
+alias hlm="mux helm"
+alias mcm="mux mcm"
+alias payoneer="mux payoneer"
 alias pco="mux pco"
-alias wk="mux work"
+alias pm="mux product-manager"
+alias pricing="mux pricing"
+alias prod="mux prod"
+alias reprint="mux reprint"
 alias t4b="mux t4b"
 alias t4b_slate="mux t4b_slate"
 alias t4b-woo="mux t4b-woo"
 alias t4b-woo-svn="mux t4b-woo-svn"
+alias tcoc="mux tco_client"
+alias tco="mux tco"
 alias tsp="mux tsp"
-alias woo="mux woo"
-alias mcm="mux mcm"
-alias pricing="mux pricing"
+alias tza="mux tza"
+alias tzf="mux tz-front"
+alias tz="mux teezily"
 alias vac="mux valid_address_client"
 alias va="mux valid_address"
-alias reprint="mux reprint"
-alias payoneer="mux payoneer"
-alias code="mux code"
-alias prod="mux prod"
-alias botros="mux botros"
-alias bass="mux botros-assets"
+alias wk="mux work"
+alias woo="mux woo"
 alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R manu:manu ."
-alias -g gpi='| grep -i'
 alias mto='curl -4 http://wttr.in/Marseille'
-alias postman=~/bin/Postman
-alias gno=gnome-open
+alias -g gpi='| grep -i'
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
 
@@ -584,9 +578,11 @@ export KEYTIMEOUT=10
 # chruby
 source /usr/local/share/chruby/chruby.sh
 # Installed with `sudo ruby-build 2.7.6 /opt/rubies/ruby-2.7.6`
+# Installed with `sudo ruby-build 3.2.0 /opt/rubies/ruby-3.2.0`
 # List available builds: `ruby-build --definitions`
 # List locales version : `chruby`
-chruby 2.7.6
+# chruby 2.7.6
+chruby 3.2.0
 
 # tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
@@ -600,3 +596,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # Rust
 source "$HOME/.cargo/env"
+
+# GPG agent
+GPG_TTY=`tty`
+export GPG_TTY
