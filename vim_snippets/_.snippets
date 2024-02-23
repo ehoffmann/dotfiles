@@ -8,3 +8,6 @@ snippet tomorrow
 
 snippet yesterday
 	`strftime("%a %d %b %Y", strftime("%s")-86400)`
+
+snippet monday
+	`strftime("%a %d %b %Y", strftime("%s") + (8 - strftime('%u'))  * 86400)`
