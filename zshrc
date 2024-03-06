@@ -582,7 +582,9 @@ source /usr/local/share/chruby/chruby.sh
 # List available builds: `ruby-build --definitions`
 # List locales version : `chruby`
 # chruby 2.7.6
-chruby 3.2.0
+# chruby 3.2.0
+# Manual install https://github.com/postmodern/chruby/wiki/Ruby#installation
+chruby 3.3.0
 
 # tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
