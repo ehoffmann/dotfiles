@@ -155,8 +155,16 @@ t4b-prod() {
   g-term Prod "_k8s t4b-prod toolbox bash"
 }
 
+t4b-prod-worker() {
+  g-term Prod "_k8s t4b-prod worker bash"
+}
+
 t4b-staging() {
   g-term Staging "_t4b-pr t4b-web-"
+}
+
+t4b-staging-worker() {
+  g-term Staging "_t4b-pr t4b-worker-"
 }
 
 t4b-staging-redis() {
@@ -188,47 +196,24 @@ _t4b-pr() {
 
 # tsp tshir-previewer
 tsp-prod() {
-  _k8s "tshirt-previewer-prod" "toolbox" "bash"
+  g-term Prod "_k8s tshirt-previewer-prod toolbox bash"
 }
 
 tsp-staging() {
-  _k8s "tshirt-previewer-staging" "web" "bash"
-}
-
-# Edit branch name
-# Don't forget to rollback
-tsp-edit-staging() {
-  # REPO=basename `git rev-parse --show-toplevel`
-  # if [[ $REPO != tshirt-previewer ]]
-  # then
-    # echo Not in tsp
-    # exit 1
-  # fi
-  docker-compose run --rm web bin/kubectl-staging edit deployment tshirt-previewer-web
-}
-
-# mockup-creator-module mcm
-mcm-edit-staging() {
-  # REPO=basename `git rev-parse --show-toplevel`
-  # if [[ $REPO != tshirt-previewer ]]
-  # then
-    # echo Not in tsp
-    # exit 1
-  # fi
-  docker-compose run --rm web bin/kubectl-staging edit deployment mockup-creator-module-web
+  g-term Staging "_k8s tshirt-previewer-staging web bash"
 }
 
 mcm-bash-staging() {
-  _k8s "mockup-creator-module-staging" "web" "bash"
+  g-term Staging "_k8s mockup-creator-module-staging web bash"
 }
 
 # Reprint
 reprint-prod() {
-  _k8s "reprint-prod" "web" "bash"
+  g-term Prod "_k8s reprint-prod web bash"
 }
 
 reprint-staging() {
-  _k8s "reprint-staging" "web" "bash"
+  g-term Staging  "_k8s reprint-staging web bash"
 }
 
 # -----------------------------------------------------------------------------
