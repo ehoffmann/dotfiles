@@ -104,6 +104,8 @@ set ruler
 syntax on
 set encoding=utf-8
 :runtime macros/matchit.vim
+set ignorecase                  " case insensitive search
+set noeb vb t_vb=               " Disable error bell
 
 "------------------------------------------------------------------------------
 " Search
@@ -120,11 +122,18 @@ augroup END
 "------------------------------------------------------------------------------
 " Whitespace
 "------------------------------------------------------------------------------
-set nowrap                        " don't wrap lines
-set tabstop=2                     " a tab is two spaces
-set shiftwidth=2                  " an autoindent (with <<) is two spaces
-set expandtab                     " use spaces, not tabs
-set backspace=indent,eol,start    " backspace through everything in insert mode
+set tabstop=2                   " a tab is two spaces
+set shiftwidth=2                " an autoindent (with <<) is two spaces
+set expandtab                   " use spaces, not tabs
+set backspace=indent,eol,start  " backspace through everything in insert mode
+
+"------------------------------------------------------------------------------
+" Wrap
+"------------------------------------------------------------------------------
+set wrap                        " wrap lines
+set linebreak                   " breaks by word rather than character
+set breakindent                 " wrapped line visually indented (same amount as the beginning line)
+set showbreak=↪\                " break symbol
 
 "------------------------------------------------------------------------------
 " Color / Scheme
@@ -147,7 +156,7 @@ set t_Cs=
 " let g:gruvbox_color_column='bg3'
 
 " Highlight col 101 and onward
-let &colorcolumn=join(range(101,6999),",")
+" let &colorcolumn=join(range(101,6999),",")
 
 " Highlight tabs and trailing spaces
 set list listchars=tab:→\ ,nbsp:␣,trail:•,precedes:«,extends:»
@@ -248,9 +257,8 @@ command! -bang -nargs=? -complete=dir Files
       \ call fzf#vim#files(<q-args>, {'options': ['--info=inline', '--preview', 'less {}']}, <bang>0)
 nmap <C-P> :Files<CR>
 
-
 "------------------------------------------------------------------------------
-" Ack / AG
+" Ack / AG / Grep
 "------------------------------------------------------------------------------
 " Use ag instead of ack
 let g:ackprg = 'ag --vimgrep --hidden --ignore .git'
@@ -404,12 +412,7 @@ let g:markdown_fenced_languages = ['ruby', 'js=javascript', 'json', 'yaml', 'bas
 "------------------------------------------------------------------------------
 " misc
 "------------------------------------------------------------------------------
-" case insensitive search
-set ignorecase
-
-" Disable error bell
-set noeb vb t_vb=
-
+"
 " Allow per project config
 if filereadable(".vim.custom")
   so .vim.custom
