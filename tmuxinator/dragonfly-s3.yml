@@ -1,0 +1,17 @@
+name: Dragonfly S3
+root: ~/code/dragonfly-s3_data_store
+
+on_project_start:
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        - git --no-pager log --pretty=reference -12
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
