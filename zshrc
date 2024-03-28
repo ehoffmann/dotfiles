@@ -600,3 +600,7 @@ source "$HOME/.cargo/env"
 # GPG agent
 GPG_TTY=`tty`
 export GPG_TTY
+
+# Tmp Firefox hack
+# https://discourse.gnome.org/t/ui-scaling-seems-not-working-correctly-on-the-latest-debian-testing/19592
+export GDK_DPI_SCALE=2
