@@ -379,6 +379,16 @@ let ruby_line_continuation_error = 1
 let ruby_global_variable_error   = 1
 let ruby_spellcheck_strings = 1
 
+" Search ruby online doc for the word under cursor
+function! OpenRubyAPI()
+    let word = expand('<cword>')
+    let cmd = "ruby -v | sed -E 's/^ruby\\s([0-9]+\\.[0-9]+).*/\\1/'"
+    let ruby_version = trim(system(cmd))
+    let url = 'https://rubyapi.org/' . ruby_version . '/o/s?q=' . word
+    execute '!xdg-open ' . shellescape(url)
+endfunction
+nnoremap <leader>rd :call OpenRubyAPI()<CR>
+
 "------------------------------------------------------------------------------
 " Create/open spec file in Rails project
 "------------------------------------------------------------------------------
