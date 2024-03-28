@@ -12,6 +12,8 @@ autoload -U zmv
 
 # Vi mode
 set -o vi
+export EDITOR=vim
+export VISUAL=vim
 bindkey -v
 
 # Not to be disturbed by Ctrl-S Ctrl-Q in terminals
