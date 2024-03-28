@@ -572,7 +572,14 @@ source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.
 # List locales version : `chruby`
 # chruby 3.2.0
 
-# Manual install https://github.com/postmodern/chruby/wiki/Ruby#installation
+# Manual install from https://github.com/postmodern/chruby/wiki/Ruby
+# sudo apt install -y build-essential bison zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev
+# wget https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.xz
+# tar -xJvf ruby-3.3.0.tar.xz
+# cd ruby-3.3.0
+# ./configure --prefix=/opt/rubies/ruby-3.3.0
+# make
+# sudo make install
 chruby 3.3.0
 
 # tmuxinator completion/alias
