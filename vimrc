@@ -261,7 +261,8 @@ nmap <C-P> :Files<CR>
 " Ack / AG / Grep
 "------------------------------------------------------------------------------
 " Use ag instead of ack
-let g:ackprg = 'ag --vimgrep --hidden --ignore .git'
+" let g:ackprg = 'ag --vimgrep --hidden --ignore .git'
+let g:ackprg = 'rg --vimgrep'
 
 nmap <leader>a :Ack!<SPACE>''<LEFT>
 
