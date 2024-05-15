@@ -5,6 +5,7 @@
 [core]
   excludesfile = ~/.gitignore
   pager = diffr | less -R
+	editor = vim
 [alias]
   # Thanks to https://blog.jez.io/cli-code-review/
 
