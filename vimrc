@@ -140,7 +140,7 @@ set showbreak=↪\                " break symbol
 "------------------------------------------------------------------------------
 
 " Solarized (manual install from https://github.com/altercation/vim-colors-solarized/tree/master#option-1-manual-installation
-set background=dark
+set background=light
 " let g:solarized_diffmode="high"
 " let g:solarized_diffmode="low"
 colorscheme solarized
@@ -367,17 +367,16 @@ let g:rails_projections = {
 "------------------------------------------------------------------------------
 " Ruby
 "------------------------------------------------------------------------------
-" Fold/unfold all def in Ruby file
-let ruby_foldable_groups = 'def do'
-nmap <leader>ff :set foldmethod=syntax<CR>
-nmap <leader>fu :set foldmethod=manual<CR>zR<CR>
+
+" Fold all `def`, unfold with zR
+nmap <leader>fr :g/^\s*def\s/normal zfam<CR>
 
 " Syntax
 let ruby_space_errors = 1
-let ruby_operators        = 1
+let ruby_operators = 1
 let ruby_pseudo_operators = 1
 let ruby_line_continuation_error = 1
-let ruby_global_variable_error   = 1
+let ruby_global_variable_error = 1
 let ruby_spellcheck_strings = 1
 
 " Search ruby online doc for the word under cursor
