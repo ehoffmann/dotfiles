@@ -26,9 +26,6 @@ Plugin 'junegunn/fzf.vim'
 " LessCSS Syntax support
 Plugin 'lunaru/vim-less'
 
-" Plugin for the Perl module / CLI script 'ack'
-Plugin 'mileszs/ack.vim'
-
 " Comment
 Plugin 'tomtom/tcomment_vim'
 
@@ -262,18 +259,6 @@ nnoremap <silent> <Leader>rg :Rg <C-R><C-W><CR>
 
 " Rg command ignoring gitignore => Rga (Rg All)
 command! -bang -nargs=* Rga call fzf#vim#grep("rg --no-ignore-vcs --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
-
-"------------------------------------------------------------------------------
-" Ack / AG / Grep
-"------------------------------------------------------------------------------
-" Use ag instead of ack
-" let g:ackprg = 'ag --vimgrep --hidden --ignore .git'
-let g:ackprg = 'rg --vimgrep'
-
-nmap <leader>a :Ack!<SPACE>''<LEFT>
-
-" Visual selection to Ack
-vnoremap <Leader>a "ay:Ack! <C-r>=fnameescape(@a)<CR><CR>
 
 "------------------------------------------------------------------------------
 " diff
