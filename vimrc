@@ -255,7 +255,7 @@ command! -bang -nargs=? -complete=dir Files
 nmap <C-P> :Files<CR>
 
 " Search with Rg for word under cursor
-nnoremap <silent> <Leader>rg :Rg <C-R><C-W><CR>
+nnoremap <silent> <Leader>rg :Rg! <C-R><C-W><CR>
 
 " Rg command ignoring gitignore => Rga (Rg All)
 command! -bang -nargs=* Rga call fzf#vim#grep("rg --no-ignore-vcs --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)

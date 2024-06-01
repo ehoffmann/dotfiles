@@ -499,6 +499,7 @@ plugins=(git
 alias ali="mux aliproxy"
 alias bass="mux botros-assets"
 alias botros="mux botros"
+alias hab="mux habibi"
 alias catalogc="mux catalog_client"
 alias catalog="mux catalog"
 alias code="mux code"
