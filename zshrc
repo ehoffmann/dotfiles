@@ -86,7 +86,7 @@ tz-deploy-branch() {
   read REPLY\?"Deploy $1 to teezily-pr$2?"
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
-    docker-compose run --rm web bin/deploy-branch $1 teezily-pr$2 d
+    docker compose run --rm web bin/deploy-branch $1 teezily-pr$2 d
   fi
 }
 
@@ -97,12 +97,12 @@ tz-enter-branch() {
     echo Not in teezily
     exit 1
   fi
-  docker-compose run --rm web bin/dokku-staging enter teezily-pr$1 web.1 bash
+  docker compose run --rm web bin/dokku-staging enter teezily-pr$1 web.1 bash
 }
 
 # update 2020-05-18 Does not work anymore, try instead:
-# docker-compose run --rm web bin/dokku-staging enter teezily web.1 bash
-# docker-compose run --rm web bin/dokku-staging enter teezily-prX web.1 bash
+# docker compose run --rm web bin/dokku-staging enter teezily web.1 bash
+# docker compose run --rm web bin/dokku-staging enter teezily-prX web.1 bash
 tz-staging() {
   _k8s "teezily-staging" "teezily-web" "bash"
 }
@@ -190,7 +190,7 @@ _t4b-pr() {
   ARG2=${2:-bash}
   CONTAINER=`dco run --rm  web bin/kubectl-staging get pods | grep $1 | awk '{print $1}'`
   if [ -n "$CONTAINER" ]; then
-    docker-compose run --rm web bin/kubectl-staging exec -it $CONTAINER  -- $ARG2
+    docker compose run --rm web bin/kubectl-staging exec -it $CONTAINER  -- $ARG2
   else
     echo "No container."
   fi
@@ -268,8 +268,8 @@ _kubetail-prod() {
 # -----------------------------------------------------------------------------
 # Docker
 # -----------------------------------------------------------------------------
-alias dco='docker-compose'
-alias dcr='docker-compose stop && docker-compose up'
+alias dco='docker compose'
+alias dcr='docker compose stop && docker compose up'
 alias drm='docker rm $(docker ps -a -q)'
 alias dsc='docker stop $(docker ps -q)'
 
@@ -285,39 +285,39 @@ drmall() {
 }
 
 rb() {
-  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bundle exec rails c"
+  docker compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; echo '\"jk\": vi-movement-mode' >> ~/.inputrc; bundle exec rails c"
 }
 
 tza-rb() {
-  docker-compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web bash
+  docker compose -f docker-compose.yml -f docker-compose.analytics.yml run --rm web bash
 }
 
 dcba() {
-  docker-compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bash"
+  docker compose run --rm web /bin/bash -c "echo 'set editing-mode vi' >> ~/.inputrc; bash"
 }
 
 dcsh() {
-  docker-compose run --rm web /bin/sh
+  docker compose run --rm web /bin/sh
 }
 
 dcbe() {
-  docker-compose run --rm web bundle exec $@
+  docker compose run --rm web bundle exec $@
 }
 
 dcguard() {
-  docker-compose run --rm web bundle exec guard -g spec
+  docker compose run --rm web bundle exec guard -g spec
 }
 
 tzguard() {
   # Mysql with tmpfs
   # guard -i => get term input echo with binding.pry
-  docker-compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec guard -i"
+  docker compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec guard -i"
 }
 
 tzspec() {
   # Mysql with tmpfs
   # guard -i => get term input echo with binding.pry
-  docker-compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec rspec"
+  docker compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec rake db:create db:schema:load && bundle exec rspec"
 }
 
 dcmigrate-all() {
@@ -326,45 +326,45 @@ dcmigrate-all() {
 }
 
 dcmigrate-dev() {
-  docker-compose run --rm web bundle exec rake db:migrate
+  docker compose run --rm web bundle exec rake db:migrate
 }
 
 dcmigrate-test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake RAILS_ENV=test db:drop db:create db:test:prepare
+  docker compose run --rm -e RAILS_ENV=test web bundle exec rake RAILS_ENV=test db:drop db:create db:test:prepare
 }
 
 dcmigrate-test-set() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set RAILS_ENV=test db:drop db:create db:test:prepare
+  docker compose run --rm -e RAILS_ENV=test web bundle exec rake db:environment:set RAILS_ENV=test db:drop db:create db:test:prepare
 }
 
 dcrollback-dev() {
-  docker-compose run --rm web bundle exec rake db:rollback
+  docker compose run --rm web bundle exec rake db:rollback
 }
 
 dcrollback-test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:rollback
+  docker compose run --rm -e RAILS_ENV=test web bundle exec rake db:rollback
 }
 
 dcdbreset-test() {
-  docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
+  docker compose run --rm -e RAILS_ENV=test web bundle exec rake db:drop db:create db:schema:load
 }
 
 tco-mysql() {
   rails_env=${1:-development}
-  docker-compose start mysql
-  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  docker compose start mysql
+  container=$(docker compose ps mysql | grep Up | awk  '{print $1}')
   docker exec -ti $container mysql -uroot -pfoo tco_$rails_env
 }
 
 pg-shell() {
-  docker-compose start db
-  container=$(docker-compose ps db | grep Up | awk  '{print $1}')
+  docker compose start db
+  container=$(docker compose ps db | grep Up | awk  '{print $1}')
   docker exec -ti $container psql -U postgres -W postgres
 }
 
 tz-mysql-upgrade() {
-  docker-compose start mysql
-  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  docker compose start mysql
+  container=$(docker compose ps mysql | grep Up | awk  '{print $1}')
   docker exec -ti $container mysql_upgrade --user=root --password=foo
 }
 
@@ -396,15 +396,15 @@ tsp-dump() {
 }
 
 _pg-load() {
-  container=$(docker-compose ps -q postgresql)
+  container=$(docker compose ps -q postgresql)
   zcat $1 | docker exec -i $container psql $2 -Upostgres -W foo                                                                │
 }
 
 _pg-dump() {
   branch_name=$(git rev-parse --abbrev-ref HEAD | sed -e 's/[^A-Za-z0-9._-]/_/g')
   file_path=~/dumps/$1-$(date "+%m_%d_%Y_%H_%M_%S")-$branch_name.sql
-  docker-compose start postgresql
-  container=$(docker-compose ps -q postgresql)
+  docker compose start postgresql
+  container=$(docker compose ps -q postgresql)
   if [ -z "$container" ]
   then
     echo "Container is not running"
@@ -423,27 +423,27 @@ _pg-dump() {
 }
 
 mysql_dump() {
-  docker-compose start $1
-  container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
+  docker compose start $1
+  container=$(docker compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump -uroot -pfoo $2
 }
 
 mysql_dump_data_only() {
-  docker-compose start $1
-  container=$(docker-compose ps $1 | grep Up | awk  '{print $1}')
+  docker compose start $1
+  container=$(docker compose ps $1 | grep Up | awk  '{print $1}')
   docker exec -ti $container mysqldump  --no-create-info --skip-triggers -uroot -pfoo $2
 }
 
 dcdb_load_tco_dev() {
-  docker-compose start mysql
-  container=$(docker-compose ps mysql | grep Up | awk  '{print $1}')
+  docker compose start mysql
+  container=$(docker compose ps mysql | grep Up | awk  '{print $1}')
   echo $container
   echo "clear database"
   docker exec -ti $container mysql -uroot -pfoo -e 'drop database tco_development; create database tco_development'
   echo "loading dump"
   docker exec -i $container mysql tco_development -uroot -pfoo < $1
   echo "running migrations"
-  docker-compose run --rm web bundle exec rake db:migrate
+  docker compose run --rm web bundle exec rake db:migrate
 }
 
 # -----------------------------------------------------------------------------
@@ -529,7 +529,7 @@ alias vac="mux valid_address_client"
 alias va="mux valid_address"
 alias wk="mux work"
 alias woo="mux woo"
-alias ctza="docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up"
+alias ctza="docker compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R manu:manu ."
 alias mto='curl -4 http://wttr.in/Marseille'
 alias -g gpi='| grep -i'
