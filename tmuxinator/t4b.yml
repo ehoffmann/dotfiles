@@ -19,3 +19,4 @@ windows:
       panes:
         -
         -
+        - ~/.dropbox-dist/dropboxd
