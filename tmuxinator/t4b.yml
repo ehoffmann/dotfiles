@@ -15,7 +15,7 @@ windows:
         - sudo rm -rf tmp/uploads/test && df -h
         - cd ~/Dropbox/work && vim
   - guard:
-      layout: even-vertical
+      layout: main-horizontal
       panes:
         -
         -
