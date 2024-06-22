@@ -257,9 +257,11 @@ nmap <C-P> :Files<CR>
 " Search with Rg for word under cursor
 nnoremap <silent> <Leader>rg :Rg! <C-R><C-W><CR>
 
-" Rg command ignoring gitignore => Rga (Rg All)
-command! -bang -nargs=* Rga call fzf#vim#grep("rg --no-ignore-vcs --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
+" Rgh: Rg search including --hidden files
+command! -bang -nargs=* Rgh call fzf#vim#grep("rg --hidden --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
 
+" Rga: Rg search including --hidden AND 'gitignored'
+command! -bang -nargs=* Rga call fzf#vim#grep("rg --no-ignore-vcs --hidden --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
 "------------------------------------------------------------------------------
 " diff
 "------------------------------------------------------------------------------
