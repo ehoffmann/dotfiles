@@ -608,3 +608,5 @@ export GPG_TTY
 # Tmp Firefox hack
 # https://discourse.gnome.org/t/ui-scaling-seems-not-working-correctly-on-the-latest-debian-testing/19592
 export GDK_DPI_SCALE=2
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
