@@ -304,7 +304,7 @@ dcbe() {
 }
 
 dcguard() {
-  docker compose run --rm web bundle exec guard -g spec
+  docker compose run --rm web /bin/bash -c "RAILS_ENV=test bundle exec guard -g spec"
 }
 
 tzguard() {
