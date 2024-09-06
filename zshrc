@@ -275,12 +275,12 @@ alias dsc='docker stop $(docker ps -q)'
 
 # Remove untaged images
 drmi() {
-  echo "Deprecated, use docker system prune -a"
+  echo "drmi is deprecated, use 'docker system prune -a' instead"
 }
 
 # Remove all docker containers and images
 drmall() {
-  echo "Deprecated, use docker system prune -a"
+  echo "drmall is deprecated, use 'docker system prune -a' instead"
 }
 
 rb() {
