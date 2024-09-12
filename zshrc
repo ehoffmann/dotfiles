@@ -299,6 +299,10 @@ dcsh() {
   docker compose run --rm web /bin/sh
 }
 
+dap() {
+  docker compose run --rm app /bin/sh;
+}
+
 dcbe() {
   docker compose run --rm web bundle exec $@
 }
