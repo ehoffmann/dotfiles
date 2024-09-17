@@ -566,9 +566,9 @@ bindkey -M vicmd 'j' history-substring-search-down
 # Delay after <ESC> press in milisec (defaul = 4)
 export KEYTIMEOUT=10
 
-# chruby
+### chruby
 source /usr/local/share/chruby/chruby.sh
-source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.7.6" > ~/.ruby-version 
+source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.7.6" > ~/.ruby-version
 
 # Installed with `sudo ruby-build 2.7.6 /opt/rubies/ruby-2.7.6`
 # chruby 2.7.6
@@ -580,16 +580,34 @@ source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.
 # List available builds: `ruby-build --definitions`
 # List locales version : `chruby`
 # chruby 3.2.0
-
-# Manual install from https://github.com/postmodern/chruby/wiki/Ruby
-# sudo apt install -y build-essential bison zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev
-# wget https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.xz
-# tar -xJvf ruby-3.3.0.tar.xz
-# cd ruby-3.3.0
-# ./configure --prefix=/opt/rubies/ruby-3.3.0
-# make
-# sudo make install
 chruby 3.3.0
+
+install_ruby() {
+  # Usage: install_ruby <version>
+  # Example: install_ruby 3.3.0
+
+  if [ -z "$1" ]; then
+    echo "Error: Ruby version not specified."
+    echo "Usage: install_ruby <version>"
+    return 1
+  fi
+
+  local version="$1"
+  # Extract the major and minor version (e.g., 3.3 from 3.3.0)
+  local major_minor_version="${version%.*}"
+
+  # Install dependencies (uncomment if not already installed)
+  # sudo apt install -y build-essential bison zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev
+
+  wget "https://cache.ruby-lang.org/pub/ruby/${major_minor_version}/ruby-${version}.tar.xz"
+  tar -xJvf "ruby-${version}.tar.xz"
+  cd "ruby-${version}"
+  ./configure --prefix="/opt/rubies/ruby-${version}"
+  make
+  sudo make install
+  cd ..
+}
+###
 
 # tmuxinator completion/alias
 source ~/.bin/tmuxinator.zsh
