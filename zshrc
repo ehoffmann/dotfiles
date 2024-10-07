@@ -500,6 +500,7 @@ plugins=(git
 # Project related
 # -----------------------------------------------------------------------------
 alias ali="mux aliproxy"
+alias shopifire="mux shopifire"
 alias bass="mux botros-assets"
 alias botros="mux botros"
 alias hab="mux habibi"
