@@ -1,0 +1,18 @@
+name: Shopifire pusher
+root: ~/code/tz/shopifire
+
+on_project_first_start:
+  - ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        - vim
+        - git --no-pager log --pretty=reference -12
+        -
+  - guard:
+      layout: even-vertical
+      panes:
+        -
+        -
