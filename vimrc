@@ -92,6 +92,9 @@ Plugin 'Konfekt/FastFold'
 " A git diff in the gutter (sign column), stages/undoes hunks and partial hunks.
 Plugin 'airblade/vim-gitgutter'
 
+Plugin 'jparise/vim-graphql'
+Plugin 'tbastos/vim-lua'
+
 call vundle#end()
 
 filetype plugin indent on " required!
