@@ -11,7 +11,7 @@ ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
 ln -s ~/dotfiles/vimrc ~/.vimrc
 ln -s ~/dotfiles/vim_snippets ~/.vim/snippets
 ln -s ~/dotfiles/zshrc ~/.zshrc
-ln -s ~/dotfiles/alacritty.yml ~/.alacritty.yml
+ln -s ~/dotfiles/alacritty.toml ~/.alacritty.toml
 mkdir -p ~/bin
 ln -s ~/dotfiles/bin/sixtify.rb ~/bin/sixtify
 ln -s ~/dotfiles/bin/backup-deploy.rb ~/bin/backup-deploy
