@@ -1,4 +1,4 @@
-name: Shopifire pusher
+name: shopifire
 root: ~/code/tz/shopifire
 
 on_project_first_start:
@@ -14,5 +14,5 @@ windows:
   - guard:
       layout: even-vertical
       panes:
-        -
-        -
+        - ~
+        - ~

@@ -17,6 +17,6 @@ windows:
   - guard:
       layout: main-horizontal
       panes:
-        -
-        -
+        - ~
+        - ~
         - ~/.dropbox-dist/dropboxd

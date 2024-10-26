@@ -1,0 +1,15 @@
+# ~/.tmuxinator/tools.yml
+
+name: tools
+root: /tmp
+
+windows:
+  - main:
+      layout: tiled
+      panes:
+        - ~
+        - ~
+        - ~
+        - ~
+        - sudo iftop -biany
+        - htop
