@@ -1,4 +1,5 @@
 # ~/.tmuxinator/dotfiles.yml
+
 name: dotfiles
 root: ~/dotfiles
 windows:
@@ -6,5 +7,5 @@ windows:
       layout: main-horizontal
       panes:
         - vim
-        -
-        -
+        - ~
+        - ~
