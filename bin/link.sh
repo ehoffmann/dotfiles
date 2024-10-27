@@ -15,5 +15,6 @@ ln -s ~/dotfiles/alacritty.toml ~/.alacritty.toml
 mkdir -p ~/bin
 ln -s ~/dotfiles/bin/sixtify.rb ~/bin/sixtify
 ln -s ~/dotfiles/bin/backup-deploy.rb ~/bin/backup-deploy
+ln -s ~/dotfiles/bin/backup.sh ~/bin/backup
 ln -s ~/dotfiles/bin/changelog.rb ~/bin/changelog
 ln -s ~/dotfiles/bin/s3.rb ~/bin/s3
