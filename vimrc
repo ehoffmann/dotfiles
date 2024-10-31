@@ -69,7 +69,7 @@ Plugin 'tpope/vim-haml'
 Plugin 'tpope/vim-rails.git'
 
 " Retro groove color scheme for Vim
-" Plugin 'morhetz/gruvbox'
+Plugin 'morhetz/gruvbox'
 
 " Transparent editing of gpg encrypted files
 Plugin 'jamessan/vim-gnupg'
@@ -141,18 +141,19 @@ set showbreak=↪\                " break symbol
 "------------------------------------------------------------------------------
 
 " Solarized (manual install from https://github.com/altercation/vim-colors-solarized/tree/master#option-1-manual-installation
-set background=light
+" set background=dark
 " let g:solarized_diffmode="high"
 " let g:solarized_diffmode="low"
-colorscheme solarized
+" colorscheme solarized
 
 " Fix issue with spell check and solarized " https://github.com/altercation/vim-colors-solarized/issues/195
 set t_Cs=
 
 " Gruvbox
-" set background=light
-" colorscheme gruvbox
-" let g:gruvbox_italic=1
+set termguicolors
+let g:gruvbox_italic=1
+colorscheme gruvbox
+set background=dark
 " let g:gruvbox_number_column='bg2'
 " let g:gruvbox_color_column='bg3'
 
