@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 
 # Link dotfiles to ~
-ln -s ~/dotfiles/gitignore ~/.gitignore
-ln -s ~/dotfiles/gitconfig ~/.gitconfig
-ln -sn ~/dotfiles/tmuxinator ~/.tmuxinator
-ln -s ~/dotfiles/rubocop.yml ~/.rubocop.yml
-ln -s ~/dotfiles/spaceshiprc.zsh ~/.spaceshiprc.zsh
-ln -s ~/dotfiles/tigrc ~/.tigrc
-ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
-ln -s ~/dotfiles/vimrc ~/.vimrc
-ln -sn ~/dotfiles/vim_snippets ~/.vim/snippets
-ln -s ~/dotfiles/zshrc ~/.zshrc
-ln -s ~/dotfiles/alacritty.toml ~/.alacritty.toml
+ln -sf ~/code/dotfiles/gitignore ~/.gitignore
+ln -sf ~/code/dotfiles/gitconfig ~/.gitconfig
+ln -snf ~/code/dotfiles/tmuxinator ~/.tmuxinator
+ln -sf ~/code/dotfiles/rubocop.yml ~/.rubocop.yml
+ln -sf ~/code/dotfiles/tigrc ~/.tigrc
+ln -sf ~/code/dotfiles/tmux.conf ~/.tmux.conf
+ln -sf ~/code/dotfiles/vimrc ~/.vimrc
+ln -snf ~/code/dotfiles/vim_snippets ~/.vim/snippets
+ln -sf ~/code/dotfiles/zshrc ~/.zshrc
+ln -sf ~/code/dotfiles/alacritty.toml ~/.alacritty.toml
+ln -sf ~/code/dotfiles/ehoffmann.zsh-theme ~/.oh-my-zsh/themes/ehoffmann.zsh-theme
+
+# Bin
 mkdir -p ~/bin
-ln -s ~/dotfiles/bin/sixtify.rb ~/bin/sixtify
-ln -s ~/dotfiles/bin/backup-deploy.rb ~/bin/backup-deploy
-ln -s ~/dotfiles/bin/backup.sh ~/bin/backup
-ln -s ~/dotfiles/bin/changelog.rb ~/bin/changelog
-ln -s ~/dotfiles/bin/s3.rb ~/bin/s3
+ln -sf ~/code/dotfiles/bin/sixtify.rb ~/bin/sixtify
+ln -sf ~/code/dotfiles/bin/backup-deploy.rb ~/bin/backup-deploy
+ln -sf ~/code/dotfiles/bin/backup.sh ~/bin/backup
+ln -sf ~/code/dotfiles/bin/changelog.rb ~/bin/changelog
+ln -sf ~/code/dotfiles/bin/s3.rb ~/bin/s3
+ln -sf ~/work/scripts/pdef.sh ~/bin/pdef
