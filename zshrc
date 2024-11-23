@@ -581,7 +581,7 @@ source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.
 # List available builds: `ruby-build --definitions`
 # List locales version : `chruby`
 # chruby 3.2.0
-chruby 3.3.0
+chruby 3.3.6
 
 install_ruby() {
   # Usage: install_ruby <version>
