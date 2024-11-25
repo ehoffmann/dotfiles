@@ -602,11 +602,13 @@ install_ruby() {
 
   wget "https://cache.ruby-lang.org/pub/ruby/${major_minor_version}/ruby-${version}.tar.xz"
   tar -xJvf "ruby-${version}.tar.xz"
+  rm "ruby-${version}.tar.xz"
   cd "ruby-${version}"
   ./configure --prefix="/opt/rubies/ruby-${version}"
   make
   sudo make install
   cd ..
+  rm -rf "ruby-${version}"
 }
 ###
 
