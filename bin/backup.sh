@@ -32,7 +32,6 @@ BACKUP_FOLDERS=(
   "/media/manu/backup2"
   "/media/manu/backup3"
   "/media/manu/backup4"
-  "/media/manu/9A7A3DFC7A3DD62B"
 )
 
 for BACKUP_FOLDER in "${BACKUP_FOLDERS[@]}"; do
