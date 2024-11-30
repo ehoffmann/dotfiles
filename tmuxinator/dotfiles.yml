@@ -1,7 +1,7 @@
 # ~/.tmuxinator/dotfiles.yml
 
 name: dotfiles
-root: ~/dotfiles
+root: ~/code/dotfiles
 windows:
   - main:
       layout: main-horizontal
