@@ -11,11 +11,11 @@ windows:
       layout: main-horizontal
       panes:
         - vim
-        - sudo rm -rf tmp/uploads/test && df -h
-        - cd ~/Dropbox/work && vim
+        - ([ -n "$(ls -A tmp/uploads/test 2>/dev/null)" ] && sudo rm -rf tmp/uploads/test)
+        - cd ~/Documents/work && vim
   - guard:
       layout: main-horizontal
       panes:
         - ~
         - ~
-        - ~/.dropbox-dist/dropboxd
+        - ~
