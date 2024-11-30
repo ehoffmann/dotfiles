@@ -4,8 +4,7 @@ name: t4b
 root: ~/code/tz/t4b
 
 on_project_first_start:
-  - rm -f log/*.log
-  - ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec
+  - (rm -f log/*.log && ctags -R --languages=ruby --exclude=.git --exclude=log --exclude=public --exclude=tmp --exclude=spec) &
 
 windows:
   - main:
