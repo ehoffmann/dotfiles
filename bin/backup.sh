@@ -44,7 +44,7 @@ for BACKUP_FOLDER in "${BACKUP_FOLDERS[@]}"; do
       OPTS="--link-dest $LAST_BKP"
     fi
     # CMD="time rsync $OPTS --delete -az --stats --include=\".password-store\" --exclude=\".*\" --exclude=tmp/ --exclude=data/ /home/manu \"$DEST\""
-    CMD="time rsync $OPTS --delete -azh --info=progress2 --info=name0 --stats --include=\".password-store\" --exclude=\".*\" --exclude=tmp/ --exclude=botros-assets/ --exclude=data/ /home/manu \"$DEST\""
+    CMD="time rsync $OPTS --delete -azh --info=progress2 --info=name0 --stats --include=\".password-store\" --include=\".ssh\" --include=\".gnupg\" --exclude=\".*\" --exclude=tmp/ --exclude=botros-assets/ --exclude=data/ --exclude=VMs/ --exclude=\"VirtualBox VMs\" /home/manu \"$DEST\""
     echo "$CMD"
     eval $CMD
     echo "$(date +%Y-%m-%d-%H-%M-%S)" > $DEST/completed_at.txt
