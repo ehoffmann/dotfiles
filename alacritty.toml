@@ -1,13 +1,4 @@
-# import = ["/home/manu/.config/alacritty/themes/themes/solarized_dark.toml"]
-import = ["/home/manu/.config/alacritty/themes/themes/gruvbox_dark.toml"]
-
-# Live config reload (changes require restart)
-live_config_reload = true
-
-# Offer IPC using `alacritty msg` (unix only)
-ipc_socket = true
-
-[shell]
+[terminal.shell]
 program = "/usr/bin/zsh"
 args = ["-l"]
 
@@ -23,6 +14,20 @@ padding.y = 10
 decorations = "Full"
 decorations_theme_variant = "Dark" # "Light" # "Dark"
 
+[general]
+# Live config reload (changes require restart)
+live_config_reload = true
+
+# Offer IPC using `alacritty msg` (unix only)
+ipc_socket = true
+# import = ["/home/manu/.config/alacritty/themes/themes/solarized_dark.toml"]
+import = ["/home/manu/.config/alacritty/themes/themes/gruvbox_dark.toml"]
+
+[bell]
+duration = 100
+command = { program = "ffplay", args = ['-nodisp', '-autoexit',  '/usr/share/sounds/gnome/default/alerts/hum.ogg'] }
+
+[terminal]
 # Values for `startup_mode`:
 #   - Windowed
 #   - Maximized
