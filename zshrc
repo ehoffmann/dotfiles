@@ -281,7 +281,7 @@ alias dsc='docker stop $(docker ps -q)'
 
 # Remove untaged images
 drmi() {
-  echo "drmi is deprecated, use 'docker system prune -a' instead"
+  echo "drmi is deprecated, use 'docker system prune' instead"
 }
 
 # Remove all docker containers and images
@@ -542,7 +542,7 @@ alias woo="mux woo"
 alias ctza="docker compose -f docker-compose.yml -f docker-compose.analytics.yml up"
 alias retake="sudo chown -R manu:manu ."
 alias mto='curl -4 http://wttr.in/Marseille'
-alias -g gpi='| grep -i'
+alias -g rgi='| rg -i'
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
 
