@@ -614,7 +614,7 @@ install_ruby() {
   make
   sudo make install
   cd ..
-  rm -rf "ruby-${version}"
+  sudo rm -rf "ruby-${version}"
 }
 ###
 
