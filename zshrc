@@ -1,10 +1,5 @@
 ZSH=$HOME/.oh-my-zsh
 
-# ZSH_THEME="agnoster"
-# ZSH_THEME="robbyrussell"
-# ZSH_THEME="gruvbox"
-# ZSH_THEME="terminalparty"
-# ZSH_THEME="spaceship"
 ZSH_THEME="ehoffmann"
 
 # zsh builtin
@@ -25,7 +20,6 @@ stty -ixon
 alias zshconf="vim ~/.zshrc"
 alias vimconf="vim ~/.vimrc"
 alias tmuxconf="vim ~/.tmux.conf"
-alias mux=tmuxinator
 
 # -----------------------------------------------------------------------------
 # Rails
@@ -48,6 +42,7 @@ export REVIEW_BASE=staging
 # TMUX
 # -----------------------------------------------------------------------------
 alias tmxu='tmux'
+alias mux=tmuxinator
 
 # -----------------------------------------------------------------------------
 # fzf
@@ -635,8 +630,5 @@ source "$HOME/.cargo/env"
 GPG_TTY=`tty`
 export GPG_TTY
 
-# Tmp Firefox hack
-# https://discourse.gnome.org/t/ui-scaling-seems-not-working-correctly-on-the-latest-debian-testing/19592
-export GDK_DPI_SCALE=2
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source ~/.localrc
