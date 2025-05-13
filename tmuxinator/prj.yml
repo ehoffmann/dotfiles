@@ -1,0 +1,12 @@
+# ~/.tmuxinator/prj.yml
+
+name: Projects
+root: ~/work/projects
+
+windows:
+  - main:
+      layout: main-horizontal
+      panes:
+        -
+        -
+        - vim
