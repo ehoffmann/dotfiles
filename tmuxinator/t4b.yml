@@ -12,7 +12,7 @@ windows:
       panes:
         - vim
         - ([ -n "$(ls -A tmp/uploads/test 2>/dev/null)" ] && sudo rm -rf tmp/uploads/test)
-        - cd ~/Documents/work && vim
+        - cd ~/work && vim
   - guard:
       layout: main-horizontal
       panes:
