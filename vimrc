@@ -273,11 +273,32 @@ command! -bang -nargs=* Rgh call fzf#vim#grep("rg --hidden --column --line-numbe
 
 " Rga: Rg search including --hidden AND 'gitignored'
 command! -bang -nargs=* Rga call fzf#vim#grep("rg --no-ignore-vcs --hidden --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
+
 "------------------------------------------------------------------------------
 " diff
 "------------------------------------------------------------------------------
 " Ignore white space in vimdiff, Gdiffsplit...
 set diffopt+=iwhite
+
+"------------------------------------------------------------------------------
+" ft Git commit word-diff syntax
+"------------------------------------------------------------------------------
+augroup GitCommitWordDiff
+  autocmd!
+  autocmd FileType gitcommit call s:gitcommit_worddiff()
+augroup END
+
+function! s:gitcommit_worddiff() abort
+  if exists('b:gitcommit_worddiff_done')
+    return
+  endif
+  let b:gitcommit_worddiff_done = 1
+
+  syntax match GitWordAdd /{+.\{-}+}/ containedin=ALL
+  syntax match GitWordDel /\[-.\{-}-\]/ containedin=ALL
+  highlight GitWordAdd ctermbg=2 guibg=#005f00 ctermfg=NONE guifg=NONE
+  highlight GitWordDel ctermbg=1 guibg=#5f0000 ctermfg=NONE guifg=NONE
+endfunction
 
 "------------------------------------------------------------------------------
 " Ctags
