@@ -12,6 +12,8 @@ ln -snf ~/code/dotfiles/vim_snippets ~/.vim/snippets
 ln -sf ~/code/dotfiles/zshrc ~/.zshrc
 ln -sf ~/code/dotfiles/alacritty.toml ~/.alacritty.toml
 ln -sf ~/code/dotfiles/ehoffmann.zsh-theme ~/.oh-my-zsh/themes/ehoffmann.zsh-theme
+mkdir -p ~/.config/git/hooks
+ln -sf ~/code/dotfiles/git_hooks/prepare-commit-msg ~/.config/git/hooks/prepare-commit-msg
 
 # Bin
 mkdir -p ~/bin
