@@ -5,7 +5,8 @@
 [core]
   excludesfile = ~/.gitignore
   pager = diffr | less -R
-	editor = vim
+  editor = vim
+  hooksPath = /home/manu/.config/git/hooks
 [alias]
   # Thanks to https://blog.jez.io/cli-code-review/
 
@@ -33,6 +34,6 @@
 [pull]
   rebase = false
 [hub]
-	protocol = https
+  protocol = https
 [interactive]
-	difffilter = diffr
+  difffilter = diffr
