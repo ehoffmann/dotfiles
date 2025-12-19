@@ -55,15 +55,14 @@ export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 # -----------------------------------------------------------------------------
 alias bell="printf '\aBELL\!\n'"
 
+kim() {
+  read -r host port < ~/.kim
+  ssh $host -p $port
+}
 
 # -----------------------------------------------------------------------------
 # k8s deploy & console
 # -----------------------------------------------------------------------------
-
-k8s() {
-  host=$(cat ~/.prod-k8s)
-  ssh $host
-}
 
 _k8s() {
   host=$(cat ~/.prod-k8s)
