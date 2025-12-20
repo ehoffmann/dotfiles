@@ -159,13 +159,12 @@ source $ZSH/oh-my-zsh.sh
 # -----------------------------------------------------------------------------
 # PATH
 # -----------------------------------------------------------------------------
-export PATH=~/bin:/opt/Telegram:$PATH
+export PATH="~/bin:/opt/Telegram:$PATH"
 export PATH="$PATH:/usr/games:/usr/local/games"
 
 # -----------------------------------------------------------------------------
 # MISC
 # -----------------------------------------------------------------------------
-export EDITOR=vim
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
