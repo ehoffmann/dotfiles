@@ -1,0 +1,10 @@
+name: euler
+root: ~/code/euler
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - git --no-pager log --pretty=reference -12
+        - ~

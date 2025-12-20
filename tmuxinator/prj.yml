@@ -1,6 +1,4 @@
-# ~/.tmuxinator/prj.yml
-
-name: Projects
+name: projects
 root: ~/work/projects
 
 windows:

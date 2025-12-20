@@ -1,5 +1,3 @@
-# ~/.tmuxinator/tools.yml
-
 name: tools
 root: /tmp
 

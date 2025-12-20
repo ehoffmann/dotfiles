@@ -1,5 +1,3 @@
-# ~/.tmuxinator/work.yml
-
 name: work
 root: ~/work
 
