@@ -1,23 +1,8 @@
 name: server
 root: /tmp
 
-on_project_start:
+on_project_exit:
   - tmux set-option -t server status-style "bg=red,fg=white,bold"
-
-# on_project_exit:
-#   -
-
-# Run on project stop
-# on_project_stop: command
-
-# Run on project start, the first time
-# on_project_first_start: command
-
-# Run on project start, after the first time
-# on_project_restart: command
-
-# Runs in each window and pane before window/pane specific commands. Useful for setting up interpreter versions.
-# pre_window: rbenv shell 2.0.0-p247
 
 # Pass command line options to tmux. Useful for specifying a different tmux.conf.
 # tmux_options: -f ~/.tmux.mac.conf
@@ -41,5 +26,11 @@ windows:
       # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
       # synchronize: after
       panes:
-        - kim
-        - kim
+        - serv:
+          - kim
+          - clear
+          - sudo ./server
+        - monit:
+          - kim
+          - clear
+          - ls
