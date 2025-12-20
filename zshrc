@@ -137,16 +137,17 @@ plugins=(git
 # -----------------------------------------------------------------------------
 # Project related
 # -----------------------------------------------------------------------------
+alias wk="mux work"
 alias prj="mux prj"
 alias code="mux code"
 alias dot="mux dotfiles"
-alias hlm="mux helm"
-alias mcm="mux mcm"
-alias prod="mux prod"
-alias wk="mux work"
+alias leet="mux leet"
+alias euler="mux euler"
+alias srv="mux server"
 alias retake="sudo chown -R manu:manu ."
 alias mto='curl -4 http://wttr.in/Marseille'
 alias -g rgi='| rg -i'
+alias -g gpi='| rg -i'
 # remove vim swap file, with confirmation
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
 
