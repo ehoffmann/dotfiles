@@ -102,7 +102,7 @@ filetype plugin indent on " required!
 set number
 set ruler
 syntax on
-set synmaxcol=120 " Limit syntax to X first cols to avoid slow response/freeze with long lines.
+set synmaxcol=1024 " Limit syntax to X first cols to avoid slow response/freeze with long lines.
 set encoding=utf-8
 :runtime macros/matchit.vim
 set ignorecase                  " case insensitive search
