@@ -16,15 +16,9 @@ Plugin 'honza/vim-snippets'
 " Vim script for text filtering and alignment
 Plugin 'godlygeek/tabular'
 
-" CoffeeScript support
-Plugin 'kchmck/vim-coffee-script'
-
 " Fuzzy file finder
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
-
-" LessCSS Syntax support
-Plugin 'lunaru/vim-less'
 
 " Comment
 Plugin 'tomtom/tcomment_vim'
