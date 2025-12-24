@@ -3,7 +3,7 @@
 # frozen_string_literal: true
 
 require 'aws-sdk-s3'
-require 'fog/aws' # v2 signature
+# require 'fog/aws' # v2 signature
 require 'toml-rb'
 require 'optparse'
 
@@ -20,7 +20,12 @@ class AwsSdkStorage
   end
 
   def list(bucket, opts = {})
-    resp = @client.list_objects_v2(bucket: bucket, max_keys: opts[:max] || DEFAULT_LIMIT)
+    options = {}
+    options[:bucket] = bucket
+    options[:max_keys] = opts[:max] || DEFAULT_LIMIT
+    options[:prefix] = opts[:prefix] if opts[:prefix]
+    # resp = @client.list_objects_v2(bucket: bucket, max_keys: opts[:max] || DEFAULT_LIMIT)
+    resp = @client.list_objects_v2(**options)
     resp.contents.each { |object| puts object.key }
   end
 
@@ -86,10 +91,10 @@ options = {}
 OptionParser.new do |parser|
   parser.banner = 'Usage: s3 OPERATION [options]' \
     "\n Available operations: " \
-    "\n\t list: bucket keys (limit by #{DEFAULT_LIMIT})" \
+    "\n\t list: bucket keys, with optional --prefix (limit by #{DEFAULT_LIMIT})" \
     "\n\t read: Read bucket object (--key) data" \
     "\n\t info: Display object (--key) info" \
-    "\n\t count: Count bucket objects" \
+    "\n\t count: Count bucket objects"
   parser.on('-c', '--config CONFIG', "Config section in TOML config #{CONFIG_FILE}") do |c|
     options[:config] = c
   end
@@ -98,6 +103,9 @@ OptionParser.new do |parser|
   end
   parser.on('-k', '--key KEY', 'Object key (for read/write operations)') do |k|
     options[:key] = k
+  end
+  parser.on('--prefix PREFIX', 'Key prefix match (listing operation)') do |prefix|
+    options[:prefix] = prefix
   end
   parser.on('-d', '--data DATA', 'Data to write (for write operation)') do |d|
     options[:data] = d
@@ -127,7 +135,9 @@ storage = if config[:signature_version].to_i == 2
 
 case options[:operation]
 when 'list'
-  storage.list(config['bucket'], max: options[:number])
+  # storage.list(config['bucket'], max: options[:number])
+  # puts "list #{config['bucket']} with #{options.inspect}}"
+  storage.list(config['bucket'], options)
 when 'count'
   storage.count(config['bucket'], progress: options[:progress])
 when 'read'
