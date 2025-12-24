@@ -230,19 +230,20 @@ nnoremap <Leader>cp :let @+ = expand('%:p') . ':' . line('.')<CR>
 " nnoremap <C-H> <C-W><C-H>
 
 "------------------------------------------------------------------------------
-" File mapping
+" Per filetype config
 "------------------------------------------------------------------------------
 au BufRead,BufNewFile *.tpl set filetype=smarty.html
 au BufNewFile,BufRead Guardfile set filetype=ruby
 au BufNewFile,BufRead *.styl set filetype=stylus
-
-"------------------------------------------------------------------------------
-" Per filetype config
-"------------------------------------------------------------------------------
+autocmd Filetype c setlocal ts=2 sts=2 sw=2
 autocmd Filetype html setlocal ts=2 sts=2 sw=2
 autocmd Filetype rust setlocal ts=2 sts=2 sw=2
 autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
 autocmd Filetype javascript setlocal ts=2 sts=2 sw=2
+augroup EnvAsShell
+  autocmd!
+  autocmd BufNewFile,BufRead .env.local,*.env.* set filetype=sh
+augroup END
 
 "------------------------------------------------------------------------------
 " netrw
