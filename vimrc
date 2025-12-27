@@ -298,7 +298,20 @@ endfunction
 "------------------------------------------------------------------------------
 " Ctags
 "------------------------------------------------------------------------------
-set tags=./tags;
+" ctags -R \
+"   --language-force=C \
+"   --kinds-C=+defgpstuv \
+"   --fields=+nKS \
+"   --extras=+q \
+"   --c-types=+p \
+"   --exclude='*/clang/*' \
+"   --exclude='*/cuda*/*' \
+"   --exclude='*/nv*/*' \
+"   -f ~/.ctags.d/glibc_gcc.tags \
+"   /usr/lib/gcc/x86_64-linux-gnu/15/include \
+"   /usr/include/x86_64-linux-gnu \
+"   /usr/include
+set tags=./tags;,~/.ctags.d/glibc_gcc.tags
 
 "------------------------------------------------------------------------------
 " gitgutter
