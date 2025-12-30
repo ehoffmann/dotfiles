@@ -138,6 +138,7 @@ plugins=(git
 # Project related
 # -----------------------------------------------------------------------------
 alias wk="mux work"
+alias kr="mux kr"
 alias prj="mux prj"
 alias code="mux code"
 alias dot="mux dotfiles"
