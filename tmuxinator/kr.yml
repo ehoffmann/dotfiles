@@ -1,0 +1,10 @@
+name: kr
+root: ~/code/kr
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - ls
+        - bc
