@@ -140,6 +140,7 @@ alias dot="mux dotfiles"
 alias leet="mux leet"
 alias euler="mux euler"
 alias srv="mux server"
+alias stree="mux tree"
 alias retake="sudo chown -R manu:manu ."
 alias mto='curl -4 http://wttr.in/Marseille'
 alias -g rgi='| rg -i'
