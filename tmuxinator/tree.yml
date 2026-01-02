@@ -1,0 +1,10 @@
+name: tree
+root: ~/code/tree_simulator
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - ls *.c | entr -cpr -s 'make clean all && ./main'
+        - bc
