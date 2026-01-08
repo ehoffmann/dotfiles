@@ -18,8 +18,6 @@ ln -sf ~/code/dotfiles/git_hooks/prepare-commit-msg ~/.config/git/hooks/prepare-
 # Bin
 mkdir -p ~/bin
 ln -sf ~/code/dotfiles/bin/sixtify.rb ~/bin/sixtify
-ln -sf ~/code/dotfiles/bin/backup-deploy.rb ~/bin/backup-deploy
-ln -sf ~/code/dotfiles/bin/backup.sh ~/bin/backup
 ln -sf ~/code/dotfiles/bin/changelog.rb ~/bin/changelog
 ln -sf ~/code/dotfiles/bin/s3.rb ~/bin/s3
 ln -sf ~/work/scripts/pdef.sh ~/bin/pdef
