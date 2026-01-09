@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.4
   Exclude:
    - 'bin/*'
    - 'db/seeds.rb'
@@ -14,9 +14,6 @@ Metrics/BlockLength:
     - 'app/admin/**/*.rb'
     - 'spec/**/*.rb'
     - 'config/routes.rb'
-
-Metrics/LineLength:
-  Max: 120
 
 Style/Documentation:
   Enabled: false
@@ -65,3 +62,6 @@ Metrics/BlockLength:
 
 Layout/DotPosition:
   EnforcedStyle: trailing
+Layout/LineLength:
+  Max: 120
+
