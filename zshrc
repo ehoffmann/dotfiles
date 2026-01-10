@@ -47,6 +47,8 @@ alias mux=tmuxinator
 # -----------------------------------------------------------------------------
 # fzf
 # -----------------------------------------------------------------------------
+# Enable
+eval "$(fzf --zsh)"
 # Default fzf search for vim
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 
@@ -238,5 +240,4 @@ source "$HOME/.cargo/env"
 GPG_TTY=`tty`
 export GPG_TTY
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 source ~/.localrc
