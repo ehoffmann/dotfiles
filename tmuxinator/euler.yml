@@ -6,5 +6,6 @@ windows:
       layout: main-vertical
       panes:
         - vim
+        - cd c && ls *.c | entr -cpr -s 'gcc -Wall -Wextra -Wpedantic -fsanitize=address,undefined "$0" -lm  && time ./a.out'
         - git --no-pager log --pretty=reference -12
-        - ~
+
