@@ -24,8 +24,8 @@ ipc_socket = true
 import = ["/home/manu/.config/alacritty/themes/themes/gruvbox_dark.toml"]
 
 [bell]
-duration = 100
-command = { program = "ffplay", args = ['-nodisp', '-autoexit',  '/usr/share/sounds/gnome/default/alerts/hum.ogg'] }
+# duration = 100
+# command = { program = "ffplay", args = ['-nodisp', '-autoexit',  '/usr/share/sounds/gnome/default/alerts/hum.ogg'] }
 
 [terminal]
 # Values for `startup_mode`:
