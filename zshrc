@@ -91,6 +91,10 @@ ${PROMPT_ARROW_COLOR}${VI_PROMPT_ARROW}%f '
 ##### FZF #####
 eval "$(fzf --zsh)"
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
+export FZF_CTRL_T_OPTS="
+  --walker-skip .git,node_modules,target
+  --preview 'bat -n --color=always {}'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
 ### Aliases
 [[ -f ~/.zsh/aliases.zsh ]] && source ~/.zsh/aliases.zsh
