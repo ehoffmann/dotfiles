@@ -1,248 +1,97 @@
-ZSH=$HOME/.oh-my-zsh
+export LANG=en_US.UTF-8
 
-ZSH_THEME="ehoffmann"
+##### PERF #####
+setopt NO_BEEP
+setopt NO_HUP
+setopt INTERACTIVE_COMMENTS
 
-# zsh builtin
-autoload -U zmv
+export GPG_TTY="$(tty)"
 
-# Vi mode
+# Avoid slow compinit on every shell
+autoload -Uz compinit
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
+##### Vi mode #####
+bindkey -v
 set -o vi
 export EDITOR=vim
 export VISUAL=vim
-bindkey -v
+export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
 
-# Not to be disturbed by Ctrl-S Ctrl-Q in terminals
-stty -ixon
+# Vi-mode cursor
+function zle-keymap-select {
+  [[ $KEYMAP == vicmd ]] && echo -ne '\e[1 q' || echo -ne '\e[5 q'
+}
+zle -N zle-keymap-select
+echo -ne '\e[5 q'
 
-# -----------------------------------------------------------------------------
-# Config alias
-# -----------------------------------------------------------------------------
-alias zshconf="vim ~/.zshrc"
-alias vimconf="vim ~/.vimrc"
-alias tmuxconf="vim ~/.tmux.conf"
+##### History #####
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt BANG_HIST                 # Treat the '!' character specially during expansion.
+setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
+setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY             # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
+setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
+setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
+setopt HIST_IGNORE_SPACE         # Don't record an entry starting with a space.
+setopt HIST_SAVE_NO_DUPS         # Don't write duplicate entries in the history file.
+setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
+setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
+# setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 
-# -----------------------------------------------------------------------------
-# Rails
-# -----------------------------------------------------------------------------
-alias be='bundle exec'
-alias brake='bundle exec rake'
-alias rubytag='ctags -R --languages=ruby --exclude=.git --exclude=log .'
 
-# -----------------------------------------------------------------------------
-# Git
-# -----------------------------------------------------------------------------
-alias gb='git branch'
-alias gss='git status --short'
-alias gsb='git status --short -b'
-alias glo='git log --oneline --decorate'
-alias gco='git checkout'
-alias gloo='git --no-pager log --oneline --decorate --color | head '
-alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
-alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
-# Clean branches already merged on staging
-alias git-clean-branch='git fetch; git branch --merged staging | egrep -v "(^\*|master|staging)" | xargs git branch -d'
+##### COMPLETION #####
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+##### GIT PROMPT #####
+autoload -Uz vcs_info
+setopt PROMPT_SUBST
+
+zstyle ':vcs_info:git:*' formats '%F{cyan}(%b)%f'
+zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
+
+precmd() { vcs_info }
+
+git_dirty() {
+  git rev-parse --is-inside-work-tree &>/dev/null &&
+  ! git diff --quiet && echo '*'
+}
+
+PROMPT='%F{green}%n@%m%f %F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)
+%# '
 export REVIEW_BASE=staging
 
-# -----------------------------------------------------------------------------
-# TMUX
-# -----------------------------------------------------------------------------
-alias tmxu='tmux'
-alias mux=tmuxinator
-
-# -----------------------------------------------------------------------------
-# fzf
-# -----------------------------------------------------------------------------
-# Enable
+##### FZF #####
 eval "$(fzf --zsh)"
-# Default fzf search for vim
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 
-# -----------------------------------------------------------------------------
-# Misc
-# -----------------------------------------------------------------------------
-alias bell="printf '\aBELL\!\n'"
+### Aliases
+[[ -f ~/.zsh/aliases.zsh ]] && source ~/.zsh/aliases.zsh
 
-# -----------------------------------------------------------------------------
-# k8s deploy & console
-# -----------------------------------------------------------------------------
+### Functions
+[[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
 
-_k8s() {
-  host=$(cat ~/.prod-k8s)
-  ssh -t $host "kubectl -n $1 get pods | grep -v ImagePullBackOff | grep $2 | awk '{print\$1}' | xargs -to -i{} kubectl -n $1 exec -it {} $3"
-}
-
-# Launch a command into a themed terminal
-g-term() { # $profile $command
-  gnome-terminal --window-with-profile="$1" -- zsh -ic "$2"
-}
-
-# -----------------------------------------------------------------------------
-# Docker
-# -----------------------------------------------------------------------------
-alias dco='docker compose'
-alias dcr='docker compose stop && docker compose up'
-alias drm='docker rm $(docker ps -a -q)'
-alias dsc='docker stop $(docker ps -q)'
-
-# Remove untaged images
-drmi() {
-  echo "drmi is deprecated, use 'docker system prune' instead"
-}
-
-# Remove all docker containers and images
-drmall() {
-  echo "drmall is deprecated, use 'docker system prune -a' instead"
-}
-
-# -----------------------------------------------------------------------------
-# linters
-# -----------------------------------------------------------------------------
-
-# Lint current diff or from $1 commit earlier
-rubo() {
-  if [ -n "$1" ]
-  then
-    git diff --name-status HEAD~"$1" HEAD | grep '^[A,M].*\.rb$' | cut -f2 | xargs -r rubocop --rails
-  else
-    git diff --name-only --diff-filter=d | grep '.rb$' | xargs -r rubocop --rails
-  fi
-}
-
-# Lint cached
-rubs() {
-  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop
-}
-
-rubsa() {
-  git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --auto-correct
-}
-
-# -----------------------------------------------------------------------------
-# ssh and forward auto
-# -----------------------------------------------------------------------------
-ssha() {
-  eval `ssh-agent -s` >/dev/null
-  ssh-add &>/dev/null
-}
-ssha;
-
-# -----------------------------------------------------------------------------
-# zsh plugins
-# -----------------------------------------------------------------------------
-plugins=(git
-  rails
-  web-search
-  vi-mode
-  history-substring-search
-)
-
-# -----------------------------------------------------------------------------
-# Project related
-# -----------------------------------------------------------------------------
-alias wk="mux work"
-alias kr="mux kr"
-alias prj="mux prj"
-alias code="mux code"
-alias dot="mux dotfiles"
-alias leet="mux leet"
-alias euler="mux euler"
-alias srv="mux server"
-alias stree="mux tree"
-alias retake="sudo chown -R manu:manu ."
-alias mto='curl -4 http://wttr.in/Marseille'
-alias -g rgi='| rg -i'
-alias -g gpi='| rg -i'
-# remove vim swap file, with confirmation
-alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
-
-# -----------------------------------------------------------------------------
-# oh-my-zsh
-# -----------------------------------------------------------------------------
-source $ZSH/oh-my-zsh.sh
-
-# -----------------------------------------------------------------------------
-# PATH
-# -----------------------------------------------------------------------------
-export PATH="~/bin:/opt/Telegram:$PATH"
-export PATH="$PATH:/usr/games:/usr/local/games"
-
-# -----------------------------------------------------------------------------
-# MISC
-# -----------------------------------------------------------------------------
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-# cycle through arg history
-bindkey '^O' insert-last-word
-
-# bind k and j for VI mode (history-substring-search plugin)
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
-
-# Delay after <ESC> press in milisec (defaul = 4)
-export KEYTIMEOUT=10
-
-### chruby
+##### Plugins #####
+source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.7.6" > ~/.ruby-version
 
-# Installed with `sudo ruby-build 2.7.6 /opt/rubies/ruby-2.7.6`
-# chruby 2.7.6
+# Autosuggestions
+bindkey '^l' autosuggest-accept
+bindkey -M viins '^l' autosuggest-accept
 
-# Installed with `sudo ruby-build 3.0.4 /opt/rubies/ruby-3.0.4`
-# chruby 3.0.4
-
-# Installed with `sudo ruby-build 3.2.0 /opt/rubies/ruby-3.2.0`
-# List available builds: `ruby-build --definitions`
-# List locales version : `chruby`
-# chruby 3.2.0
-# chruby 3.3.6
+##### chruby #####
+# Check avalable versions:
+# ls /opt/rubies'
+# install_ruby 3.4.8
 chruby 3.4.8
-
-install_ruby() {
-  # Usage: install_ruby <version>
-  # Example: install_ruby 3.3.0
-
-  if [ -z "$1" ]; then
-    echo "Error: Ruby version not specified."
-    echo "Usage: install_ruby <version>"
-    return 1
-  fi
-
-  local version="$1"
-  # Extract the major and minor version (e.g., 3.3 from 3.3.0)
-  local major_minor_version="${version%.*}"
-
-  # Install dependencies (uncomment if not already installed)
-  # sudo apt install -y build-essential bison zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev
-
-  wget "https://cache.ruby-lang.org/pub/ruby/${major_minor_version}/ruby-${version}.tar.xz"
-  tar -xJvf "ruby-${version}.tar.xz"
-  rm "ruby-${version}.tar.xz"
-  cd "ruby-${version}"
-  ./configure --prefix="/opt/rubies/ruby-${version}"
-  make
-  sudo make install
-  cd ..
-  sudo rm -rf "ruby-${version}"
-}
-###
-
-# tmuxinator completion/alias
-source ~/.bin/tmuxinator.zsh
-
-# Zsh syntax hi
-source ~/code/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# Rust
-source "$HOME/.cargo/env"
-
-# GPG agent
-GPG_TTY=`tty`
-export GPG_TTY
-
-source ~/.localrc
