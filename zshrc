@@ -94,4 +94,4 @@ bindkey -M viins '^l' autosuggest-accept
 # Check avalable versions:
 # ls /opt/rubies'
 # install_ruby 3.4.8
-chruby 3.4.8
+chruby 4.0.0
