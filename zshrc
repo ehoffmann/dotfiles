@@ -1,11 +1,17 @@
 export LANG=en_US.UTF-8
+if [ -d "$HOME/bin" ] ; then
+  PATH="$HOME/bin:$PATH"
+fi
+if [ -d "$HOME/.local/bin" ] ; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
+export GPG_TTY="$(tty)"
+export REVIEW_BASE=staging
 
 ##### PERF #####
 setopt NO_BEEP
 setopt NO_HUP
 setopt INTERACTIVE_COMMENTS
-
-export GPG_TTY="$(tty)"
 
 # Avoid slow compinit on every shell
 autoload -Uz compinit
@@ -21,13 +27,6 @@ set -o vi
 export EDITOR=vim
 export VISUAL=vim
 export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
-
-# Vi-mode cursor
-function zle-keymap-select {
-  [[ $KEYMAP == vicmd ]] && echo -ne '\e[1 q' || echo -ne '\e[5 q'
-}
-zle -N zle-keymap-select
-echo -ne '\e[5 q'
 
 ##### History #####
 HISTFILE="$HOME/.zsh_history"
@@ -52,23 +51,42 @@ setopt HIST_VERIFY               # Don't execute immediately upon history expans
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-##### GIT PROMPT #####
+##### PROMPT #####
+VI_PROMPT_ARROW='❯'
+
+function zle-keymap-select {
+  if [[ $KEYMAP == vicmd ]]; then
+    VI_PROMPT_ARROW='❮'
+  else
+    VI_PROMPT_ARROW='❯'
+  fi
+  zle reset-prompt
+}
+zle -N zle-keymap-select
+
 autoload -Uz vcs_info
 setopt PROMPT_SUBST
 
+zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' formats '%F{cyan}(%b)%f'
 zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
-
-precmd() { vcs_info }
 
 git_dirty() {
   git rev-parse --is-inside-work-tree &>/dev/null &&
   ! git diff --quiet && echo '*'
 }
 
+precmd() {
+  local st=$?
+  vcs_info
+  if (( st == 0 )); then
+    PROMPT_ARROW_COLOR='%F{white}'
+  else
+    PROMPT_ARROW_COLOR='%F{red}'
+  fi
+}
 PROMPT='%F{green}%n@%m%f %F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)
-%# '
-export REVIEW_BASE=staging
+${PROMPT_ARROW_COLOR}${VI_PROMPT_ARROW}%f '
 
 ##### FZF #####
 eval "$(fzf --zsh)"
@@ -81,7 +99,7 @@ export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 [[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
 
 ##### Plugins #####
-source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.7.6" > ~/.ruby-version
