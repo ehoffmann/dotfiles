@@ -10,10 +10,10 @@ ln -sf ~/code/dotfiles/tmux.conf ~/.tmux.conf
 ln -sf ~/code/dotfiles/vimrc ~/.vimrc
 ln -snf ~/code/dotfiles/vim_snippets ~/.vim/snippets
 ln -sf ~/code/dotfiles/zshrc ~/.zshrc
-ln -sf ~/code/dotfiles/aliases.zsh ~/.zsh/aliases.zsh
-ln -sf ~/code/dotfiles/functions.zsh ~/.zsh/functions.zsh
+ln -sf ~/code/dotfiles/zsh/aliases.zsh ~/.zsh/aliases.zsh
+ln -sf ~/code/dotfiles/zsh/functions.zsh ~/.zsh/functions.zsh
+ln -sf ~/code/dotfiles/zsh/prompt.zsh ~/.zsh/prompt.zsh
 ln -sf ~/code/dotfiles/alacritty.toml ~/.alacritty.toml
-ln -sf ~/code/dotfiles/ehoffmann.zsh-theme ~/.oh-my-zsh/themes/ehoffmann.zsh-theme
 mkdir -p ~/.config/git/hooks
 ln -sf ~/code/dotfiles/git_hooks/prepare-commit-msg ~/.config/git/hooks/prepare-commit-msg
 

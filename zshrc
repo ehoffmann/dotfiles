@@ -51,43 +51,6 @@ setopt HIST_VERIFY               # Don't execute immediately upon history expans
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-##### PROMPT #####
-VI_PROMPT_ARROW='❯'
-
-function zle-keymap-select {
-  if [[ $KEYMAP == vicmd ]]; then
-    VI_PROMPT_ARROW='❮'
-  else
-    VI_PROMPT_ARROW='❯'
-  fi
-  zle reset-prompt
-}
-zle -N zle-keymap-select
-
-autoload -Uz vcs_info
-setopt PROMPT_SUBST
-
-zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git:*' formats '%F{cyan}(%b)%f'
-zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
-
-git_dirty() {
-  git rev-parse --is-inside-work-tree &>/dev/null &&
-  ! git diff --quiet && echo '*'
-}
-
-precmd() {
-  local st=$?
-  vcs_info
-  if (( st == 0 )); then
-    PROMPT_ARROW_COLOR='%F{white}'
-  else
-    PROMPT_ARROW_COLOR='%F{red}'
-  fi
-}
-PROMPT='%F{green}%n@%m%f %F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)
-${PROMPT_ARROW_COLOR}${VI_PROMPT_ARROW}%f '
-
 ##### FZF #####
 eval "$(fzf --zsh)"
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
@@ -98,6 +61,9 @@ export FZF_CTRL_T_OPTS="
 
 ### Aliases
 [[ -f ~/.zsh/aliases.zsh ]] && source ~/.zsh/aliases.zsh
+
+### Prompt
+[[ -f ~/.zsh/prompt.zsh ]] && source ~/.zsh/prompt.zsh
 
 ### Functions
 [[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
