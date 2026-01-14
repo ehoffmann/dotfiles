@@ -257,7 +257,7 @@ nmap gx yiW:!xdg-open "<C-r>"" > /dev/null<CR><CR>
 " FZF
 "------------------------------------------------------------------------------
 command! -bang -nargs=? -complete=dir Files
-      \ call fzf#vim#files(<q-args>, {'options': ['--info=inline', '--preview', 'less {}']}, <bang>0)
+    \ call fzf#vim#files(<q-args>, {'options': ['--layout=reverse', '--info=inline', '--preview', '~/.vim/bundle/fzf/bin/fzf-preview.sh {}']}, <bang>0)
 nmap <C-P> :Files<CR>
 
 " Search with Rg for word under cursor

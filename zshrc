@@ -52,7 +52,7 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 ##### FZF #####
-eval "$(fzf --zsh)"
+source <(fzf --zsh)
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 export FZF_CTRL_T_OPTS="
   --walker-skip .git,node_modules,target
