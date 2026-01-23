@@ -9,6 +9,7 @@ ln -sf ~/code/dotfiles/tigrc ~/.tigrc
 ln -sf ~/code/dotfiles/tmux.conf ~/.tmux.conf
 ln -sf ~/code/dotfiles/vimrc ~/.vimrc
 ln -snf ~/code/dotfiles/vim_snippets ~/.vim/snippets
+mkdir -p ~/.zsh
 ln -sf ~/code/dotfiles/zshrc ~/.zshrc
 ln -sf ~/code/dotfiles/zsh/aliases.zsh ~/.zsh/aliases.zsh
 ln -sf ~/code/dotfiles/zsh/functions.zsh ~/.zsh/functions.zsh
