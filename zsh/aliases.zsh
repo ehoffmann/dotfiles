@@ -14,7 +14,6 @@ alias dsc='docker stop $(docker ps -q)'
 alias tmxu='tmux'
 alias mux=tmuxinator
 alias tmuxconf="vim ~/.tmux.conf"
-source ~/.bin/tmuxinator.zsh # tmuxinator completion/alias
 
 # -----------------------------------------------------------------------------
 # Project related
