@@ -450,7 +450,7 @@ command! OpenSpec :call OpenCorrespondingSpec()
 " Markdown (tpope vim-markdown, embedeed in vim)
 " https://github.com/tpope/vim-markdown
 "------------------------------------------------------------------------------
-let g:markdown_fenced_languages = ['ruby', 'js=javascript', 'json', 'yaml', 'bash=sh', 'html']
+let g:markdown_fenced_languages = ['c', 'ruby', 'js=javascript', 'json', 'yaml', 'bash=sh', 'html']
 
 "------------------------------------------------------------------------------
 " misc
