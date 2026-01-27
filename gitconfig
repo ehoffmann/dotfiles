@@ -6,7 +6,7 @@
   excludesfile = ~/.gitignore
   pager = diffr | less -R
   editor = vim
-  hooksPath = /home/manu/.config/git/hooks
+
 [alias]
   # Thanks to https://blog.jez.io/cli-code-review/
 
@@ -23,17 +23,11 @@
   # tell vim-gitgutter to show +/- for changes since REVIEW_BASE
   review = !vim -p $(git files) +\"tabdo Gvdiffsplit $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
 
-[user]
-  signingkey = 9824B2BF22DDA63B
-  email = emmanuel@activeand.co
-  name = ehoffmann
-
-[commit]
-  gpgsign = true
-
 [pull]
   rebase = false
+
 [hub]
   protocol = https
+
 [interactive]
   difffilter = diffr
