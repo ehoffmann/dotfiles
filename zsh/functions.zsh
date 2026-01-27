@@ -26,33 +26,49 @@ rubsa() {
   git diff --name-only --cached --diff-filter=d | grep '.rb$' | xargs -r rubocop --auto-correct
 }
 
-install_ruby() {
-  # Usage: install_ruby <version>
-  # Example: install_ruby 3.3.0
+build_ruby() {
+  emulate -L zsh
+  set -euo pipefail
 
-  if [ -z "$1" ]; then
+  if [ $# -ne 1 ]; then
     echo "Error: Ruby version not specified."
-    echo "Usage: install_ruby <version>"
+    echo "Usage: build_ruby <version>"
     return 1
   fi
 
-  local version="$1"
-  # Extract the major and minor version (e.g., 3.3 from 3.3.0)
-  local major_minor_version="${version%.*}"
+  version="$1"
+  major_minor_version="${version%.*}"
+  workdir="$(mktemp -d)"
 
-  # Install dependencies (uncomment if not already installed)
-  # sudo apt install -y build-essential bison zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev
+  cleanup() {
+    sudo rm -rf "$workdir"
+  }
+  trap cleanup EXIT INT TERM
 
-  wget "https://cache.ruby-lang.org/pub/ruby/${major_minor_version}/ruby-${version}.tar.xz"
-  tar -xJvf "ruby-${version}.tar.xz"
-  rm "ruby-${version}.tar.xz"
+  cd "$workdir"
+
+  wget -q --show-progress \
+    "https://cache.ruby-lang.org/pub/ruby/${major_minor_version}/ruby-${version}.tar.xz"
+
+  tar -xJf "ruby-${version}.tar.xz"
   cd "ruby-${version}"
+
   CFLAGS="-O3 -march=native -flto" \
-    CXXFLAGS="-O3 -march=native -flto" \
-    LDFLAGS="-flto" \
+  CXXFLAGS="-O3 -march=native -flto" \
+  LDFLAGS="-flto" \
     ./configure --prefix="/opt/rubies/ruby-${version}" --enable-yjit
+
   make -j"$(nproc)"
   sudo make install
-  cd ..
-  sudo rm -rf "ruby-${version}"
+}
+
+list_ruby_versions() {
+  emulate -L zsh
+  set -euo pipefail
+  base_url="http://cache.ruby-lang.org/pub/ruby/index.txt"
+
+  curl -fsSL http://cache.ruby-lang.org/pub/ruby/index.txt |
+    rg 'ruby-[0-9]+\.[0-9]+\.[0-9]+\.tar\.xz' |
+    sed 's/^ruby-//; s/\t.*//' |
+    sort -uV
 }
