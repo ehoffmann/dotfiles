@@ -70,17 +70,13 @@ export FZF_CTRL_T_OPTS="
 [[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
 
 ##### Plugins #####
-# source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/local/share/chruby/chruby.sh
-source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.7.6" > ~/.ruby-version
+[[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+[[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-highlighting.zsh ]] && source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Autosuggestions
 bindkey '^l' autosuggest-accept
 bindkey -M viins '^l' autosuggest-accept
 
-##### chruby #####
-# Check avalable versions:
-# ls /opt/rubies'
-# install_ruby 3.4.8
-chruby 4.0.0
+# Autosuggestions
+bindkey '^y' autosuggest-accept
+bindkey -M viins '^y' autosuggest-accept
