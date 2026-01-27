@@ -82,7 +82,7 @@ if [ -d /usr/local/share/chruby ] ; then
   # list_ruby_version
   # build and install a new version
   # build_ruby x.x.x
-  chruby 4.0.0
+  chruby 4.0.1
 fi
 
 # Autosuggestions
