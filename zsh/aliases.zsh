@@ -1,4 +1,44 @@
-alias ll='ls -la'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias ln='ln -i'
+
+# -----------------------------------------------------------------------------
+# Git
+# -----------------------------------------------------------------------------
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gca='git commit --amend'
+alias gp='git push'
+alias gl='git pull'
+alias gd='git diff'
+alias gb='git branch'
+alias gss='git status --short'
+alias gsb='git status --short -b'
+alias gco='git checkout'
+alias glo='git log --oneline --decorate'
+alias gloo='git --no-pager log --oneline --decorate --color | head '
+alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
+alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
+# Clean branches already merged on staging
+alias git-clean-branch='git fetch; git branch --merged staging | egrep -v "(^\*|master|staging)" | xargs git branch -d'
+
+# -----------------------------------------------------------------------------
+# IP
+# -----------------------------------------------------------------------------
+alias ip='ip -c'
+alias ports='ss -tulpen'
+alias myip='ip a'
+alias pingg='ping -c 5 8.8.8.8'
 
 # -----------------------------------------------------------------------------
 # Docker
@@ -35,7 +75,7 @@ alias -g gpi='| rg -i'
 alias rmswp="find . -name '*.swp' -exec rm -i '{}' \;"
 
 # -----------------------------------------------------------------------------
-# Config alias
+# Conf.
 # -----------------------------------------------------------------------------
 alias zshconf="vim ~/.zshrc"
 alias vimconf="vim ~/.vimrc"
@@ -44,17 +84,3 @@ alias vimconf="vim ~/.vimrc"
 # Ruby/Rails
 # -----------------------------------------------------------------------------
 alias rubytag='ctags -R --languages=ruby --exclude=.git --exclude=log .'
-
-# -----------------------------------------------------------------------------
-# Git
-# -----------------------------------------------------------------------------
-alias gb='git branch'
-alias gss='git status --short'
-alias gsb='git status --short -b'
-alias glo='git log --oneline --decorate'
-alias gco='git checkout'
-alias gloo='git --no-pager log --oneline --decorate --color | head '
-alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
-alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
-# Clean branches already merged on staging
-alias git-clean-branch='git fetch; git branch --merged staging | egrep -v "(^\*|master|staging)" | xargs git branch -d'
