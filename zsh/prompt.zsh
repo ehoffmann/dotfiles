@@ -1,23 +1,26 @@
-VI_PROMPT_ARROW='❯'
+setopt promptsubst
 
-function zle-keymap-select {
+function _vi_update_prompt() {
   if [[ $KEYMAP == vicmd ]]; then
     VI_PROMPT_ARROW='❮'
   else
     VI_PROMPT_ARROW='❯'
   fi
+}
+
+function zle-keymap-select {
+  _vi_update_prompt
   zle reset-prompt
 }
 zle -N zle-keymap-select
 
 autoload -Uz vcs_info
-setopt PROMPT_SUBST
 
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' formats '%F{cyan}(%b)%f'
 zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
 
-git_dirty() {
+function git_dirty() {
   git rev-parse --is-inside-work-tree &>/dev/null &&
   ! git diff --quiet && echo '*'
 }
@@ -30,7 +33,7 @@ precmd() {
   else
     PROMPT_ARROW_COLOR='%F{red}'
   fi
+  _vi_update_prompt
 }
 PROMPT='%F{green}%n@%m%f %F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)
 ${PROMPT_ARROW_COLOR}${VI_PROMPT_ARROW}%f '
-
