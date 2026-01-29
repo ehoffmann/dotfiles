@@ -93,3 +93,14 @@ fi
 # Autosuggestions
 bindkey '^y' autosuggest-accept
 bindkey -M viins '^y' autosuggest-accept
+
+# Node, lazy
+export NVM_DIR="$HOME/.nvm"
+nvm() {
+  unset -f nvm node npm npx
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
+node() { nvm; node "$@"; }
+npm()  { nvm; npm "$@"; }
+npx()  { nvm; npx "$@"; }
