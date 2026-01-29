@@ -59,7 +59,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 ##### FZF #####
 source <(fzf --zsh)
 export FZF_TMUX_OPTS='-p80%,60%'
-export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 export FZF_CTRL_T_OPTS="
   --walker-skip .git,node_modules,target
   --preview 'bat -n --color=always {}'
