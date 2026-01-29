@@ -76,7 +76,7 @@ export FZF_CTRL_T_OPTS="
 
 ##### Plugins #####
 [[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-[[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-highlighting.zsh ]] && source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 if [ -d /usr/local/share/chruby ] ; then
   source /usr/local/share/chruby/chruby.sh
