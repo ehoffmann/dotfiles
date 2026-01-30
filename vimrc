@@ -272,17 +272,11 @@ nmap gx yiW:!xdg-open "<C-r>"" > /dev/null<CR><CR>
 " FZF
 "------------------------------------------------------------------------------
 command! -bang -nargs=? -complete=dir Files
-    \ call fzf#vim#files(<q-args>, {'options': ['--layout=reverse', '--info=inline', '--preview', '~/.vim/bundle/fzf/bin/fzf-preview.sh {}']}, <bang>0)
+      \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 nmap <C-P> :Files<CR>
 
 " Search with Rg for word under cursor
 nnoremap <silent> <Leader>rg :Rg! <C-R><C-W><CR>
-
-" Rgh: Rg search including --hidden files
-command! -bang -nargs=* Rgh call fzf#vim#grep("rg --hidden --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
-
-" Rga: Rg search including --hidden AND 'gitignored'
-command! -bang -nargs=* Rga call fzf#vim#grep("rg --no-ignore-vcs --hidden --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, <bang>0)
 
 "------------------------------------------------------------------------------
 " diff
