@@ -137,6 +137,21 @@ set breakindent                 " wrapped line visually indented (same amount as
 set showbreak=↪\                " break symbol
 
 "------------------------------------------------------------------------------
+" Fold
+"------------------------------------------------------------------------------
+
+" Fold all `def`, unfold with zR
+nmap <leader>fr :g/^\s*def\s/normal zfam<CR>
+
+" Save fold on exit
+set viewoptions-=options
+augroup remember_folds
+  autocmd!
+  au BufWinLeave ?* mkview 1
+  au BufWinEnter ?* silent! loadview 1
+augroup END
+
+"------------------------------------------------------------------------------
 " Color / Scheme
 "------------------------------------------------------------------------------
 
@@ -400,9 +415,6 @@ let g:rails_projections = {
 "------------------------------------------------------------------------------
 " Ruby
 "------------------------------------------------------------------------------
-
-" Fold all `def`, unfold with zR
-nmap <leader>fr :g/^\s*def\s/normal zfam<CR>
 
 " Syntax
 let ruby_space_errors = 1
