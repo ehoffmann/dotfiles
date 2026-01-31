@@ -16,3 +16,4 @@ ln -sbf ~/code/dotfiles/alacritty.toml ~/.alacritty.toml
 mkdir -p ~/.config/git/hooks
 ln -sbf ~/code/dotfiles/git_hooks/prepare-commit-msg ~/.config/git/hooks/prepare-commit-msg
 ln -sbf ~/code/dotfiles/gdbinit ~/.gdbinit
+ln -sbf ~/code/dotfiles/inputrc ~/.inputrc

@@ -1,0 +1,8 @@
+set editing-mode vi
+set keymap vi-command
+
+# Make Esc feel snappier
+set keyseq-timeout 0.1
+
+# Show mode in prompt for readline apps that support it
+set show-mode-in-prompt on
