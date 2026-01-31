@@ -27,11 +27,14 @@ else
 fi
 
 ##### Vi mode #####
+autoload -Uz edit-command-line
+zle -N edit-command-line
 bindkey -v
-set -o vi
 export EDITOR=vim
 export VISUAL=vim
 export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
+bindkey '^X^E' edit-command-line
+bindkey -M vicmd 'v' edit-command-line
 
 ##### History #####
 HISTFILE="$HOME/.zsh_history"
