@@ -31,3 +31,5 @@
 
 [interactive]
   difffilter = diffr
+[init]
+	defaultBranch = master
