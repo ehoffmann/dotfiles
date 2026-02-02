@@ -2,9 +2,16 @@ name: leetcode
 root: ~/code/leetcode
 
 windows:
-  - main:
+  - code:
       layout: main-vertical
       panes:
         - vim
-        - ls *.c | entr -cpr -s 'gcc -Wall -Wextra -Wpedantic -fsanitize=address,undefined "$0" -lm  && time ./a.out'
-        - clear;ls
+        - ls *.c | entr -zcps 'gcc -Wall -Wextra -Wpedantic -fsanitize=address,undefined "$0" -lm | less -R'
+        - echo "./a.out" | entr -zcps 'unbuffer $0 2>&1  | less -R'
+  - debug:
+      layout: tiled
+      panes:
+        - vim
+        - ls *.c | entr -rcps 'gcc -O0 -g3 -fno-omit-frame-pointer -fsanitize=address,undefined -Wall -Wextra -Wpedantic "$0" -lm -o debug.out'
+        - valgrind ./debug.out
+        - gdb ./debug.out
