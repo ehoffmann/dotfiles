@@ -23,9 +23,6 @@ Plugin 'junegunn/fzf.vim'
 " Comment
 Plugin 'tomtom/tcomment_vim'
 
-" File tree
-Plugin 'scrooloose/nerdtree'
-
 " Some utility functions for VIM
 Plugin 'tomtom/tlib_vim'
 
