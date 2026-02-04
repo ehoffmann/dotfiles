@@ -188,14 +188,6 @@ au BufWinEnter * let w:m1=matchadd('Special', 'DONE', -1)
 "------------------------------------------------------------------------------
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 
-" After pasting, type gp to select the pasted text in visual mode. This is
-" similar to the standard gv which you can type to select the last
-" visually-selected text.
-nnoremap gp `[v`]
-
-" Save time
-nmap <SPACE> :
-
 " F11 switch to cp1252 encoding
 nnoremap <F7> :e ++enc=cp1252<CR>
 
