@@ -102,7 +102,6 @@ syntax on
 set synmaxcol=1024 " Limit syntax to X first cols to avoid slow response/freeze with long lines.
 set encoding=utf-8
 :runtime macros/matchit.vim
-set ignorecase                  " case insensitive search
 set noeb vb t_vb=               " Disable error bell
 
 "------------------------------------------------------------------------------
@@ -113,8 +112,8 @@ set incsearch " highlight matched string.
 " hlsearch only when cmd
 augroup vimrc-incsearch-highlight
   autocmd!
-  autocmd CmdlineEnter /,\? :set hlsearch
-  autocmd CmdlineLeave /,\? :set nohlsearch
+  autocmd CmdlineEnter [\/\?] :set hlsearch
+  autocmd CmdlineLeave [\/\?] :set nohlsearch
 augroup END
 
 "------------------------------------------------------------------------------
@@ -206,20 +205,20 @@ nmap <leader>hc :s/:\([^ ]*\)\(\s*\)=>/\1:/g<cr>
 
 " Rocket to Hash convert "id"=>"1" to id: "1",
 " memo: Hash
-nmap <leader>hh :s/["']\(\w*\)["']\(\s*\)=>\s*/\1: /g<cr>
+nmap <leader>hh :s/["']\(\w*\)["']\(\s*\)=>\s*/\1: /g<CR>
 
 " Hash to Rocket id: "1" to "id" => "1"
 " memo: Rocket
-nmap <leader>hr :s/\(\w*\):\s*/'\1' => /g<cr>
+nmap <leader>hr :s/\(\w*\):\s*/'\1' => /g<CR>
 
 " Swap quotes " for '
-nmap <leader>q :s/"/'/g<cr>
+nmap <leader>q :s/"/'/g<CR>
 
 " Normalize space between curly (depends on Surround.vim)
 nmap <leader>cr cs{}cs}{
 
 " Mark task as done
-nmap <leader>x :s/\[ \]/[X]/<cr>
+nmap <leader>x :s/\[ \]/[X]/<CR>:nohls<CR>
 
 " Copy current file path and line number into system clipboard. Use gF then.
 nnoremap <Leader>cp :let @+ = expand('%:p') . ':' . line('.')<CR>
