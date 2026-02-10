@@ -53,9 +53,6 @@ Plugin 'tpope/vim-surround'
 " Easily search for, substitute, and abbreviate multiple variants of a word
 Plugin 'tpope/vim-abolish'
 
-" Runtime files for Haml, Sass, and SCSS
-Plugin 'tpope/vim-haml'
-
 " Rails
 Plugin 'tpope/vim-rails.git'
 
@@ -77,20 +74,8 @@ Plugin 'jgdavey/vim-blockle'
 " Perform an interactive diff on two blocks of text
 Plugin 'AndrewRadev/linediff.vim'
 
-" Speed up Vim by updating folds only when called-for
-Plugin 'Konfekt/FastFold'
-
 " A git diff in the gutter (sign column), stages/undoes hunks and partial hunks.
 Plugin 'airblade/vim-gitgutter'
-
-" Syntax
-Plugin 'jparise/vim-graphql'
-
-" Syntax
-Plugin 'tbastos/vim-lua'
-
-" Distraction-free writing in Vim
-Plugin 'junegunn/goyo.vim'
 
 call vundle#end()
 
@@ -218,7 +203,7 @@ nmap <leader>q :s/"/'/g<CR>
 nmap <leader>cr cs{}cs}{
 
 " Mark task as done
-nmap <leader>x :s/\[ \]/[X]/<CR>:nohls<CR>
+nmap <leader>x :s/\[ \]/[X]/<CR>
 
 " Copy current file path and line number into system clipboard. Use gF then.
 nnoremap <Leader>cp :let @+ = expand('%:p') . ':' . line('.')<CR>
