@@ -5,7 +5,6 @@ fi
 if [ -d "$HOME/.local/bin" ] ; then
   PATH="$HOME/.local/bin:$PATH"
 fi
-
 if [ -d "$HOME/.cargo/bin" ] ; then
   PATH="$HOME/.cargo/bin:$PATH"
 fi
@@ -30,6 +29,8 @@ fi
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -v
+bindkey -M viins '^A' beginning-of-line
+bindkey -M viins '^E' end-of-line
 export EDITOR=vim
 export VISUAL=vim
 export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
