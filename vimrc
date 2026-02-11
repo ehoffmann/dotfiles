@@ -78,21 +78,30 @@ Plugin 'AndrewRadev/linediff.vim'
 Plugin 'airblade/vim-gitgutter'
 
 call vundle#end()
-
-filetype plugin indent on " required!
-
-set number
-set ruler
+filetype plugin indent on
+:runtime macros/matchit.vim
 syntax on
 set synmaxcol=1024 " Limit syntax to X first cols to avoid slow response/freeze with long lines.
 set encoding=utf-8
-:runtime macros/matchit.vim
 set noeb vb t_vb=               " Disable error bell
+
+set number
+set ruler
+set scrolloff=3
+" set scrolloff=999
+
+" Buffer switching behavior
+" set hidden
+set confirm
 
 "------------------------------------------------------------------------------
 " Search
 "------------------------------------------------------------------------------
-set incsearch " highlight matched string.
+set incsearch
+set showmatch
+" set matchtime=2
+" set ttimeout
+" set ttimeoutlen=10
 
 " hlsearch only when cmd
 augroup vimrc-incsearch-highlight
