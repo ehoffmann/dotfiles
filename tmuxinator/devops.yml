@@ -1,0 +1,9 @@
+name: devops
+root: ~/code/devops
+
+windows:
+  - ssh:
+      layout: main-vertical
+      panes:
+        - vim
+        -
