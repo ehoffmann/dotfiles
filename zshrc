@@ -38,6 +38,7 @@ bindkey '^X^E' edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
 ##### History #####
+HISTFILE="$HOME/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=100000
 
