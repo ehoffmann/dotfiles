@@ -245,10 +245,51 @@ augroup END
 "------------------------------------------------------------------------------
 " netrw
 "------------------------------------------------------------------------------
+" let g:netrw_banner = 0       " disable banner
+let g:netrw_liststyle = 3    " tree view
+let g:netrw_browse_split = 4 " open files in previous window
+let g:netrw_winsize = 25     " sidebar width
+
+nmap <silent> <leader>nt :Lexplore<CR>
+
+" Close netrw automatically when it is the last window
+augroup netrw_close_last
+  autocmd!
+  autocmd WinEnter * if winnr('$') == 1 && &filetype ==# 'netrw' | quit | endif
+augroup END
+
 " Disable default gx
 let g:netrw_nogx = 1
 " Remap gx to open any URL under cursor in the browser
 nmap gx yiW:!xdg-open "<C-r>"" > /dev/null<CR><CR>
+
+command! -nargs=0 LexFind call s:LexFind()
+function! s:LexFind() abort
+  if &buftype !=# '' || expand('%:p') ==# '' | return | endif
+
+  let l:dir  = expand('%:p:h')
+  let l:file = expand('%:t')
+
+  " Reuse existing netrw (Lexplore) window if present, else open it
+  let l:netrw_winid = 0
+  for l:w in getwininfo()
+    if getbufvar(l:w.bufnr, '&filetype') ==# 'netrw'
+      let l:netrw_winid = l:w.winid
+      break
+    endif
+  endfor
+  if l:netrw_winid == 0
+    silent! Lexplore
+    let l:netrw_winid = win_getid()
+    wincmd p
+  endif
+
+  " Point netrw at current file's directory and move cursor to the file
+  call win_execute(l:netrw_winid, 'silent keepalt Explore ' . fnameescape(l:dir))
+  call win_execute(l:netrw_winid, 'silent keepalt normal! gg')
+  call win_execute(l:netrw_winid, 'silent keepalt call search('
+        \ . string('\V' . escape(l:file, '\')) . ', "W")')
+endfunction
 
 "------------------------------------------------------------------------------
 " FZF
