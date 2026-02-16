@@ -6,12 +6,13 @@ windows:
       layout: main-vertical
       panes:
         - vim
-        - ls *.c | entr -zcps 'gcc -Wall -Wextra -Wpedantic -fsanitize=address,undefined "$0" -lm | less -R'
-        - echo "./a.out" | entr -zcps 'unbuffer $0 2>&1  | less -R'
+        - ls *.c | entr -zcps 'gcc -std=c23 -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wformat=2 -Wstrict-prototypes -Werror -O2 -g -fsanitize=address,undefined -fno-omit-frame-pointer -D_FORTIFY_SOURCE=3 -pipe "$0"'
+        - echo "./a.out" | entr -rcps 'time $0'
+        # - echo "./a.out" | entr -zcps 'unbuffer $0 2>&1  | less -R'
+
   - debug:
       layout: tiled
       panes:
-        - vim
-        - ls *.c | entr -rcps 'gcc -O0 -g3 -fno-omit-frame-pointer -fsanitize=address,undefined -Wall -Wextra -Wpedantic "$0" -lm -o debug.out'
-        - valgrind ./debug.out
+        - ls *.c | entr -rcps 'gcc -std=c23 -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wformat=2 -Og -g -fsanitize=address,undefined -fno-omit-frame-pointer "$0" -o debug.out
+        # - valgrind ./debug.out
         - gdb ./debug.out
