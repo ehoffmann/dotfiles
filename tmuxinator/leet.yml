@@ -13,6 +13,6 @@ windows:
   - debug:
       layout: tiled
       panes:
-        - ls *.c | entr -rcps 'gcc -std=c23 -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wformat=2 -Og -g -fsanitize=address,undefined -fno-omit-frame-pointer "$0" -o debug.out
+        - ls *.c | entr -rcps 'gcc -std=c23 -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wformat=2 -Og -g -fsanitize=address,undefined -fno-omit-frame-pointer "$0" -o debug.out'
         # - valgrind ./debug.out
         - gdb ./debug.out
