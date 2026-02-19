@@ -214,9 +214,6 @@ nmap <leader>cr cs{}cs}{
 " Mark task as done
 nmap <leader>x :s/\[ \]/[X]/<CR>
 
-" Copy current file path and line number into system clipboard. Use gF then.
-nnoremap <Leader>cp :let @+ = expand('%:p') . ':' . line('.')<CR>
-
 "------------------------------------------------------------------------------
 " Split navigation shortcut (same as tmux)
 "------------------------------------------------------------------------------
