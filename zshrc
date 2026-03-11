@@ -26,16 +26,27 @@ else
 fi
 
 ##### Vi mode #####
+export EDITOR=vim
+export VISUAL=vim
+export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
+
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -v
 bindkey -M viins '^A' beginning-of-line
 bindkey -M viins '^E' end-of-line
-export EDITOR=vim
-export VISUAL=vim
-export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
 bindkey '^X^E' edit-command-line
 bindkey -M vicmd 'v' edit-command-line
+
+# Yank to clipboard
+function vi-yank-xclip {
+  zle vi-yank
+  print -rn -- "$CUTBUFFER" | xclip -selection clipboard
+}
+zle -N vi-yank-xclip
+
+bindkey -M vicmd 'y' vi-yank-xclip
+bindkey -M vicmd 'Y' vi-yank-xclip
 
 ##### History #####
 HISTFILE="$HOME/.zsh_history"
@@ -55,15 +66,6 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
-
-# Per-tmux-session history (shared among panes/windows of same tmux session)
-if [[ -n "$TMUX" ]]; then
-  local _tmux_sess
-  _tmux_sess="$(tmux display-message -p '#S' 2>/dev/null)"
-  HISTFILE="$HOME/.tmux-${_tmux_sess}.zsh_history"
-else
-  HISTFILE="$HOME/.zsh_history"
-fi
 
 ##### COMPLETION #####
 zstyle ':completion:*' menu select
