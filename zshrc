@@ -8,6 +8,9 @@ fi
 if [ -d "$HOME/.cargo/bin" ] ; then
   PATH="$HOME/.cargo/bin:$PATH"
 fi
+if [ -d "$HOME/code/tools/bin" ] ; then
+  PATH="$HOME/code/tools/bin:$PATH"
+fi
 
 export GPG_TTY="$(tty)"
 export REVIEW_BASE=staging
