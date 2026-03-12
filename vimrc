@@ -324,6 +324,15 @@ function! s:gitcommit_worddiff() abort
 endfunction
 
 "------------------------------------------------------------------------------
+" C
+"------------------------------------------------------------------------------
+set makeprg=make
+set errorformat=%f:%l:%c:\ %m
+" nnoremap <F5> :w<CR>:silent! :make<CR>:cwindow<CR>
+nnoremap <leader>5 :update<CR>:silent! make \| redraw! \| cwindow<CR>
+" inoremap <F5> <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>a
+
+"------------------------------------------------------------------------------
 " Ctags
 "------------------------------------------------------------------------------
 " ctags -R \
@@ -497,3 +506,11 @@ set clipboard^=unnamed,unnamedplus
 
 " Snipmate deprecate v0
 let g:snipMate = { 'snippet_version' : 1 }
+
+function! Today()
+    let l:dir = "~/work/@daily"
+    let l:file = strftime("%Y-%m-%d") . ".md"
+    let l:path = l:dir . "/" . l:file
+    execute "edit " . fnameescape(l:path)
+endfunction
+command! Today call Today()
