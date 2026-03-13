@@ -1,0 +1,12 @@
+name: Network
+root: ~/tmp
+
+windows:
+  - main:
+      layout: tiled
+      panes:
+        - ~
+        - '#sudo vim /etc/nftables.conf'
+        - sudo iftop -i wlp3s0
+        - sudo iftop -i tun0
+
