@@ -12,6 +12,9 @@ if [ -d "$HOME/code/tools/bin" ] ; then
   PATH="$HOME/code/tools/bin:$PATH"
 fi
 
+# Ignore the XOFF/XON characters (typically Ctrl-S for XOFF to pause output, Ctrl-Q for XON to resume)
+stty -ixon
+
 export GPG_TTY="$(tty)"
 export REVIEW_BASE=staging
 
