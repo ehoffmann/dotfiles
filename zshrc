@@ -1,3 +1,15 @@
+# Summary:
+# - vi mode enabled, with fast ESC
+# - Ctrl-A / Ctrl-E: jump to start / end of line in insert mode
+# - Alt-.: insert last word from previous command
+# - `v` in normal mode: edit current command in vim
+# - Alt-s: prepend `sudo` to current command
+# - `y` / `Y` in normal mode: yank to system clipboard
+# - Ctrl-y: accept autosuggestion
+# - Up / Down or `k` / `j`: history substring search
+# - fzf enabled for file/dir picking with previews
+# - lazy-load nvm on first `node` / `npm` / `npx` / `nvm`
+
 export LANG=en_US.UTF-8
 if [ -d "$HOME/bin" ] ; then
   PATH="$HOME/bin:$PATH"
