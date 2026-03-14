@@ -22,7 +22,7 @@ zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
 
 function git_dirty() {
   git rev-parse --is-inside-work-tree &>/dev/null &&
-  ! git diff --quiet && echo '*'
+  ! git diff --quiet && echo ' *'
 }
 
 precmd() {
@@ -35,5 +35,5 @@ precmd() {
   fi
   _vi_update_prompt
 }
-PROMPT='%F{green}%n@%m%f %F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)
+PROMPT='%F{green}%n%f %F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)
 ${PROMPT_ARROW_COLOR}${VI_PROMPT_ARROW}%f '
