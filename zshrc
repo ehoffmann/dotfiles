@@ -31,17 +31,39 @@ else
   compinit -C
 fi
 
-##### Vi mode #####
+# Vi mode
 export EDITOR=vim
 export VISUAL=vim
 export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
-
-autoload -Uz edit-command-line
-zle -N edit-command-line
 bindkey -v
+
+# Auto-suggest
+if [[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+  bindkey '^y' autosuggest-accept
+  bindkey -M viins '^y' autosuggest-accept
+fi
+
+# Syntax highlight
+[[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# History substring match with arrow up/down
+if [[ -f ~/.zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
+  source ~/.zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+  bindkey -M vicmd 'k' history-substring-search-up
+  bindkey -M vicmd 'j' history-substring-search-down
+  bindkey "$key[Up]" history-substring-search-up
+  bindkey "$key[Down]" history-substring-search-down
+fi
+
+# Restore some useful bindings
 bindkey -M viins '^A' beginning-of-line
 bindkey -M viins '^E' end-of-line
-bindkey '^X^E' edit-command-line
+bindkey -M viins '^[.' insert-last-word
+
+# Edit command line in vim with v
+autoload -Uz edit-command-line
+zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
 # Yank to clipboard
@@ -98,10 +120,7 @@ export FZF_ALT_C_OPTS="
 ### Functions
 [[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
 
-##### Plugins #####
-[[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-[[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
+# Ruby
 if [ -d /usr/local/share/chruby ] ; then
   source /usr/local/share/chruby/chruby.sh
   source /usr/local/share/chruby/auto.sh # Auto switch, per project: echo "ruby-2.7.6" > ~/.ruby-version
@@ -113,10 +132,6 @@ if [ -d /usr/local/share/chruby ] ; then
   # build_ruby x.x.x
   chruby 4.0.1
 fi
-
-# Autosuggestions
-bindkey '^y' autosuggest-accept
-bindkey -M viins '^y' autosuggest-accept
 
 # Node, lazy
 export NVM_DIR="$HOME/.nvm"
