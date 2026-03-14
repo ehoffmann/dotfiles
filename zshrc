@@ -66,6 +66,15 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
+# Insert sudo before the command
+sudo-command-line() {
+  [[ -z $BUFFER ]] && zle up-history
+  BUFFER="sudo $BUFFER"
+  zle end-of-line
+}
+zle -N sudo-command-line
+bindkey '^[s' sudo-command-line
+
 # Yank to clipboard
 function vi-yank-xclip {
   zle vi-yank
