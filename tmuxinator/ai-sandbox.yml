@@ -1,0 +1,10 @@
+name: ai-sandbox
+root: ~/ai_sandbox
+
+windows:
+  - ssh:
+      layout: main-vertical
+      panes:
+          - vim
+          - gpt
+          - ls
