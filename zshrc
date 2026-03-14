@@ -123,7 +123,11 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 ##### FZF #####
 source <(fzf --zsh)
 export FZF_DEFAULT_COMMAND='rg --files'
-export FZF_DEFAULT_OPTS='--height 40% --tmux top,80%'
+if [[ -n "$TMUX_IN_POPUP" ]]; then
+  export FZF_DEFAULT_OPTS='--height 40%'
+else
+  export FZF_DEFAULT_OPTS='--height 40% --tmux top,80%'
+fi
 export FZF_CTRL_T_OPTS="
   --walker-skip .git,node_modules,target
   --preview 'bat -n --color=always {}'
