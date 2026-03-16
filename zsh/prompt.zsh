@@ -31,9 +31,9 @@ precmd() {
   local st=$?
   vcs_info
   if (( st == 0 )); then
-    PROMPT_ARROW_COLOR='%F{white}'
+    PROMPT_ARROW_COLOR='%F{15}' # Bright white
   else
-    PROMPT_ARROW_COLOR='%F{red}'
+    PROMPT_ARROW_COLOR='%F{9}' # Bright red
   fi
   _vi_update_prompt
 }
