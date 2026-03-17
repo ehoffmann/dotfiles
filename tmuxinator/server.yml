@@ -1,9 +1,6 @@
 name: server
 root: /tmp
 
-on_project_exit:
-  - tmux set-option -t server status-style "bg=red,fg=white,bold"
-
 windows:
   - ssh:
       layout: main-vertical
