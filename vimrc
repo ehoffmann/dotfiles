@@ -326,10 +326,12 @@ endfunction
 "------------------------------------------------------------------------------
 " C
 "------------------------------------------------------------------------------
-set makeprg=make
+" set makeprg=make
+autocmd FileType c setlocal makeprg=make\ -k\ NAME=%:r
 set errorformat=%f:%l:%c:\ %m
 " nnoremap <F5> :w<CR>:silent! :make<CR>:cwindow<CR>
 nnoremap <leader>5 :update<CR>:silent! make \| redraw! \| cwindow<CR>
+inoremap <leader>5 <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>
 " inoremap <F5> <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>a
 
 "------------------------------------------------------------------------------
