@@ -236,13 +236,14 @@ nmap <leader>cr cs{}cs}{
 nmap <leader>x :s/\[ \]/[X]/<CR>
 
 "------------------------------------------------------------------------------
-" Split navigation shortcut (same as tmux)
+" Navigation vim-tmux-navigation
 "------------------------------------------------------------------------------
-" Aleady set by Plugin 'christoomey/vim-tmux-navigator'
+" Set by 'christoomey/vim-tmux-navigator'
 " nnoremap <C-J> <C-W><C-J>
 " nnoremap <C-K> <C-W><C-K>
 " nnoremap <C-L> <C-W><C-L>
 " nnoremap <C-H> <C-W><C-H>
+let g:tmux_navigator_disable_when_zoomed = 1
 
 "------------------------------------------------------------------------------
 " Per filetype config
