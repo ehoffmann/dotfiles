@@ -126,6 +126,18 @@ set breakindent                 " wrapped line visually indented (same amount as
 set showbreak=↪\                " break symbol
 
 "------------------------------------------------------------------------------
+" Mouse
+"------------------------------------------------------------------------------
+set mouse=a
+if !has('nvim')
+  if has('mouse_sgr')
+    set ttymouse=sgr
+  else
+    set ttymouse=xterm2
+  endif
+endif
+
+"------------------------------------------------------------------------------
 " Fold
 "------------------------------------------------------------------------------
 
