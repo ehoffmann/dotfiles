@@ -141,6 +141,28 @@ augroup remember_folds
 augroup END
 
 "------------------------------------------------------------------------------
+" GDB
+"------------------------------------------------------------------------------
+packadd termdebug
+let g:termdebug_config = {
+      \ 'wide': 1,
+      \ 'variables_window': v:true,
+      \ 'variables_window_height': 12,
+      \ 'disasm_window': v:true,
+      \ 'disasm_window_height': 1,
+      \ 'popup': 1,
+      \ 'sign': '>>',
+      \}
+
+" nnoremap <F5>  :Run<CR>
+" nnoremap <F9>  :Break<CR>
+" nnoremap <F10> :Over<CR>
+" nnoremap <F11> :Step<CR>
+" nnoremap <F12> :Finish<CR>
+" nnoremap <Leader>dc :Continue<CR>
+" nnoremap <Leader>de :Evaluate<CR>
+
+"------------------------------------------------------------------------------
 " Color / Scheme
 "------------------------------------------------------------------------------
 
