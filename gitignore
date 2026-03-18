@@ -5,3 +5,4 @@ eh_notes.rb
 tags
 gems_copy/
 a.out
+.gdb_breakpoints
