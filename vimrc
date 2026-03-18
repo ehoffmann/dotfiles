@@ -318,7 +318,9 @@ command! -bang -nargs=? -complete=dir Files
 nmap <C-P> :Files!<CR>
 
 " Search with Rg for word under cursor
-nnoremap <silent> <Leader>rg :Rg! <C-R><C-W><CR>
+nnoremap <silent> <Leader>r :Rg! <C-R><C-W><CR>
+" Open Rg full screen in insert mode
+inoremap <silent> <Leader>r <ESC>:Rg!<CR>
 
 "------------------------------------------------------------------------------
 " diff
