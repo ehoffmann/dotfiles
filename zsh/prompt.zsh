@@ -3,10 +3,12 @@ setopt promptsubst
 function _vi_update_prompt() {
   if [[ $KEYMAP == vicmd ]]; then
     # VI_PROMPT_ARROW='❮'
-    VI_PROMPT_ARROW='<esc> '
+    # VI_PROMPT_ARROW='# [cmd]'
+    VI_MODE_CHAR='[cmd] '
   else
     # VI_PROMPT_ARROW='❯'
-    VI_PROMPT_ARROW=''
+    # VI_PROMPT_ARROW='#'
+    VI_MODE_CHAR=''
   fi
 }
 
@@ -24,19 +26,23 @@ zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
 
 function git_dirty() {
   git rev-parse --is-inside-work-tree &>/dev/null &&
-  ! git diff --quiet && echo ' %F{yellow}⚡%f'
+  ! git diff --quiet && echo ' %F{yellow}*%f'
 }
 
 precmd() {
   local st=$?
   vcs_info
   if (( st == 0 )); then
-    PROMPT_ARROW_COLOR='%F{15}' # Bright white
+    # PROMPT_ARROW_COLOR='%F{15}' # Bright white
+    PROMPT_ARROW_COLOR='%F{white}' # Bright white
   else
     PROMPT_ARROW_COLOR='%F{9}' # Bright red
   fi
   _vi_update_prompt
 }
 
-PROMPT='${PROMPT_ARROW_COLOR}%#${VI_PROMPT_ARROW}%f '
-RPROMPT='%F{blue}%~%f ${vcs_info_msg_0_}$(git_dirty)'
+# WDIR='%F{blue}%-1~...%1~%f'
+WDIR='%F{blue}%.%f'
+WDIR='%~'
+PROMPT='${PROMPT_ARROW_COLOR}%#%f ${WDIR} %F{yellow}${VI_MODE_CHAR}%f'
+RPROMPT='${vcs_info_msg_0_}$(git_dirty)'
