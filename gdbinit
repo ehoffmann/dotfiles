@@ -26,6 +26,10 @@ define hook-quit
   save breakpoints .gdb_breakpoints
 end
 
+define hook-exit
+  save breakpoints .gdb_breakpoints
+end
+
 define hookpost-file
   source .gdb_breakpoints
 end
