@@ -160,19 +160,11 @@ let g:termdebug_config = {
       \ 'wide': 1,
       \ 'variables_window': v:true,
       \ 'variables_window_height': 12,
-      \ 'disasm_window': v:true,
+      \ 'disasm_window': v:false,
       \ 'disasm_window_height': 1,
       \ 'popup': 1,
       \ 'sign': '>>',
       \}
-
-" nnoremap <F5>  :Run<CR>
-" nnoremap <F9>  :Break<CR>
-" nnoremap <F10> :Over<CR>
-" nnoremap <F11> :Step<CR>
-" nnoremap <F12> :Finish<CR>
-" nnoremap <Leader>dc :Continue<CR>
-" nnoremap <Leader>de :Evaluate<CR>
 
 "------------------------------------------------------------------------------
 " Color / Scheme
@@ -260,17 +252,15 @@ let g:tmux_navigator_disable_when_zoomed = 1
 "------------------------------------------------------------------------------
 " Per filetype config
 "------------------------------------------------------------------------------
-au BufRead,BufNewFile *.tpl set filetype=smarty.html
-au BufNewFile,BufRead Guardfile set filetype=ruby
-au BufNewFile,BufRead *.styl set filetype=stylus
-autocmd Filetype c setlocal ts=2 sts=2 sw=2
-autocmd Filetype html setlocal ts=2 sts=2 sw=2
-autocmd Filetype rust setlocal ts=2 sts=2 sw=2
-autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
-autocmd Filetype javascript setlocal ts=2 sts=2 sw=2
-augroup EnvAsShell
+augroup IndentSettings
   autocmd!
-  autocmd BufNewFile,BufRead .env.local,*.env.* set filetype=sh
+  autocmd FileType c,ruby,rust,javascript,html setlocal ts=2 sts=2 sw=2 expandtab
+augroup END
+
+augroup FiletypeOverrides
+  autocmd!
+  autocmd BufNewFile,BufRead Guardfile setfiletype ruby
+  autocmd BufNewFile,BufRead .env.local,*.env.* setfiletype sh
 augroup END
 
 "------------------------------------------------------------------------------
