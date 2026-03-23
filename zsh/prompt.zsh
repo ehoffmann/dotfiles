@@ -4,7 +4,7 @@ function _vi_update_prompt() {
   if [[ $KEYMAP == vicmd ]]; then
     # VI_PROMPT_ARROW='❮'
     # VI_PROMPT_ARROW='# [cmd]'
-    VI_MODE_CHAR='[cmd] '
+    VI_MODE_CHAR='[c] '
   else
     # VI_PROMPT_ARROW='❯'
     # VI_PROMPT_ARROW='#'
