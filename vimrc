@@ -320,9 +320,10 @@ command! -bang -nargs=? -complete=dir Files
 nmap <C-P> :Files!<CR>
 
 " Search with Rg for word under cursor
-nnoremap <silent> <Leader>r :Rg! <C-R><C-W><CR>
+nnoremap <silent> <Leader>rw :Rg! <C-R><C-W><CR>
+nnoremap <silent> <Leader>rg :Rg!<CR>
 " Open Rg full screen in insert mode
-inoremap <silent> <Leader>r <ESC>:Rg!<CR>
+inoremap <silent> <Leader>rg <ESC>:Rg!<CR>
 
 "------------------------------------------------------------------------------
 " diff
@@ -483,7 +484,7 @@ function! OpenRubyAPI()
     let url = 'https://rubyapi.org/' . ruby_version . '/o/s?q=' . word
     execute '!xdg-open ' . shellescape(url)
 endfunction
-nnoremap <leader>rd :call OpenRubyAPI()<CR>
+" nnoremap <leader>a :call OpenRubyAPI()<CR>
 
 "------------------------------------------------------------------------------
 " Create/open spec file in Rails project
