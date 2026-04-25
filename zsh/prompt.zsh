@@ -26,7 +26,8 @@ zstyle ':vcs_info:git:*' actionformats '%F{cyan}(%b|%a)%f'
 
 function git_dirty() {
   git rev-parse --is-inside-work-tree &>/dev/null &&
-  ! git diff --quiet && echo ' %F{yellow}*%f'
+  [ -n "$(git status --porcelain)" ] &&
+  echo ' %F{yellow}*%f'
 }
 
 precmd() {
