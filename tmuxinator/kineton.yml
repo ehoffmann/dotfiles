@@ -1,0 +1,22 @@
+<%
+suffix = @args[0]
+
+project =
+  if suffix.nil? || suffix.empty? || suffix == "main"
+    "kineton"
+  else
+    "kineton-#{suffix}"
+  end
+
+root_dir = File.expand_path("~/code/#{project}")
+%>
+
+name: <%= project %>
+root: <%= root_dir %>
+
+windows:
+  - code:
+      layout: main-vertical
+      panes:
+        - vim
+        - git status
