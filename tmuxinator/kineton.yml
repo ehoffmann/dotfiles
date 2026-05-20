@@ -2,10 +2,10 @@
 suffix = @args[0]
 
 project =
-  if suffix.nil? || suffix.empty? || suffix == "main"
+  if suffix.nil? || suffix.empty? || suffix == "0"
     "kineton"
   else
-    "kineton-#{suffix}"
+    "kineton_#{suffix}"
   end
 
 root_dir = File.expand_path("~/code/#{project}")
