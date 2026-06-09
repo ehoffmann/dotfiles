@@ -50,11 +50,11 @@ export KEYTIMEOUT=1 # Delay after <ESC> press in milisec (defaul = 4)
 bindkey -v
 
 # Auto-suggest
-if [[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-  source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-  bindkey '^y' autosuggest-accept
-  bindkey -M viins '^y' autosuggest-accept
-fi
+# if [[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+#   source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+#   bindkey '^y' autosuggest-accept
+#   bindkey -M viins '^y' autosuggest-accept
+# fi
 
 # Syntax highlight
 [[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -155,7 +155,7 @@ if [ -d /usr/local/share/chruby ] ; then
   # list_ruby_version
   # build and install a new version
   # build_ruby x.x.x
-  chruby 4.0.1
+  chruby 4.0.5
 fi
 
 # Node, lazy
