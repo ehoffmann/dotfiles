@@ -94,6 +94,9 @@ set scrolloff=3
 " set hidden
 set confirm
 
+" Required for 'git review' custom alias
+set tabpagemax=100
+
 "------------------------------------------------------------------------------
 " Search
 "------------------------------------------------------------------------------
