@@ -520,6 +520,18 @@ command! OpenSpec :call OpenCorrespondingSpec()
 let g:markdown_fenced_languages = ['c', 'ruby', 'js=javascript', 'json', 'yaml', 'bash=sh', 'html']
 
 "------------------------------------------------------------------------------
+" YAML
+"------------------------------------------------------------------------------
+autocmd FileType yaml,yml setlocal tabstop=2
+autocmd FileType yaml,yml setlocal shiftwidth=2
+autocmd FileType yaml,yml setlocal softtabstop=2
+autocmd FileType yaml,yml setlocal expandtab
+autocmd FileType yaml,yml setlocal autoindent
+autocmd FileType yaml,yml setlocal indentkeys-=<:>
+autocmd FileType yaml,yml setlocal foldmethod=indent
+autocmd FileType yaml,yml setlocal foldlevel=99
+
+"------------------------------------------------------------------------------
 " misc
 "------------------------------------------------------------------------------
 "
