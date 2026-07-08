@@ -122,7 +122,8 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 ##### FZF #####
 source <(fzf --zsh)
-export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+
 if [[ -n "$TMUX_IN_POPUP" ]]; then
   export FZF_DEFAULT_OPTS='--height 40%'
 else
