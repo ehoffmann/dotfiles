@@ -1,0 +1,24 @@
+<%
+suffix = @args[0]
+
+project =
+  if suffix.nil? || suffix.empty? || suffix == "0"
+    "mj-fleet-backend"
+  else
+    "mj-fleet-backend_#{suffix}"
+  end
+
+root_dir = File.expand_path("~/code/#{project}")
+%>
+
+name: <%= project %>
+root: <%= root_dir %>
+
+windows:
+  - code:
+      layout: main-vertical
+      panes:
+        - vim
+        - git status
+  - docker:
+      layout: main-vertical
