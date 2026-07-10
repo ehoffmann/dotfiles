@@ -11,6 +11,12 @@ Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
 
+" Fern
+Plug 'lambdalisue/vim-fern'
+Plug 'lambdalisue/vim-fern-hijack'
+Plug 'lambdalisue/vim-fern-git-status'
+Plug 'lambdalisue/fern-renderer-nerdfont.vim'
+
 " Vim script for text filtering and alignment
 Plug 'godlygeek/tabular'
 
@@ -264,6 +270,46 @@ augroup FiletypeOverrides
   autocmd BufNewFile,BufRead Guardfile setfiletype ruby
   autocmd BufNewFile,BufRead .env.local,*.env.* setfiletype sh
 augroup END
+
+"------------------------------------------------------------------------------
+" fern
+"------------------------------------------------------------------------------
+
+" Toggle project drawer and reveal current file
+nnoremap <silent> <Leader>e
+      \ :Fern . -drawer -toggle -reveal=% -width=30<CR>
+
+augroup fern-custom
+  autocmd!
+  autocmd FileType fern call s:fern_settings()
+augroup END
+
+function! s:fern_settings() abort
+endfunction
+
+function! s:fern_settings() abort
+  nunmap <buffer> <C-h>
+  nunmap <buffer> <C-j>
+  nunmap <buffer> <C-k>
+  nunmap <buffer> <C-l>
+
+  nnoremap <buffer><silent> <C-h> :TmuxNavigateLeft<CR>
+  nnoremap <buffer><silent> <C-j> :TmuxNavigateDown<CR>
+  nnoremap <buffer><silent> <C-k> :TmuxNavigateUp<CR>
+  nnoremap <buffer><silent> <C-l> :TmuxNavigateRight<CR>
+
+  " nmap <buffer><silent> R <Plug>(fern-action-redraw)
+  " nmap <buffer><silent> r <Plug>(fern-action-rename)
+  " " nmap <buffer><silent> n <Plug>(fern-action-new-path)
+  " nmap <buffer><silent> d <Plug>(fern-action-trash)
+  " nmap <buffer><silent> m <Plug>(fern-action-move)
+  " nmap <buffer><silent> c <Plug>(fern-action-copy)
+  " nmap <buffer><silent> v <Plug>(fern-action-open:vsplit)
+  " nmap <buffer><silent> s <Plug>(fern-action-open:split)
+  " nmap <buffer><silent> t <Plug>(fern-action-open:tabedit)
+  " nmap <buffer><silent> h <Plug>(fern-action-collapse)
+  " nmap <buffer><silent> l <Plug>(fern-action-expand)
+endfunction
 
 "------------------------------------------------------------------------------
 " netrw
