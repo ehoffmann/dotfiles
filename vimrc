@@ -1,83 +1,82 @@
 set nocompatible " be iMproved
 filetype off     " required!
 
-set rtp+=~/.vim/bundle/Vundle.vim/
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
+call plug#begin('~/.vim/plugged')
 
 " Interpret a file by function and cache file automatically, used by
 " other plugin
-Plugin 'MarcWeber/vim-addon-mw-utils'
+Plug 'MarcWeber/vim-addon-mw-utils'
 
 " Snippets
-Plugin 'garbas/vim-snipmate'
-Plugin 'honza/vim-snippets'
+Plug 'garbas/vim-snipmate'
+Plug 'honza/vim-snippets'
 
 " Vim script for text filtering and alignment
-Plugin 'godlygeek/tabular'
+Plug 'godlygeek/tabular'
 
 " Fuzzy file finder
-Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim'
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
 
 " Comment
-Plugin 'tomtom/tcomment_vim'
+Plug 'tomtom/tcomment_vim'
 
 " Some utility functions for VIM
-Plugin 'tomtom/tlib_vim'
+Plug 'tomtom/tlib_vim'
 
 " Ruby support
-Plugin 'vim-ruby/vim-ruby'
+Plug 'vim-ruby/vim-ruby'
 
 " Required for 'nelstrom/vim-textobj-rubyblock'
-Plugin 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-user'
 
 " New text objects, al 'a line' and il 'inner line'
-Plugin 'kana/vim-textobj-line'
+Plug 'kana/vim-textobj-line'
 
 " Ruby text object
-Plugin 'nelstrom/vim-textobj-rubyblock'
+Plug 'nelstrom/vim-textobj-rubyblock'
 
 " Git wrapper
-Plugin 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive'
 
 " GitHub extension for fugitive.vim, GBrowse, hub, completion in commit msg
-Plugin 'tpope/vim-rhubarb'
+Plug 'tpope/vim-rhubarb'
 
 " Dot repeat at plugin level
-Plugin 'tpope/vim-repeat'
+Plug 'tpope/vim-repeat'
 
 " Quoting/parenthesizing made simple
-Plugin 'tpope/vim-surround'
+Plug 'tpope/vim-surround'
 
 " Easily search for, substitute, and abbreviate multiple variants of a word
-Plugin 'tpope/vim-abolish'
+Plug 'tpope/vim-abolish'
 
 " Rails
-Plugin 'tpope/vim-rails.git'
+Plug 'tpope/vim-rails.git'
 
 " Retro groove color scheme for Vim
-Plugin 'morhetz/gruvbox'
+Plug 'morhetz/gruvbox'
 
 " Transparent editing of gpg encrypted files
-Plugin 'jamessan/vim-gnupg'
+Plug 'jamessan/vim-gnupg'
 
 " Navigate seamlessly between vim and tmux splits
-Plugin 'christoomey/vim-tmux-navigator'
+Plug 'christoomey/vim-tmux-navigator'
 
 " Simplifies the transition between multiline and single-line code
-Plugin 'andrewradev/splitjoin.vim'
+Plug 'andrewradev/splitjoin.vim'
 
 " Toggle ruby block with <Leader>b
-Plugin 'jgdavey/vim-blockle'
+Plug 'jgdavey/vim-blockle'
 
 " Perform an interactive diff on two blocks of text
-Plugin 'AndrewRadev/linediff.vim'
+Plug 'AndrewRadev/linediff.vim'
 
 " A git diff in the gutter (sign column), stages/undoes hunks and partial hunks.
-Plugin 'airblade/vim-gitgutter'
+Plug 'airblade/vim-gitgutter'
 
-call vundle#end()
+call plug#end()
+
 filetype plugin indent on
 :runtime macros/matchit.vim
 syntax on
