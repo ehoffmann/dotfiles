@@ -322,11 +322,18 @@ command! -bang -nargs=? -complete=dir Files
       \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 nmap <C-P> :Files!<CR>
 
-" Search with Rg for word under cursor
-nnoremap <silent> <Leader>rw :Rg! <C-R><C-W><CR>
+" Rg
+command! -bang -nargs=* Rg
+      \ call fzf#vim#grep(
+      \   'rg --column --line-number --no-heading --color=always
+      \       --smart-case --hidden --glob "!.git/*" -- '
+      \       . shellescape(<q-args>),  1, fzf#vim#with_preview(),
+      \   <bang>0
+      \ )
+" Open Rg full screen
 nnoremap <silent> <Leader>rg :Rg!<CR>
-" Open Rg full screen in insert mode
-inoremap <silent> <Leader>rg <ESC>:Rg!<CR>
+" Open Rg full screen, filled with word under cursor
+nnoremap <silent> <Leader>rw :Rg! <C-R><C-W><CR>
 
 "------------------------------------------------------------------------------
 " diff
