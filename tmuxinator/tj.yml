@@ -1,0 +1,10 @@
+name: tj
+root: ~/code/tj
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - ls
+        - agent
