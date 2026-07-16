@@ -27,6 +27,7 @@ rubsa() {
 }
 
 build_ruby() {
+  initial_dir="$(pwd)"
   emulate -L zsh
   set -euo pipefail
 
@@ -60,6 +61,7 @@ build_ruby() {
 
   make -j"$(nproc)"
   sudo make install
+  cd "$initial_dir"
 }
 
 list_ruby_versions() {
