@@ -157,7 +157,7 @@ if [ -d /usr/local/share/chruby ] ; then
   # list_ruby_version
   # build and install a new version
   # build_ruby x.x.x
-  chruby 4.0.5
+  chruby 4.0.6
 fi
 
 # Node, lazy
@@ -170,3 +170,8 @@ nvm() {
 node() { nvm; node "$@"; }
 npm()  { nvm; npm "$@"; }
 npx()  { nvm; npx "$@"; }
+
+# Projects
+# MJ
+export APP_USER_UID=$(id -u)
+export APP_GROUP_GID=$(id -g)
