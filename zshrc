@@ -122,7 +122,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 ##### FZF #####
 source <(fzf --zsh)
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --no-ignore-vcs'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 if [[ -n "$TMUX_IN_POPUP" ]]; then

@@ -74,3 +74,19 @@ list_ruby_versions() {
     sed 's/^ruby-//; s/\t.*//' |
     sort -uV
 }
+
+# Delete branches merged into either staging or main, while preserving master, main, staging, and the current branch.
+git-clean-branch() {
+  git fetch --prune || return
+
+  {
+    git show-ref --verify --quiet refs/heads/staging &&
+      git branch --merged staging
+
+    git show-ref --verify --quiet refs/heads/main &&
+      git branch --merged main
+  } |
+    grep -Ev '^\*|^[[:space:]]*(master|main|staging)$' |
+    sort -u |
+    xargs -r git branch -d
+}
