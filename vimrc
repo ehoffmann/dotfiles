@@ -320,8 +320,8 @@ nmap <C-P> :Files!<CR>
 command! -bang -nargs=* Rg
       \ call fzf#vim#grep(
       \   'rg --column --line-number --no-heading --color=always
-      \       --smart-case --hidden --glob "!.git/*" -- '
-      \       . shellescape(<q-args>),  1, fzf#vim#with_preview(),
+      \       --smart-case --hidden --no-ignore-vcs -- '
+      \       . shellescape(<q-args>), 1, fzf#vim#with_preview(),
       \   <bang>0
       \ )
 " Open Rg full screen
