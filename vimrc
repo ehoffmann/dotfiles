@@ -81,6 +81,9 @@ Plug 'AndrewRadev/linediff.vim'
 " A git diff in the gutter (sign column), stages/undoes hunks and partial hunks.
 Plug 'airblade/vim-gitgutter'
 
+" Tags
+Plug 'ludovicchabant/vim-gutentags'
+
 call plug#end()
 
 filetype plugin indent on
@@ -382,7 +385,75 @@ inoremap <leader>5 <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>
 "   /usr/lib/gcc/x86_64-linux-gnu/15/include \
 "   /usr/include/x86_64-linux-gnu \
 "   /usr/include
-set tags=./tags;,~/.ctags.d/glibc_gcc.tags
+" set tags=./tags;,~/.ctags.d/glibc_gcc.tags
+" set tags=./tags;,~/.ctags.d/glibc_gcc.tags
+
+" ---------------------------------------------------------------------------
+" Ctags / Gutentags
+" ---------------------------------------------------------------------------
+
+" Keep generated tag files outside repositories.
+let g:gutentags_cache_dir = expand('~/.cache/vim/gutentags')
+
+" Explicitly use Universal Ctags.
+let g:gutentags_ctags_executable = 'ctags'
+
+" Let Git decide which files belong to the project:
+"   -c: tracked files
+"   -o: untracked files
+"   --exclude-standard: respect .gitignore, .git/info/exclude and global ignore
+let g:gutentags_file_list_command = {
+      \ 'markers': {
+      \   '.git': 'git ls-files -co --exclude-standard'
+      \ }
+      \ }
+
+" Generate qualified entries such as namespaced classes and scoped methods.
+let g:gutentags_ctags_extra_args = [
+      \ '--extras=+q'
+      \ ]
+
+" Useful if some generated directories contain tracked files.
+let g:gutentags_ctags_exclude = [
+      \ 'log/*',
+      \ 'tmp/*',
+      \ 'storage/*',
+      \ 'coverage/*',
+      \ 'node_modules/*',
+      \ 'vendor/*',
+      \ 'public/assets/*',
+      \ 'public/packs/*'
+      \ ]
+
+" These are defaults, but keeping them explicit documents the behaviour.
+let g:gutentags_generate_on_missing = 1
+let g:gutentags_generate_on_write = 1
+let g:gutentags_background_update = 1
+
+" Optional status-line indicator while ctags is running.
+" set statusline+=%{gutentags#statusline('[',']')}
+"
+" Jump immediately when unique; show the selection list when ambiguous.
+nnoremap <C-]> g<C-]>
+
+" Useful native commands:
+" CTRL-]          Jump to definition; mapped above to :tjump
+" g]              Always show all matching tags
+" CTRL-T          Return through the tag stack
+" :tags           Display the current tag stack
+" :tnext          Next matching tag
+" :tprevious      Previous matching tag
+" CTRL-W g CTRL-] Open the definition in a split
+"
+" Vim maintains a real tag stack, so CTRL-T is preferable to relying exclusively on CTRL-O
+"
+" A Normal workflow would be:
+"
+" CTRL-]       Symbol directly under cursor
+" g]           Inspect ambiguous definitions
+" :Tags Foo    Search for an approximately known class or method
+" :BTags       Browse the structure of a large current file
+" CTRL-T       Return
 
 "------------------------------------------------------------------------------
 " gitgutter
