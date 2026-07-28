@@ -90,3 +90,87 @@ git-clean-branch() {
     sort -u |
     xargs -r git branch -d
 }
+
+git-list-mj() {
+  local repo
+
+  for repo in \
+    ~/code/mj-fleet-backend \
+    ~/code/mj-fleet-backend_{1..3}
+  do
+    [[ -d "$repo/.git" ]] || continue
+
+    printf '\n\033[1;35m%s\033[0m' "$repo"
+
+    if ! git -C "$repo" diff --quiet ||
+       ! git -C "$repo" diff --cached --quiet; then
+      printf ' \033[1;31m[dirty]\033[0m'
+    fi
+
+    printf '\n'
+
+    git -C "$repo" for-each-ref \
+      --sort=-committerdate \
+      --color=always \
+      --format='%(if)%(HEAD)%(then)%(color:bold green)* %(else)  %(end)%(color:bold yellow)%(refname:short)%(color:reset) %(color:cyan)%(upstream:short)%(color:reset) %(color:red)%(upstream:trackshort)%(color:reset)  %(color:blue)%(committerdate:relative)%(color:reset)  %(color:dim white)%(authorname)%(color:reset)  %(subject)' \
+      refs/heads/
+  done
+}
+
+update-mj-repos() {
+  local repo branch
+  local -a repos=(
+    ~/code/mj-fleet-backend
+    ~/code/mj-fleet-backend_{1..3}
+  )
+
+  for repo in "${repos[@]}"; do
+    print
+    print -P "%F{magenta}%B==> ${repo}%b%f"
+
+    if ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+      print -P "%F{red}Not a Git repository; skipping.%f"
+      continue
+    fi
+
+    (
+      cd "$repo" || exit 1
+
+      print -P "%F{cyan}Fetching backend...%f"
+      git fetch --prune || exit 1
+
+      branch=$(git branch --show-current)
+
+      if [[ "$branch" == main ]]; then
+        print -P "%F{cyan}Updating backend main...%f"
+        git pull --ff-only origin main || exit 1
+      else
+        print -P "%F{yellow}Backend on '$branch'; not pulling main.%f"
+      fi
+
+      print -P "%F{cyan}Cleaning backend branches...%f"
+      git-clean-branch || exit 1
+
+      if ! git -C spa rev-parse --git-dir >/dev/null 2>&1; then
+        print -P "%F{yellow}No SPA Git repository; skipping SPA.%f"
+        exit 0
+      fi
+
+      cd spa || exit 1
+
+      print -P "%F{cyan}Fetching SPA...%f"
+      git fetch --prune || exit 1
+
+      branch=$(git branch --show-current)
+
+      if [[ "$branch" == main ]]; then
+        print -P "%F{cyan}Updating SPA main...%f"
+        git pull --ff-only origin main || exit 1
+      else
+        print -P "%F{yellow}SPA on '$branch'; not pulling main.%f"
+      fi
+
+      print -P "%F{green}%B✓ Repository processed%b%f"
+    ) || print -P "%F{red}%B✗ Update failed for ${repo}%b%f"
+  done
+}
