@@ -174,3 +174,14 @@ update-mj-repos() {
     ) || print -P "%F{red}%B✗ Update failed for ${repo}%b%f"
   done
 }
+
+# Switch git local branches with fzf
+git-switch() {
+  local branch
+  branch=$(git branch --format='%(refname:short)' |
+    sort -u |
+    fzf --prompt='Git branch> ') || return
+
+  git switch "$branch" 2>/dev/null
+}
+
