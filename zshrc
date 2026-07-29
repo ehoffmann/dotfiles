@@ -28,7 +28,6 @@ fi
 stty -ixon
 
 export GPG_TTY="$(tty)"
-export REVIEW_BASE=staging
 
 ##### PERF #####
 setopt NO_BEEP
