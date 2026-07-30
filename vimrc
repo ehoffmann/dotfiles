@@ -279,7 +279,7 @@ let g:fern#drawer_width = 40
 
 " Toggle Fern and reveal the current file.
 nnoremap <silent> <Leader>e
-      \ :Fern . -drawer -toggle -reveal=% -stay<CR>
+      \ :Fern . -drawer -toggle -reveal=%<CR>
 
 augroup fern-custom
   autocmd!
@@ -319,32 +319,6 @@ nnoremap <silent> <Leader>rg :Rg!<CR>
 nnoremap <silent> <Leader>rw :Rg! <C-R><C-W><CR>
 
 "------------------------------------------------------------------------------
-" diff
-"------------------------------------------------------------------------------
-" Ignore white space in vimdiff, Gdiffsplit...
-set diffopt+=iwhite
-
-"------------------------------------------------------------------------------
-" ft Git commit word-diff syntax
-"------------------------------------------------------------------------------
-augroup GitCommitWordDiff
-  autocmd!
-  autocmd FileType gitcommit call s:gitcommit_worddiff()
-augroup END
-
-function! s:gitcommit_worddiff() abort
-  if exists('b:gitcommit_worddiff_done')
-    return
-  endif
-  let b:gitcommit_worddiff_done = 1
-
-  syntax match GitWordAdd /{+.\{-}+}/ containedin=ALL
-  syntax match GitWordDel /\[-.\{-}-\]/ containedin=ALL
-  highlight GitWordAdd ctermbg=2 guibg=#005f00 ctermfg=NONE guifg=NONE
-  highlight GitWordDel ctermbg=1 guibg=#5f0000 ctermfg=NONE guifg=NONE
-endfunction
-
-"------------------------------------------------------------------------------
 " C
 "------------------------------------------------------------------------------
 " set makeprg=make
@@ -355,27 +329,8 @@ nnoremap <leader>5 :update<CR>:silent! make \| redraw! \| cwindow<CR>
 inoremap <leader>5 <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>
 " inoremap <F5> <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>a
 
-"------------------------------------------------------------------------------
-" Ctags
-"------------------------------------------------------------------------------
-" ctags -R \
-"   --language-force=C \
-"   --kinds-C=+defgpstuv \
-"   --fields=+nKS \
-"   --extras=+q \
-"   --c-types=+p \
-"   --exclude='*/clang/*' \
-"   --exclude='*/cuda*/*' \
-"   --exclude='*/nv*/*' \
-"   -f ~/.ctags.d/glibc_gcc.tags \
-"   /usr/lib/gcc/x86_64-linux-gnu/15/include \
-"   /usr/include/x86_64-linux-gnu \
-"   /usr/include
-" set tags=./tags;,~/.ctags.d/glibc_gcc.tags
-" set tags=./tags;,~/.ctags.d/glibc_gcc.tags
-
 " ---------------------------------------------------------------------------
-" Ctags / Gutentags
+" Ctags / Gutentags / tags
 " ---------------------------------------------------------------------------
 
 " Keep generated tag files outside repositories.
@@ -440,12 +395,6 @@ nnoremap <C-]> g<C-]>
 " :Tags Foo    Search for an approximately known class or method
 " :BTags       Browse the structure of a large current file
 " CTRL-T       Return
-
-"------------------------------------------------------------------------------
-" gitgutter
-"------------------------------------------------------------------------------
-set updatetime=750
-highlight! link SignColumn LineNr
 
 "------------------------------------------------------------------------------
 " GO
@@ -588,6 +537,123 @@ autocmd FileType yaml,yml setlocal autoindent
 autocmd FileType yaml,yml setlocal indentkeys-=<:>
 autocmd FileType yaml,yml setlocal foldmethod=indent
 autocmd FileType yaml,yml setlocal foldlevel=99
+
+"------------------------------------------------------------------------------
+" Review / diff / Gitgutter
+"------------------------------------------------------------------------------
+
+" Gitgutter
+set updatetime=750
+highlight! link SignColumn LineNr
+
+" Ignore white space in vimdiff, Gdiffsplit...
+set diffopt+=iwhite
+
+" ft Git commit word-diff syntax
+augroup GitCommitWordDiff
+  autocmd!
+  autocmd FileType gitcommit call s:gitcommit_worddiff()
+augroup END
+
+function! s:gitcommit_worddiff() abort
+  if exists('b:gitcommit_worddiff_done')
+    return
+  endif
+  let b:gitcommit_worddiff_done = 1
+
+  syntax match GitWordAdd /{+.\{-}+}/ containedin=ALL
+  syntax match GitWordDel /\[-.\{-}-\]/ containedin=ALL
+  highlight GitWordAdd ctermbg=2 guibg=#005f00 ctermfg=NONE guifg=NONE
+  highlight GitWordDel ctermbg=1 guibg=#5f0000 ctermfg=NONE guifg=NONE
+endfunction
+
+function! ReviewGitGutter(base) abort
+  let l:base = trim(system(
+        \ 'git merge-base HEAD ' . shellescape(a:base)
+        \ ))
+
+  if v:shell_error || empty(l:base)
+    echoerr 'Could not find merge base with ' . a:base
+    return
+  endif
+
+  let g:gitgutter_diff_base = l:base
+  GitGutterAll
+  GitGutterQuickFix
+  copen
+endfunction
+
+command! -nargs=? Review
+      \ call ReviewGitGutter(empty(<q-args>) ? 'origin/main' : <q-args>)
+
+command! ReviewLast
+      \ let g:gitgutter_diff_base = 'HEAD^' |
+      \ GitGutterAll |
+      \ GitGutterQuickFix |
+      \ copen
+
+command! ReviewEnd
+      \ let g:gitgutter_diff_base = '' |
+      \ GitGutterAll |
+      \ cclose
+
+" Review uncommited work
+" :Git
+" From here:
+" =       toggle inline diff
+" ]c      next hunk
+" [c      previous hunk
+" ]m      next changed file
+" [m      previous changed file
+" dv      vertical side-by-side diff
+" dq      close the diff view
+" -       stage or unstage file/hunk
+
+" Review the last commit
+" :Git show --stat HEAD
+" :Git show HEAD
+" For a systematic source-level review:
+" :Git difftool HEAD^ HEAD
+" Navigate with:
+" :cnext
+" :cprevious
+" :copen
+" For a full side-by-side review, one file per tab:
+" :Git difftool -y HEAD^ HEAD
+" Then :
+" ]c / [c       next/previous hunk
+" gt / gT       next/previous file tab
+" <C-w>w        switch diff side
+" dq            close current diff
+
+" Review the entire current branch
+" :Git fetch origin
+" Inspect the commits belonging to your branch:
+" :Git log --oneline --decorate origin/staging..HEAD
+" Inspect its size:
+" :Git diff --stat origin/staging...HEAD
+" Then review every hunk:
+" :Git difftool origin/staging...HEAD
+" For side-by-side tabs:
+" :Git difftool -y origin/staging...HEAD
+
+" Deep-review one particular file
+" While editing the file:
+" :Gvdiffsplit origin/staging...HEAD
+" For the last commit:
+" :Gvdiffsplit HEAD^
+" For the current committed version:
+" :Gvdiffsplit HEAD
+" For ordinary unstaged changes:
+" :Gvdiffsplit
+"
+" GitGutter based review:
+" Review diff main
+" :Review
+" Review diff last commit
+" :ReviewLast
+" Reset to default GitGutter
+" ReviewEnd
 
 "------------------------------------------------------------------------------
 " misc
