@@ -9,6 +9,7 @@ ln -sbf ~/code/dotfiles/vimrc ~/.vimrc
 ln -sbnf ~/code/dotfiles/vim_snippets ~/.vim/snippets
 mkdir -p ~/.zsh
 ln -sbf ~/code/dotfiles/zshrc ~/.zshrc
+ln -sbf ~/code/dotfiles/profile ~/.profile
 ln -sbf ~/code/dotfiles/zsh/aliases.zsh ~/.zsh/aliases.zsh
 ln -sbf ~/code/dotfiles/zsh/functions.zsh ~/.zsh/functions.zsh
 ln -sbf ~/code/dotfiles/zsh/prompt.zsh ~/.zsh/prompt.zsh
