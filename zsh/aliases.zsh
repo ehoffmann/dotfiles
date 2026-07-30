@@ -37,8 +37,8 @@ alias gcb=git-clean-branch
 # IP
 # -----------------------------------------------------------------------------
 alias ip='ip -c'
+alias ipp="curl -s -w '\n' https://ifconfig.me"
 alias ports='ss -tulpen'
-alias myip='ip a'
 alias pingg='ping -c 5 8.8.8.8'
 
 # -----------------------------------------------------------------------------
