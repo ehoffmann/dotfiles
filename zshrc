@@ -171,6 +171,9 @@ npm()  { nvm; npm "$@"; }
 npx()  { nvm; npx "$@"; }
 
 # Projects
-# MJ
 export APP_USER_UID=$(id -u)
 export APP_GROUP_GID=$(id -g)
+
+# SSH
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+# ssh-add -c -t 1h ~/.ssh/id_ed25519 # 1h with confirmation
