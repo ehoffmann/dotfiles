@@ -176,4 +176,4 @@ export APP_GROUP_GID=$(id -g)
 
 # SSH
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
-# ssh-add -c -t 1h ~/.ssh/id_ed25519 # 1h with confirmation
+export SSH_ASKPASS=/usr/bin/ssh-askpass
