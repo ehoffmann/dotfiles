@@ -96,7 +96,7 @@ git-list-mj() {
 
   for repo in \
     ~/code/mj-fleet-backend \
-    ~/code/mj-fleet-backend_{1..3}
+    ~/code/mj-fleet-backend_{1..5}
   do
     [[ -d "$repo/.git" ]] || continue
 
@@ -121,7 +121,7 @@ update-mj-repos() {
   local repo branch
   local -a repos=(
     ~/code/mj-fleet-backend
-    ~/code/mj-fleet-backend_{1..3}
+    ~/code/mj-fleet-backend_{1..5}
   )
 
   for repo in "${repos[@]}"; do
