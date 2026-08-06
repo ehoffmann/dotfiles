@@ -173,7 +173,3 @@ npx()  { nvm; npx "$@"; }
 # Projects
 export APP_USER_UID=$(id -u)
 export APP_GROUP_GID=$(id -g)
-
-# SSH
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
-export SSH_ASKPASS=/usr/bin/ssh-askpass
