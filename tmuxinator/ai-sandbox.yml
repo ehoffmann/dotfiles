@@ -6,5 +6,5 @@ windows:
       layout: main-vertical
       panes:
           - vim
-          - gpt
-          - ls
+          - agent
+          - agent
