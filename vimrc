@@ -1,6 +1,8 @@
 set nocompatible " be iMproved
 filetype off     " required!
 
+let g:gutentags_modules = ['ctags']
+
 call plug#begin('~/.vim/plugged')
 
 " Interpret a file by function and cache file automatically, used by
@@ -246,9 +248,13 @@ nmap <leader>cr cs{}cs}{
 " Mark task as done
 nmap <leader>x :s/\[ \]/[X]/<CR>
 
+" Select pasted text visually
+nnoremap gp `[v`]
+
 "------------------------------------------------------------------------------
 " Navigation vim-tmux-navigation
 "------------------------------------------------------------------------------
+
 " Set by 'christoomey/vim-tmux-navigator'
 " nnoremap <C-J> <C-W><C-J>
 " nnoremap <C-K> <C-W><C-K>
@@ -372,8 +378,8 @@ let g:gutentags_generate_on_write = 1
 let g:gutentags_background_update = 1
 
 " Optional status-line indicator while ctags is running.
-" set statusline+=%{gutentags#statusline('[',']')}
-"
+set statusline+=%{gutentags#statusline('[',']')}
+
 " Jump immediately when unique; show the selection list when ambiguous.
 nnoremap <C-]> g<C-]>
 
