@@ -1,0 +1,10 @@
+name: landro
+root: ~/code/landro
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - ls
+        - agent
