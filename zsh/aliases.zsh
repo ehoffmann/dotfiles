@@ -44,8 +44,8 @@ alias pingg='ping -c 5 8.8.8.8'
 # -----------------------------------------------------------------------------
 # Docker
 # -----------------------------------------------------------------------------
-alias dco='docker compose'
-alias dcr='docker compose stop && docker compose up'
+alias dco='safe-compose'
+alias dcr='docker compose stop && safe-compose up'
 alias drm='docker rm $(docker ps -a -q)'
 alias dsc='docker stop $(docker ps -q)'
 
