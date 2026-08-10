@@ -1,0 +1,11 @@
+
+name: sentry
+root: ~/code/sentry
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - ls
+        - agent
