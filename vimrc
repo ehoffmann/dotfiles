@@ -159,8 +159,8 @@ nmap <leader>fr :g/^\s*def\s/normal zfam<CR>
 set viewoptions-=options
 augroup remember_folds
   autocmd!
-  au BufWinLeave ?* mkview 1
-  au BufWinEnter ?* silent! loadview 1
+  autocmd BufWinLeave * if &buftype ==# '' && !empty(expand('%:p')) | silent! mkview 1 | endif
+  autocmd BufWinEnter * if &buftype ==# '' && !empty(expand('%:p')) | silent! loadview 1 | endif
 augroup END
 
 "------------------------------------------------------------------------------
