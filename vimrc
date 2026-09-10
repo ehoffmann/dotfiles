@@ -381,10 +381,16 @@ let g:gutentags_background_update = 1
 set statusline+=%{gutentags#statusline('[',']')}
 
 " Jump immediately when unique; show the selection list when ambiguous.
-nnoremap <C-]> g<C-]>
+" nnoremap <C-]> g<C-]>
+
+" Open in new tab
+nnoremap <leader>] :tab tag <C-R><C-W><CR>
+
+" Open in new split
+nnoremap <leader>[ :stag <C-R><C-W><CR>
 
 " Useful native commands:
-" CTRL-]          Jump to definition; mapped above to :tjump
+" CTRL-]          Jump to definition; mapped above
 " g]              Always show all matching tags
 " CTRL-T          Return through the tag stack
 " :tags           Display the current tag stack
