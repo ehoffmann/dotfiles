@@ -185,3 +185,45 @@ git-switch() {
   git switch "$branch" 2>/dev/null
 }
 
+# list-branch() {
+#   local email="$(git config user.email)"
+#
+#   git log main --first-parent --merges --format='%H' |
+#   while read -r merge; do
+#       if git rev-list --author="$email" "$merge^1..$merge^2" |
+#          grep -q .; then
+#           git show -s --format='%h %ad %s' --date=short "$merge"
+#       fi
+#   done
+# }
+
+list-contrib-branch() {
+  local branch
+  if git show-ref --verify --quiet refs/heads/main; then
+      branch="main"
+  elif git show-ref --verify --quiet refs/heads/staging; then
+      branch="staging"
+  elif git show-ref --verify --quiet refs/heads/master; then
+      branch="master"
+  else
+      echo "Neither main nor staging nor master branch found" >&2
+      return 1
+  fi
+
+  local email="$(git config user.email)"
+
+  git log "$branch" --first-parent --merges --format='%H' |
+  while read -r merge; do
+      if git rev-list --author="$email" "$merge^1..$merge^2" |
+         grep -q .; then
+          git show -s --format='%h %ad %s' --date=short "$merge"
+      fi
+  done
+}
+
+gbs() {
+  branch=$(git branch --format='%(refname:short)' | fzf) || return
+  [ -n "$branch" ] || return
+  git checkout "$branch"
+}
+
