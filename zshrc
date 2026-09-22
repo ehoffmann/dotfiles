@@ -127,7 +127,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 if [[ -n "$TMUX_IN_POPUP" ]]; then
   export FZF_DEFAULT_OPTS='--height 40%'
 else
-  export FZF_DEFAULT_OPTS='--height 40% --tmux top,99%'
+  export FZF_DEFAULT_OPTS='--height 40% --tmux top,99% --border'
 fi
 export FZF_CTRL_T_OPTS="
   --walker-skip .git,node_modules,target
