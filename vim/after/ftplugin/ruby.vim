@@ -10,3 +10,6 @@ if exists('b:gutentags_files') && has_key(b:gutentags_files, 'ctags')
   execute 'setlocal tags+=' . fnameescape(b:gutentags_files.ctags)
 endif
 setlocal iskeyword+=!
+setlocal iskeyword+=?
+" Use navite C-]
+silent! nunmap <buffer> <C-]>
