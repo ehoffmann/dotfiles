@@ -44,6 +44,7 @@ Plug 'nelstrom/vim-textobj-rubyblock'
 
 " Git wrapper
 Plug 'tpope/vim-fugitive'
+Plug 'shumphrey/fugitive-gitlab.vim'
 
 " GitHub extension for fugitive.vim, GBrowse, hub, completion in commit msg
 Plug 'tpope/vim-rhubarb'
@@ -692,6 +693,13 @@ endfunction
 
 command! Tabs call Tabs()
 
+"------------------------------------------------------------------------------
+" Fugitive
+"------------------------------------------------------------------------------
+
+let g:fugitive_gitlab_domains = {
+      \ 'gitlab.myjungly.com': 'https://gitlab.myjungly.com'
+      \ }
 
 "------------------------------------------------------------------------------
 " Glow .md markdown previewer
