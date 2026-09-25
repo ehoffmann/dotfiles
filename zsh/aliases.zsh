@@ -28,6 +28,7 @@ alias gss='git status --short'
 alias gsb='git status --short -b'
 alias gco='git checkout'
 alias glo='git log --oneline --decorate'
+alias gld="git log --decorate --format='%C(yellow)%h%Creset %C(auto)%d%Creset %C(dim)%ah%Creset %s'"
 alias gloo='git --no-pager log --oneline --decorate --color | head '
 alias gla="git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
 alias glb="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
@@ -44,7 +45,8 @@ alias pingg='ping -c 5 8.8.8.8'
 # -----------------------------------------------------------------------------
 # Docker
 # -----------------------------------------------------------------------------
-alias dco='safe-compose'
+# alias dco='safe-compose'
+alias dco='docker compose'
 alias dcr='docker compose stop && safe-compose up'
 alias drm='docker rm $(docker ps -a -q)'
 alias dsc='docker stop $(docker ps -q)'
@@ -90,4 +92,4 @@ alias rubytag='ctags -R --languages=ruby --exclude=.git --exclude=log .'
 # -----------------------------------------------------------------------------
 # Glow .md reader
 # -----------------------------------------------------------------------------
-alias glow='glow -ltw0'
+alias glow='glow -lmntw120'
