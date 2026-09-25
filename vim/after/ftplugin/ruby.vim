@@ -13,3 +13,4 @@ setlocal iskeyword+=!
 setlocal iskeyword+=?
 " Use navite C-]
 silent! nunmap <buffer> <C-]>
+nnoremap <buffer> <silent> <C-]> :call rubytag#jump()<CR>

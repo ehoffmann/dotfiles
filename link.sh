@@ -9,6 +9,8 @@ ln -sbf ~/code/dotfiles/vimrc ~/.vimrc
 ln -sbnf ~/code/dotfiles/vim_snippets ~/.vim/snippets
 mkdir -p ~/.vim/after/ftplugin
 ln -sbf ~/code/dotfiles/vim/after/ftplugin/ruby.vim ~/.vim/after/ftplugin/ruby.vim
+mkdir -p ~/.vim/autoload
+ln -sbf ~/code/dotfiles/vim/autoload/rubytag.vim ~/.vim/autoload/rubytag.vim
 mkdir -p ~/.zsh
 ln -sbf ~/code/dotfiles/zshrc ~/.zshrc
 ln -sbf ~/code/dotfiles/profile ~/.profile
