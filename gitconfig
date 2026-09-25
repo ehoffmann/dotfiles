@@ -18,3 +18,5 @@
 
 [init]
 	defaultBranch = master
+[user]
+	name = Emmanuel Hoffmann
