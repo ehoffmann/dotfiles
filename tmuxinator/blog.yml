@@ -1,0 +1,9 @@
+name: Blog
+root: ~/code/blog
+
+windows:
+  - code:
+      layout: main-vertical
+      panes:
+        - vim
+        -
