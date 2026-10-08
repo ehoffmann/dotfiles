@@ -357,9 +357,7 @@ let g:gutentags_file_list_command = {
       \ }
 
 " Generate qualified entries such as namespaced classes and scoped methods.
-let g:gutentags_ctags_extra_args = [
-      \ '--extras=+q'
-      \ ]
+let g:gutentags_ctags_extra_args = ['--extras=+q', '--fields=+nKS']
 
 " Useful if some generated directories contain tracked files.
 let g:gutentags_ctags_exclude = [
