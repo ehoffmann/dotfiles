@@ -17,6 +17,8 @@
   difffilter = diffr
 
 [init]
-	defaultBranch = master
+  defaultBranch = master
 [user]
-	name = Emmanuel Hoffmann
+  name = Emmanuel Hoffmann
+[sequence]
+  editor = vim
