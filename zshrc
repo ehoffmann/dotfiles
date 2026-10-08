@@ -156,7 +156,7 @@ if [ -d /usr/local/share/chruby ] ; then
   # list_ruby_version
   # build and install a new version
   # build_ruby x.x.x
-  chruby 4.0.6
+  chruby 4.0.7
 fi
 
 # Node, lazy
