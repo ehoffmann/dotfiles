@@ -608,6 +608,76 @@ command! ReviewEnd
       \ GitGutterAll |
       \ cclose
 
+let g:git_review_left = ''
+let g:git_review_right = ''
+
+function! GitReview(...)
+  let g:git_review_left = a:1
+  let g:git_review_right = a:0 >= 2 ? a:2 : ''
+
+  if empty(g:git_review_right)
+    execute 'Git difftool --name-only ' . g:git_review_left
+  else
+    execute 'Git difftool --name-only '
+          \ . g:git_review_left . ' '
+          \ . g:git_review_right
+  endif
+endfunction
+
+command! -nargs=+ GitReview call GitReview(<f-args>)
+
+
+function! GitQfDiff()
+  let qf_idx = line('.')
+  call setqflist([], 'a', {'idx': qf_idx})
+
+  let item = getqflist()[qf_idx - 1]
+  let file = bufname(item.bufnr)
+
+  " Nettoie uniquement le layout
+  only
+
+  if empty(g:git_review_right)
+    " Review branche courante / working tree
+    execute 'edit ' . fnameescape(file)
+    execute 'Gvdiffsplit ' . g:git_review_left
+  else
+    " Review historique entre deux commits
+    execute 'Gedit ' . fnameescape(g:git_review_right . ':' . file)
+    execute 'Gvdiffsplit ' . g:git_review_left
+  endif
+
+  wincmd h
+  execute 'vertical resize ' . float2nr(&columns * 0.35)
+
+  " Quickfix en bas, sur la même entrée
+  botright copen
+  resize 10
+  call cursor(qf_idx, 1)
+
+  " Retour au diff
+  wincmd k
+  wincmd l
+endfunction
+
+function! GitQfReviewCommit()
+  let item = getqflist()[line('.') - 1]
+  let commit = item.module
+
+  if empty(commit)
+    echoerr 'No commit on this quickfix entry'
+    return
+  endif
+
+  execute 'GitReview ' . commit . '^ ' . commit
+endfunction
+
+augroup quickfix_git
+  autocmd!
+  autocmd FileType qf nnoremap <buffer> gd :call GitQfDiff()<CR>
+  autocmd FileType qf nnoremap <buffer> gc :call GitQfReviewCommit()<CR>
+augroup END
+
 " Review uncommited work
 " :Git
 " From here:
@@ -665,6 +735,9 @@ command! ReviewEnd
 " :ReviewLast
 " Reset to default GitGutter
 " ReviewEnd
+"
+" :Git difftool --name-only main
+" Then in quickfix gd to open diff split
 
 "------------------------------------------------------------------------------
 " Tabs
