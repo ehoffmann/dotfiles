@@ -643,7 +643,8 @@ function! GitQfDiff()
     execute 'Gvdiffsplit ' . g:git_review_left
   else
     " Review historique entre deux commits
-    execute 'Gedit ' . fnameescape(g:git_review_right . ':' . file)
+    " Fugitive already supplies the historical buffer path in quickfix.
+    execute 'edit ' . fnameescape(file)
     execute 'Gvdiffsplit ' . g:git_review_left
   endif
 
