@@ -39,8 +39,14 @@ Plug 'kana/vim-textobj-user'
 " New text objects, al 'a line' and il 'inner line'
 Plug 'kana/vim-textobj-line'
 
+" Text objects for indented blocks of lines
+Plug 'kana/vim-textobj-indent'
+
 " Ruby text object
 Plug 'nelstrom/vim-textobj-rubyblock'
+
+" Indent-level based motion.
+Plug 'jeetsukumaran/vim-indentwise'
 
 " Git wrapper
 Plug 'tpope/vim-fugitive'
