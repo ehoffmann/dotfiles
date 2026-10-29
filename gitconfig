@@ -18,7 +18,16 @@
 
 [init]
   defaultBranch = master
+
 [user]
   name = Emmanuel Hoffmann
+
 [sequence]
   editor = vim
+
+[credential "https://gitlab.myjungly.com"]
+  helper = 
+  helper = !/usr/bin/glab auth git-credential
+
+[alias]
+  merged = "!f() { target=${1:-main}; git fetch -q origin || return 1; if git merge-base --is-ancestor HEAD \"origin/$target\"; then echo \"Merged into $target\"; else echo \"Not merged into $target\"; fi; }; f"
