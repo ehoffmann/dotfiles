@@ -5,12 +5,9 @@ ln -sbnf ~/code/dotfiles/tmuxinator ~/.tmuxinator
 ln -sbf ~/code/dotfiles/rubocop.yml ~/.rubocop.yml
 ln -sbf ~/code/dotfiles/tigrc ~/.tigrc
 ln -sbf ~/code/dotfiles/tmux.conf ~/.tmux.conf
+mkdir -p ~/.vim
 ln -sbf ~/code/dotfiles/vimrc ~/.vimrc
-ln -sbnf ~/code/dotfiles/vim_snippets ~/.vim/snippets
-mkdir -p ~/.vim/after/ftplugin
-ln -sbf ~/code/dotfiles/vim/after/ftplugin/ruby.vim ~/.vim/after/ftplugin/ruby.vim
-mkdir -p ~/.vim/autoload
-ln -sbf ~/code/dotfiles/vim/autoload/rubytag.vim ~/.vim/autoload/rubytag.vim
+# vimrc adds vim/ (including snippets) and vim/after/ to runtimepath.
 mkdir -p ~/.zsh
 ln -sbf ~/code/dotfiles/zshrc ~/.zshrc
 ln -sbf ~/code/dotfiles/profile ~/.profile
