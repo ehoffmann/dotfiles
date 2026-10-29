@@ -86,15 +86,19 @@ sudo-command-line() {
 zle -N sudo-command-line
 bindkey '^[s' sudo-command-line
 
-# Yank to clipboard
-function vi-yank-xclip {
+# Yank to clipboard (native Wayland tool when available, xclip on X11)
+function vi-yank-clipboard {
   zle vi-yank
-  print -rn -- "$CUTBUFFER" | xclip -selection clipboard
+  if [[ -n "$WAYLAND_DISPLAY" ]] && (( $+commands[wl-copy] )); then
+    print -rn -- "$CUTBUFFER" | wl-copy
+  else
+    print -rn -- "$CUTBUFFER" | xclip -selection clipboard
+  fi
 }
-zle -N vi-yank-xclip
+zle -N vi-yank-clipboard
 
-bindkey -M vicmd 'y' vi-yank-xclip
-bindkey -M vicmd 'Y' vi-yank-xclip
+bindkey -M vicmd 'y' vi-yank-clipboard
+bindkey -M vicmd 'Y' vi-yank-clipboard
 
 ##### History #####
 HISTFILE="$HOME/.zsh_history"
