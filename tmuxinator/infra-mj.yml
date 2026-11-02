@@ -1,0 +1,9 @@
+name: infra-mj
+root: ~/code/infra-mj
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - agent

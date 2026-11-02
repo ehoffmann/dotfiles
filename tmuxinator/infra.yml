@@ -1,0 +1,9 @@
+name: infra
+root: ~/code/infra
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - vim
+        - agent
