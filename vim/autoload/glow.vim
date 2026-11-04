@@ -49,7 +49,7 @@ function! s:Jump() abort
 
   call cursor(1, 1)
   if search(s:mark, 'cW')
-    call cursor(line('.'), 1)      " Keep nowrap from shifting the view toward the marker.
+    call cursor(line('.'), 1)      " Start at the beginning of the rendered line.
     call matchadd('Conceal', ' \?' . s:mark, 10, -1, {'conceal': ''})
     setlocal conceallevel=2 concealcursor=nvic
   endif
@@ -77,14 +77,16 @@ function! glow#open() abort
   call writefile(s:MarkedLines(), l:file)
 
   tabnew
-  setlocal nonumber norelativenumber signcolumn=no foldcolumn=0
+  setlocal number norelativenumber signcolumn=no foldcolumn=0
+  " Reserve the number column so the rendered Markdown fits beside it.
+  let l:width = max([1, winwidth(0) - getwininfo(win_getid())[0].textoff])
 
-  let s:buf = term_start(['glow', '-s', 'dracula', '-w', string(winwidth(0)), l:file], {
+  let s:buf = term_start(['glow', '-s', 'dracula', '-w', string(l:width), l:file], {
         \ 'curwin': 1,
         \ 'exit_cb': {-> delete(l:file)},
         \ })
 
-  setlocal nowrap nospell colorcolumn=
+  setlocal wrap linebreak nospell colorcolumn=
   setlocal list listchars=precedes:«,extends:»
   setlocal bufhidden=wipe scrolloff=3
 

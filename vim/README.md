@@ -51,6 +51,12 @@ repository root. They use temporary directories and stubs for vim-plug and
 Gruvbox, with no plugin downloads. Run MR integration checks with
 `python3 vim/tests/run_gitmr.py`. Both runners return 77 if Vim is unavailable.
 
+## Markdown preview
+
+`:Glow` renders the current buffer in a new tab with absolute line numbers for
+the rendered output. Glow's width excludes the number column, and long lines
+wrap to stay visible when the window is narrowed. Press `q` to close the preview.
+
 ## GitLab reviews in Vim
 
 The selector uses classic Vim with `+job`, `json_decode()`, `glab`, and the

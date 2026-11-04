@@ -21,6 +21,18 @@ function! plug#end() abort
 endfunction
 """
 
+GLOW_STUB = """#!/usr/bin/env python3
+import json
+import os
+from pathlib import Path
+import sys
+
+Path(os.environ['VIM_CONFIG_TEST_GLOW_ARGS']).write_text(json.dumps(sys.argv[1:]))
+width = int(sys.argv[sys.argv.index('-w') + 1])
+print('x' * width)
+print('y' * (width * 2))
+"""
+
 
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -72,6 +84,10 @@ let b:undo_ftplugin = 'setlocal tags<'
             target.symlink_to(checkout / "vim" / name)
         project = root / "project"
         project.mkdir()
+        glow = root / "bin/glow"
+        write(glow, GLOW_STUB)
+        glow.chmod(0o755)
+        glow_args = root / "glow-args.json"
         write(project / ".vim.custom", """let g:config_test_project_loads = get(g:, 'config_test_project_loads', 0) + 1
 call assert_equal(2, exists(':GitReview'))
 call assert_equal(1, exists('*GitReview'))
@@ -79,7 +95,9 @@ call assert_equal(2, exists(':Glow'))
 set scrolloff=7
 """)
         env = {**os.environ, "HOME": str(home), "VIM_CONFIG_TEST_ROOT": str(root),
-               "VIM_CONFIG_TEST_RUNTIME": str(checkout / "vim")}
+               "VIM_CONFIG_TEST_RUNTIME": str(checkout / "vim"),
+               "VIM_CONFIG_TEST_GLOW_ARGS": str(glow_args),
+               "PATH": str(glow.parent) + os.pathsep + os.environ.get("PATH", "")}
         result = subprocess.run(
             [vim, "-N", "-u", str(home / ".vimrc"), "-i", "NONE", "-n", "-es",
              "-V1" + str(root / "vim.log"), "-S", str(repo / "vim/tests/config.vim")],
@@ -89,6 +107,8 @@ set scrolloff=7
             print(result.stdout + result.stderr)
             print((root / "vim.log").read_text())
             return 1
+        if not glow_args.exists():
+            print("SKIP Glow preview tests: Vim was built without +terminal.")
     print("Vim configuration passed: symlink startup, reloads, lazy commands, "
           "filetype detection, local settings/mappings, undo and syntax reloads.")
     return 0

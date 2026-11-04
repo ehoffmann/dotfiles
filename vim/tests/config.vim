@@ -134,6 +134,35 @@ setlocal syntax=OFF
 setlocal syntax=gitcommit
 call assert_match('GitWordAdd', execute('syntax list GitWordAdd'))
 
+" Glow must leave room for line numbers, even with a wider number column.
+if has('terminal')
+  enew!
+  call setline(1, '# Preview')
+  setlocal nonumber relativenumber nowrap nolinebreak
+  let s:source_buf = bufnr('%')
+  for s:numberwidth in [4, 8]
+    let &l:numberwidth = s:numberwidth
+    Glow
+    let s:preview_buf = bufnr('%')
+    for s:attempt in range(100)
+      call term_wait(s:preview_buf, 20)
+      if term_getstatus(s:preview_buf) =~# 'finished'
+        break
+      endif
+    endfor
+    call assert_match('finished', term_getstatus(s:preview_buf))
+    call assert_equal([1, 0, 1, 1], [&l:number, &l:relativenumber, &l:wrap, &l:linebreak])
+    let s:args = json_decode(join(readfile($VIM_CONFIG_TEST_GLOW_ARGS), "\n"))
+    let s:width = winwidth(0) - s:numberwidth
+    call assert_equal(['-s', 'dracula', '-w', string(s:width)], s:args[:3])
+    call assert_equal(repeat('x', s:width), getline(1))
+    call assert_false(filereadable(s:args[-1]), 'Temporary Markdown must be removed')
+    tabclose!
+    call assert_equal(s:source_buf, bufnr('%'))
+    call assert_equal([0, 1, 0, 0], [&l:number, &l:relativenumber, &l:wrap, &l:linebreak])
+  endfor
+endif
+
 " Source deferred implementations too, without invoking external programs.
 for s:script in glob(s:runtime . '/autoload/*.vim', 0, 1)
   execute 'source ' . fnameescape(s:script)
