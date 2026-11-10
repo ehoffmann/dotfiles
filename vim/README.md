@@ -51,11 +51,19 @@ repository root. They use temporary directories and stubs for vim-plug and
 Gruvbox, with no plugin downloads. Run MR integration checks with
 `python3 vim/tests/run_gitmr.py`. Both runners return 77 if Vim is unavailable.
 
+## Preview colors
+
+Vim uses Gruvbox with a light cream background. The fzf interface and preview
+background follow Vim's highlight groups; file previews use bat's bundled
+`gruvbox-light` theme (`bat` or `batcat` must be installed for syntax colors).
+This applies to `:Files`/`<C-P>` and `:Rg` as well as other fzf.vim pickers.
+
 ## Markdown preview
 
 `:Glow` renders the current buffer in a new tab with absolute line numbers for
 the rendered output. Glow's width excludes the number column, and long lines
-wrap to stay visible when the window is narrowed. Press `q` to close the preview.
+wrap to stay visible when the window is narrowed. Its light/dark style follows
+Vim's `background` setting. Press `q` to close the preview.
 
 ## GitLab reviews in Vim
 

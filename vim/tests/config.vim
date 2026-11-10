@@ -4,6 +4,7 @@ let s:runtime = $VIM_CONFIG_TEST_RUNTIME
 " Exercise the normal startup entry point, including project overrides.
 call assert_equal('', v:errmsg)
 call assert_equal('gruvbox', g:colors_name)
+call assert_equal('light', &background)
 call assert_equal(1024, &synmaxcol)
 call assert_equal(7, &scrolloff)
 call assert_equal(1, g:config_test_project_loads)
@@ -154,7 +155,7 @@ if has('terminal')
     call assert_equal([1, 0, 1, 1], [&l:number, &l:relativenumber, &l:wrap, &l:linebreak])
     let s:args = json_decode(join(readfile($VIM_CONFIG_TEST_GLOW_ARGS), "\n"))
     let s:width = winwidth(0) - s:numberwidth
-    call assert_equal(['-s', 'dracula', '-w', string(s:width)], s:args[:3])
+    call assert_equal(['-s', 'light', '-w', string(s:width)], s:args[:3])
     call assert_equal(repeat('x', s:width), getline(1))
     call assert_false(filereadable(s:args[-1]), 'Temporary Markdown must be removed')
     tabclose!

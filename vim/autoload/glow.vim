@@ -44,7 +44,7 @@ function! s:MarkedLines() abort
 endfunction
 
 function! s:Jump() abort
-  highlight GlowMark ctermfg=212 guifg=#ff79c6 cterm=bold gui=bold
+  highlight! link GlowMark Special
   call matchadd('GlowMark', s:rowmark, 5)
 
   call cursor(1, 1)
@@ -81,7 +81,7 @@ function! glow#open() abort
   " Reserve the number column so the rendered Markdown fits beside it.
   let l:width = max([1, winwidth(0) - getwininfo(win_getid())[0].textoff])
 
-  let s:buf = term_start(['glow', '-s', 'dracula', '-w', string(l:width), l:file], {
+  let s:buf = term_start(['glow', '-s', &background, '-w', string(l:width), l:file], {
         \ 'curwin': 1,
         \ 'exit_cb': {-> delete(l:file)},
         \ })

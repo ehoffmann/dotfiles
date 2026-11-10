@@ -10,10 +10,30 @@ set t_Cs=
 " Gruvbox
 set termguicolors
 let g:gruvbox_italic=1
+set background=light
 colorscheme gruvbox
-set background=dark
 " let g:gruvbox_number_column='bg2'
 " let g:gruvbox_color_column='bg3'
+
+" Match fzf and its bat previews to the cream editor palette.
+let g:fzf_colors = {
+      \ 'fg': ['fg', 'Normal'],
+      \ 'bg': ['bg', 'Normal'],
+      \ 'fg+': ['fg', 'Normal'],
+      \ 'bg+': ['bg', 'CursorLine'],
+      \ 'preview-fg': ['fg', 'Normal'],
+      \ 'preview-bg': ['bg', 'Normal'],
+      \ 'hl': ['fg', 'Statement'],
+      \ 'hl+': ['fg', 'Statement'],
+      \ 'info': ['fg', 'PreProc'],
+      \ 'border': ['fg', 'Comment'],
+      \ 'prompt': ['fg', 'Conditional'],
+      \ 'pointer': ['fg', 'Exception'],
+      \ 'marker': ['fg', 'Keyword'],
+      \ 'spinner': ['fg', 'Label'],
+      \ 'header': ['fg', 'Comment'],
+      \ }
+let $BAT_THEME = 'gruvbox-light'
 
 " Highlight col 101 and onward
 " let &colorcolumn=join(range(101,6999),",")
