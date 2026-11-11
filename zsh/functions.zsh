@@ -121,7 +121,7 @@ update-mj-repos() {
   local repo branch
   local -a repos=(
     ~/code/mj-fleet-backend
-    ~/code/mj-fleet-backend_{1..5}
+    ~/code/mj-fleet-backend_{1..6}
   )
 
   for repo in "${repos[@]}"; do
@@ -169,6 +169,9 @@ update-mj-repos() {
       else
         print -P "%F{yellow}SPA on '$branch'; not pulling main.%f"
       fi
+
+      print -P "%F{cyan}Cleaning frontend branches...%f"
+      git-clean-branch || exit 1
 
       print -P "%F{green}%B✓ Repository processed%b%f"
     ) || print -P "%F{red}%B✗ Update failed for ${repo}%b%f"
