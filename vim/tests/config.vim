@@ -108,6 +108,18 @@ call assert_equal(1, maparg('<C-h>', 'n', 0, 1).buffer)
 setlocal filetype=text
 call assert_equal('', maparg('<C-h>', 'n'))
 
+" A saved view restores the cursor but not an outdated fold method.
+call writefile(['a:', '  b: 1', 'c:', '  d: 2'], 'view.yml')
+edit view.yml
+call cursor(3, 1)
+setlocal foldmethod=manual
+mkview 1
+bwipe!
+edit view.yml
+call assert_equal('indent', &l:foldmethod)
+call assert_equal(3, line('.'))
+bwipe!
+
 " Custom detection still runs from outside the checkout.
 for [s:name, s:ft] in [['Guardfile', 'ruby'], ['.env.local', 'sh'],
       \ ['app.env.test', 'sh'], ['example.go', 'go'], ['example.yml', 'yaml']]

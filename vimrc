@@ -463,10 +463,25 @@ augroup vimrc-incsearch-highlight
   autocmd CmdlineLeave [\/\?] :set nohlsearch
 augroup END
 
+" Remember each file's folds and cursor position. The modeline and filetype
+" settings keep choosing how folds are computed: a view saved earlier must not
+" bring back an outdated 'foldmethod', 'foldexpr' or 'foldmarker'.
+function! s:load_view() abort
+  let l:method = &l:foldmethod
+  let l:expr = &l:foldexpr
+  let l:marker = &l:foldmarker
+  silent! loadview 1
+  if [&l:foldmethod, &l:foldexpr, &l:foldmarker] !=# [l:method, l:expr, l:marker]
+    let &l:foldexpr = l:expr
+    let &l:foldmarker = l:marker
+    let &l:foldmethod = l:method
+  endif
+endfunction
+
 augroup remember_folds
   autocmd!
   autocmd BufWinLeave * if &buftype ==# '' && !empty(expand('%:p')) | silent! mkview 1 | endif
-  autocmd BufWinEnter * if &buftype ==# '' && !empty(expand('%:p')) | silent! loadview 1 | endif
+  autocmd BufWinEnter * if &buftype ==# '' && !empty(expand('%:p')) | call s:load_view() | endif
 augroup END
 
 " Refresh the window's matches without accumulating them on every visit.
