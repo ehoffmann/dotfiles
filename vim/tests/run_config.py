@@ -77,6 +77,8 @@ let b:did_ftplugin = 1
 setlocal tags=./tags
 let b:undo_ftplugin = 'setlocal tags<'
 """)
+        # The Ruby settings moved into vimrc; an old link to the removed
+        # after/ftplugin/ruby.vim must not break startup.
         for name in ["autoload/rubytag.vim", "autoload/gitmr.vim",
                      "after/ftplugin/ruby.vim"]:
             target = runtime / name

@@ -23,12 +23,14 @@ for s:function in ['gitreview#open', 'glow#open', 'navigation#tabs', 'rubytools#
 endfor
 call assert_true(index(globpath(&runtimepath, 'snippets/_.snippets', 0, 1),
       \ s:runtime . '/snippets/_.snippets') >= 0)
-let s:paths = globpath(&runtimepath, 'ftdetect/custom.vim', 0, 1)
+let s:autocmds = execute('autocmd dotfiles_filetypes')
+      \ . execute('autocmd dotfiles_ftplugin')
 let s:statusline = &statusline
 let g:git_review_left = 'keep-review-state'
 source $MYVIMRC
 call assert_equal('', v:errmsg)
-call assert_equal(s:paths, globpath(&runtimepath, 'ftdetect/custom.vim', 0, 1))
+call assert_equal(s:autocmds, execute('autocmd dotfiles_filetypes')
+      \ . execute('autocmd dotfiles_ftplugin'))
 call assert_equal(s:statusline, &statusline)
 call assert_equal('keep-review-state', g:git_review_left)
 call assert_equal(2, g:config_test_project_loads)

@@ -5,7 +5,7 @@ Alacritty, Git, and development tools. There is no application build step.
 
 ## Layout
 
-- `vimrc`: Vim entry point and configuration loading order.
+- `vimrc`: the whole Vim configuration, in folded sections.
 - `vim/`: Vim runtime files, snippets, documentation, and offline tests.
   Read `vim/README.md` before changing the configuration structure.
 - `zshrc`, `profile`, `zsh/`: shell startup, aliases, functions, and prompt.
@@ -30,8 +30,10 @@ Alacritty, Git, and development tools. There is no application build step.
 
 ## Vim structure
 
-- Keep `vimrc` a small loader. Put preferences in `vim/config/`, command entry
-  points in `vim/plugin/`, and substantial implementations in `vim/autoload/`.
+- Keep the configuration in the single `vimrc`, organized in marker folds
+  (`{{{1` sections, `{{{2` subsections). Put only substantial implementations
+  in `vim/autoload/`; do not reintroduce `vim/config/`, `vim/plugin/`,
+  `vim/ftdetect/`, or `vim/after/ftplugin/` files.
 - Set plugin startup variables before `plug#end()` and colorscheme variables
   before selecting the colorscheme.
 - Match autoload function namespaces to their paths, such as `glow#open()` in
@@ -39,10 +41,11 @@ Alacritty, Git, and development tools. There is no application build step.
 - Preserve existing public commands and compatibility functions. The MR
   selector calls `GitReview()`; quickfix review mappings use `GitQfDiff()` and
   `GitQfReviewCommit()`.
-- Put filename detection in `vim/ftdetect/`. Put filetype preferences in
-  `vim/after/ftplugin/`, using `setlocal`, `<buffer>` mappings, and
-  `b:undo_ftplugin` cleanup. Use `after/indent/` or `after/syntax/` for overrides
-  that need those scripts to have finished loading.
+- Put filename detection in the vimrc's `dotfiles_filetypes` group. Put
+  filetype preferences in an `s:ft_<filetype>()` function in the vimrc's
+  Filetypes section, using `setlocal`, `<buffer>` mappings, and
+  `s:undo_ftplugin()` cleanup. Use `vim/after/indent/` or `vim/after/syntax/`
+  only for overrides that need those scripts to have finished loading.
 - Keep reloads safe: use named autocommand groups with `autocmd!`, avoid
   duplicate runtime paths and highlights, and guard repeated filetype setup.
 - Keep snippets in `vim/snippets/`; Vim's runtime path discovers them.

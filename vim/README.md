@@ -1,44 +1,39 @@
 # Vim configuration
 
-`../vimrc` is the entry point. It resolves its symlink and adds this directory
-and `after/` to Vim's `runtimepath`, so new runtime files need no installer
-changes. Keep `~/.vim` for vim-plug, downloaded plugins, and local state.
+`../vimrc` holds the whole configuration in one file, split into folded
+sections: Options, Plugins (with Gutentags and Rails projections), Appearance,
+Mappings, Autocommands, Filetypes, Commands, and the project override. `zM`
+closes every section and `za` toggles the one under the cursor. The vimrc
+resolves its symlink and adds this directory and `after/` to Vim's
+`runtimepath`. Keep `~/.vim` for vim-plug, downloaded plugins, and local state.
+
+Only files that cannot live in the vimrc remain here:
 
 | Location | Responsibility |
 | --- | --- |
-| `config/options.vim` | General editor defaults |
-| `config/plugins.vim` | vim-plug declarations and plugin startup variables |
-| `config/rails.vim`, `config/tags.vim` | Larger Rails and Gutentags configurations |
-| `config/appearance.vim` | Colorscheme and display preferences |
-| `config/mappings.vim` | General editing and plugin shortcut mappings |
-| `config/autocmds.vim` | General events, in groups safe to reload |
-| `plugin/` | Public commands and compatibility functions |
 | `autoload/` | Custom feature implementations, loaded on first use |
-| `ftdetect/` | Custom filename-to-filetype rules |
-| `after/ftplugin/` | Filetype settings and buffer mappings |
 | `after/indent/` | Overrides that must run after indent scripts |
 | `after/syntax/` | Extra syntax rules |
 | `snippets/` | Personal SnipMate snippets |
 | `tests/` | Offline configuration and GitLab MR checks |
 
-The entry point loads options, then plugin configuration, then enables filetype
-plugins and syntax. Appearance, general mappings, and events follow. Personal
-command entry points load before `.vim.custom`, preserving the ability to use
-those commands from the existing project override. The implementations stay
-in `autoload/`. Set plugin startup variables before `plug#end()`; keep
-colorscheme variables before `colorscheme`.
+Set plugin startup variables before `plug#end()`; keep colorscheme variables
+before `colorscheme`. Public commands and compatibility functions are defined
+in the Commands section, before `.vim.custom`, so the project override can use
+them. Their implementations stay in `autoload/`.
 
-Filetype overrides use `setlocal`, buffer mappings, and `b:undo_ftplugin` so
-switching filetypes cleans up their settings. Ruby hash conversions and folding
-are now local to Ruby; Rust's `<C-s>`, Go's whitespace display, and C's compiler
-error format no longer affect unrelated buffers. The Ruby tag workaround and
-quickfix `gd`/`gc` review mappings are preserved. YAML's `indentkeys` override
-lives in `after/indent/` because the default indent script sets that option
-after filetype plugins have run.
+Filetype settings are `s:ft_<filetype>()` functions in the Filetypes section.
+One `FileType` handler, defined after `filetype plugin on`, runs them after
+Vim's own filetype plugins, like `after/ftplugin/` scripts. They use
+`setlocal`, buffer mappings, and `b:undo_ftplugin`, so switching filetypes
+cleans up their settings. The Ruby tag workaround and quickfix `gd`/`gc` review
+mappings are preserved. Custom filename detection is in the
+`dotfiles_filetypes` group. YAML's `indentkeys` override lives in
+`after/indent/` because the default indent script sets that option after
+filetype plugins have run.
 
-Installation still uses `../link.sh`. It links the entry point; runtime files
-and snippets no longer need individual symlinks. Existing Ruby/autoload links
-can remain: filetype guards prevent applying the Ruby overrides twice. Restart
+Installation still uses `../link.sh`, which links only the vimrc. Old links to
+the removed `after/ftplugin/ruby.vim` are harmless and can be deleted. Restart
 Vim after updating; `:source $MYVIMRC` reloads preferences during normal use.
 Already loaded autoload implementations require a restart to pick up edits.
 
@@ -71,8 +66,7 @@ Vim's `background` setting. Press `q` to close the preview.
 ## GitLab reviews in Vim
 
 The selector uses classic Vim with `+job`, `json_decode()`, `glab`, and the
-`GitReview` defined in `plugin/gitreview.vim`. The vimrc loads this entry point
-and adds the implementations to the runtime; no individual autoload symlink or
+`GitReview` defined in the vimrc's Commands section. The vimrc also adds the implementations to the runtime; no individual autoload symlink or
 additional plugin is needed.
 
 | Command | List |
