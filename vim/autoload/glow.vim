@@ -76,7 +76,10 @@ function! glow#open() abort
   let l:file = tempname() . '.md'
   call writefile(s:MarkedLines(), l:file)
 
+  " :tabnew does not copy a window-local numberwidth; keep the source's.
+  let l:numberwidth = &l:numberwidth
   tabnew
+  let &l:numberwidth = l:numberwidth
   setlocal number norelativenumber signcolumn=no foldcolumn=0
   " Reserve the number column so the rendered Markdown fits beside it.
   let l:width = max([1, winwidth(0) - getwininfo(win_getid())[0].textoff])

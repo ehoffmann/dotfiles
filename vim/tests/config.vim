@@ -21,13 +21,16 @@ endfor
 for s:function in ['gitreview#open', 'glow#open', 'navigation#tabs', 'rubytools#api']
   call assert_false(exists('*' . s:function), 'Must remain lazy: ' . s:function)
 endfor
-call assert_true(index(globpath(&runtimepath, 'snippets/_.snippets', 0, 1),
+" The fixture lives under /tmp, which 'wildignore' excludes; bypass it.
+call assert_true(index(globpath(&runtimepath, 'snippets/_.snippets', 1, 1),
       \ s:runtime . '/snippets/_.snippets') >= 0)
 let s:autocmds = execute('autocmd dotfiles_filetypes')
       \ . execute('autocmd dotfiles_ftplugin')
 let s:statusline = &statusline
 let g:git_review_left = 'keep-review-state'
-source $MYVIMRC
+" Vim started with -u leaves $MYVIMRC empty, so reload the link directly.
+let v:errmsg = ''
+source ~/.vimrc
 call assert_equal('', v:errmsg)
 call assert_equal(s:autocmds, execute('autocmd dotfiles_filetypes')
       \ . execute('autocmd dotfiles_ftplugin'))
@@ -154,6 +157,8 @@ if has('terminal')
       endif
     endfor
     call assert_match('finished', term_getstatus(s:preview_buf))
+    " Let Vim read the last output of the finished job.
+    call term_wait(s:preview_buf, 50)
     call assert_equal([1, 0, 1, 1], [&l:number, &l:relativenumber, &l:wrap, &l:linebreak])
     let s:args = json_decode(join(readfile($VIM_CONFIG_TEST_GLOW_ARGS), "\n"))
     let s:width = winwidth(0) - s:numberwidth
@@ -167,6 +172,8 @@ if has('terminal')
 endif
 
 " Source deferred implementations too, without invoking external programs.
+" Earlier steps run Vim's own ftplugins, whose cleanup may set v:errmsg.
+let v:errmsg = ''
 for s:script in glob(s:runtime . '/autoload/*.vim', 0, 1)
   execute 'source ' . fnameescape(s:script)
 endfor

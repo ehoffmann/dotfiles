@@ -5,7 +5,11 @@
 
 " Runtime path {{{1
 set nocompatible
-filetype off
+" Restart detection on reload. At startup it is not on yet, and turning it off
+" would fail on the missing filetypedetect group.
+if exists('#filetypedetect')
+  filetype off
+endif
 
 " Resolve the ~/.vimrc symlink so the runtime follows this checkout.
 let s:vim_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h') . '/vim'
@@ -487,7 +491,8 @@ augroup END
 augroup dotfiles_filetypes
   autocmd!
   autocmd BufNewFile,BufRead Guardfile setfiletype ruby
-  autocmd BufNewFile,BufRead .env.local,*.env.* setfiletype sh
+  " Vim 9.2 detects .env.local as "env"; keep shell highlighting for env files.
+  autocmd BufNewFile,BufRead .env.local,*.env.* setlocal filetype=sh
   autocmd BufNewFile,BufRead *.go setfiletype go
 augroup END
 
@@ -511,10 +516,13 @@ function! s:apply_ftplugins() abort
 endfunction
 
 " Register cleanup for one filetype's settings and its guard variable.
+" {commands} are separated by "|" with no space before it: an unmap command
+" would include that space in the key it removes. The cleanup runs before the
+" standard ftplugin's, so an error there cannot skip it.
 function! s:undo_ftplugin(name, commands) abort
   let l:undo = get(b:, 'undo_ftplugin', '')
-  let b:undo_ftplugin = l:undo . (empty(l:undo) ? '' : ' | ') . a:commands
-        \ . ' | unlet! b:dotfiles_' . a:name . '_settings'
+  let b:undo_ftplugin = a:commands . '|unlet! b:dotfiles_' . a:name . '_settings'
+        \ . (empty(l:undo) ? '' : '|' . l:undo)
 endfunction
 
 function! s:ft_c() abort
@@ -531,9 +539,9 @@ function! s:ft_fern() abort
   nnoremap <buffer> <silent> <C-k> :TmuxNavigateUp<CR>
   nnoremap <buffer> <silent> <C-l> :TmuxNavigateRight<CR>
   call s:undo_ftplugin('fern', 'silent! nunmap <buffer> <C-h>'
-        \ . ' | silent! nunmap <buffer> <C-j>'
-        \ . ' | silent! nunmap <buffer> <C-k>'
-        \ . ' | silent! nunmap <buffer> <C-l>')
+        \ . '|silent! nunmap <buffer> <C-j>'
+        \ . '|silent! nunmap <buffer> <C-k>'
+        \ . '|silent! nunmap <buffer> <C-l>')
 endfunction
 
 function! s:ft_go() abort
@@ -555,7 +563,7 @@ endfunction
 function! s:ft_qf() abort
   nnoremap <buffer> gd :call GitQfDiff()<CR>
   nnoremap <buffer> gc :call GitQfReviewCommit()<CR>
-  call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd | silent! nunmap <buffer> gc')
+  call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd|silent! nunmap <buffer> gc')
 endfunction
 
 function! s:ft_ruby() abort
@@ -595,11 +603,11 @@ function! s:ft_ruby() abort
 
   call s:undo_ftplugin('ruby',
         \ 'setlocal tabstop< softtabstop< shiftwidth< expandtab< path< tags< iskeyword<'
-        \ . ' | silent! nunmap <buffer> <C-]>'
-        \ . ' | silent! nunmap <buffer> <leader>hc'
-        \ . ' | silent! nunmap <buffer> <leader>hh'
-        \ . ' | silent! nunmap <buffer> <leader>hr'
-        \ . ' | silent! nunmap <buffer> <leader>fr')
+        \ . '|silent! nunmap <buffer> <C-]>'
+        \ . '|silent! nunmap <buffer> <leader>hc'
+        \ . '|silent! nunmap <buffer> <leader>hh'
+        \ . '|silent! nunmap <buffer> <leader>hr'
+        \ . '|silent! nunmap <buffer> <leader>fr')
 endfunction
 
 function! s:ft_rust() abort
@@ -607,7 +615,7 @@ function! s:ft_rust() abort
   " Save and cargo run in Rust buffers.
   inoremap <buffer> <C-s> <Esc>:update<CR>:! cargo run<CR>
   call s:undo_ftplugin('rust', 'setlocal tabstop< softtabstop< shiftwidth< expandtab<'
-        \ . ' | silent! iunmap <buffer> <C-s>')
+        \ . '|silent! iunmap <buffer> <C-s>')
 endfunction
 
 function! s:ft_yaml() abort
