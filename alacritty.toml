@@ -21,9 +21,9 @@ live_config_reload = true
 
 # Offer IPC using `alacritty msg` (unix only)
 ipc_socket = true
-# import = ["/home/manu/.config/alacritty/themes/themes/solarized_dark.toml"]
-# import = ["/home/manu/.config/alacritty/themes/themes/gruvbox_dark.toml"]
-import = ["/home/manu/.config/alacritty/themes/themes/gruvbox_light.toml"]
+# import = ["~/.config/alacritty/themes/themes/solarized_dark.toml"]
+# import = ["~/.config/alacritty/themes/themes/gruvbox_dark.toml"]
+import = ["~/.config/alacritty/themes/themes/gruvbox_light.toml"]
 
 [bell]
 # duration = 100

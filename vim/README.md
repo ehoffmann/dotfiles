@@ -57,6 +57,9 @@ Vim uses Gruvbox with a light cream background. The fzf interface and preview
 background follow Vim's highlight groups; file previews use bat's bundled
 `gruvbox-light` theme (`bat` or `batcat` must be installed for syntax colors).
 This applies to `:Files`/`<C-P>` and `:Rg` as well as other fzf.vim pickers.
+In zsh, fzf uses its light palette and bat uses the same `gruvbox-light` theme.
+Inside tmux, Vim sets the true-color escape codes that it only enables by
+default for xterm-like terminals.
 
 ## Markdown preview
 
