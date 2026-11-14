@@ -899,11 +899,14 @@ command! ReviewEnd
 command! -nargs=+ GitReview call GitReview(<f-args>)
 
 " Review context from .review/context.json: the annotation at the cursor in
-" a popup, every annotation in the location list, and marks on their lines.
+" a popup, every annotation in the location list, marks on their lines, and
+" the summary of the whole change in a tab.
 command! ReviewContext call reviewcontext#show()
 command! ReviewContextList call reviewcontext#list()
 command! ReviewContextMarks call reviewcontext#toggle_marks()
+command! ReviewSummary call reviewcontext#summary()
 nnoremap <silent> <leader>k :ReviewContext<CR>
+nnoremap <silent> <leader>K :ReviewSummary<CR>
 
 " Refresh marks when a file is read, or on entering it after the context
 " changed. Looking for the file first keeps the implementation unloaded in

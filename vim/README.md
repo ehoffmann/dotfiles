@@ -121,6 +121,42 @@ The popup warns that they may be stale when `HEAD` no longer matches `head`
 when the buffer has unsaved changes. Generate the review again in those
 cases.
 
+## Review summary
+
+`:ReviewSummary`, or `<leader>K`, opens in a new tab a pre-reading of the
+whole change, from the optional `summary` object of `.review/context.json`:
+its intent, goals and non-goals, the contract, a reading order, tests, risks,
+and questions for the author. The contract lists what callers, users, and
+other teams can rely on after the merge, breaking changes first, then
+changes, then explicit guarantees that something stays the same.
+
+On a contract item or reading-order step with a file reference, `<CR>` opens
+the code beside the summary and reuses that window for later references;
+`q` closes the summary. The header shows the commits of the review and warns
+when `HEAD` moved or referenced files changed after it was generated.
+
+```json
+"summary": {
+  "intent": "Why the branch exists",
+  "goals": ["What the change commits to"],
+  "non_goals": ["What it deliberately leaves out"],
+  "contract": [
+    {"text": "What callers can rely on", "status": "changed",
+     "ref": {"path": "app/services/order_sync.rb", "start": 20}}
+  ],
+  "reading_order": [
+    {"path": "app/services/inventory_sync.rb", "start": 1, "why": "Where to start"}
+  ],
+  "tests": ["What is covered or missing"],
+  "risks": ["What could break"],
+  "questions": ["What to ask the author"]
+}
+```
+
+`status` is `breaking`, `changed`, or `unchanged`, and `ref` is optional.
+Reading-order steps need `path` and `start`. Every field is optional;
+malformed entries are skipped.
+
 ## Markdown preview
 
 `:Glow` renders the current buffer in a new tab with absolute line numbers for

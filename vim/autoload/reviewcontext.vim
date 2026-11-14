@@ -101,16 +101,21 @@ function! s:context_for(file) abort
   return l:context
 endfunction
 
+" Whether HEAD differs from the full or abbreviated head of the context.
+function! s:head_moved(context) abort
+  let l:head = get(a:context.data, 'head', '')
+  if type(l:head) != v:t_string || empty(l:head)
+    return 0
+  endif
+  let l:current = systemlist('git -C ' . shellescape(a:context.root) . ' rev-parse HEAD')
+  return v:shell_error || empty(l:current) || stridx(l:current[0], l:head) != 0
+endfunction
+
 " Reasons why the line ranges may no longer match the code.
 function! s:stale_warnings(context, modified) abort
   let l:warnings = []
-  let l:head = get(a:context.data, 'head', '')
-  if type(l:head) == v:t_string && !empty(l:head)
-    let l:current = systemlist('git -C ' . shellescape(a:context.root)
-          \ . ' rev-parse HEAD')
-    if v:shell_error || empty(l:current) || stridx(l:current[0], l:head) != 0
-      call add(l:warnings, '! HEAD moved since this review was generated')
-    endif
+  if s:head_moved(a:context)
+    call add(l:warnings, '! HEAD moved since this review was generated')
   endif
   if getftime(a:context.file) > getftime(a:context.source)
     call add(l:warnings, '! File changed after this review was generated')
@@ -290,4 +295,181 @@ function! reviewcontext#toggle_marks() abort
     endif
   endfor
   echo 'ReviewContext marks: ' . (g:review_context_marks ? 'on' : 'off')
+endfunction
+
+" Review summary
+" The optional "summary" object of the context describes the whole change:
+"   {"intent": "...", "goals": [...], "non_goals": [...],
+"    "contract": [{"text": "...", "status": "changed", "ref": {"path": ..., "start": ...}}],
+"    "reading_order": [{"path": "...", "start": 1, "why": "..."}],
+"    "tests": [...], "risks": [...], "questions": [...]}
+" Contract statuses are "breaking", "changed", or "unchanged".
+
+let s:status_rank = {'breaking': 0, 'changed': 1, 'unchanged': 2}
+
+function! s:strings(value) abort
+  return type(a:value) == v:t_list
+        \ ? filter(copy(a:value), 'type(v:val) == v:t_string') : []
+endfunction
+
+" A {path, start} reference, or {} when a:value is not a valid one.
+function! s:ref(value) abort
+  return type(a:value) == v:t_dict
+        \ && type(get(a:value, 'path', 0)) == v:t_string
+        \ && type(get(a:value, 'start', '')) == v:t_number
+        \ ? {'path': a:value.path, 'start': a:value.start} : {}
+endfunction
+
+function! s:compare_status(a, b) abort
+  return get(s:status_rank, a:a.status, 3) - get(s:status_rank, a:b.status, 3)
+endfunction
+
+" Return {'lines': [...], 'refs': {lnum: {path, start}}} for the summary.
+function! s:summary_lines(context) abort
+  let l:summary = a:context.data.summary
+  let l:lines = ['# Review summary', '']
+  let l:refs = {}
+
+  let l:range = []
+  for l:key in ['base', 'head']
+    let l:sha = get(a:context.data, l:key, '')
+    if type(l:sha) == v:t_string && !empty(l:sha)
+      call add(l:range, printf('%s `%s`', l:key, l:sha[:6]))
+    endif
+  endfor
+  if !empty(l:range)
+    call extend(l:lines, [join(l:range, ' → '), ''])
+  endif
+
+  let l:warnings = s:head_moved(a:context)
+        \ ? ['> ! HEAD moved since this review was generated'] : []
+  let l:paths = map(copy(a:context.annotations), 'v:val.path')
+  for l:item in type(get(l:summary, 'reading_order', 0)) == v:t_list
+        \ ? l:summary.reading_order : []
+    call add(l:paths, get(s:ref(l:item), 'path', ''))
+  endfor
+  let l:changed = len(filter(uniq(sort(filter(l:paths, '!empty(v:val)'))),
+        \ 'getftime(a:context.root . "/" . v:val) > getftime(a:context.source)'))
+  if l:changed
+    call add(l:warnings, printf('> ! %d file%s changed after this review was generated',
+          \ l:changed, l:changed == 1 ? '' : 's'))
+  endif
+  if !empty(l:warnings)
+    call extend(l:lines, l:warnings + ['> Line references may be stale.', ''])
+  endif
+
+  let l:intent = s:text(get(l:summary, 'intent', ''))
+  if !empty(l:intent)
+    call extend(l:lines, ['## Intent'] + l:intent + [''])
+  endif
+  for [l:key, l:title] in [['goals', 'Goals'], ['non_goals', 'Non-goals']]
+    call s:section(l:lines, '## ' . l:title,
+          \ map(s:strings(get(l:summary, l:key, [])), '"- " . v:val'))
+  endfor
+
+  " Contract: breaking changes first, then changes, then explicit guarantees.
+  let l:contract = []
+  for l:item in type(get(l:summary, 'contract', 0)) == v:t_list ? l:summary.contract : []
+    if type(l:item) == v:t_dict && type(get(l:item, 'text', 0)) == v:t_string
+      let l:status = get(l:item, 'status', '')
+      call add(l:contract, {'text': l:item.text, 'ref': s:ref(get(l:item, 'ref', 0)),
+            \ 'status': type(l:status) == v:t_string ? l:status : ''})
+    endif
+  endfor
+  if !empty(l:contract)
+    call add(l:lines, '## Contract')
+    for l:item in sort(l:contract, function('s:compare_status'))
+      let l:line = '- ' . (empty(l:item.status) ? '' : '[' . l:item.status . '] ')
+            \ . split(l:item.text, "\n")[0]
+      if !empty(l:item.ref)
+        let l:line .= printf(' (%s:%d)', l:item.ref.path, l:item.ref.start)
+        let l:refs[len(l:lines) + 1] = l:item.ref
+      endif
+      call add(l:lines, l:line)
+    endfor
+    call add(l:lines, '')
+  endif
+
+  let l:steps = []
+  for l:item in type(get(l:summary, 'reading_order', 0)) == v:t_list
+        \ ? l:summary.reading_order : []
+    if !empty(s:ref(l:item))
+      call add(l:steps, l:item)
+    endif
+  endfor
+  if !empty(l:steps)
+    call add(l:lines, '## Reading order')
+    for l:i in range(len(l:steps))
+      let l:why = s:text(get(l:steps[l:i], 'why', ''))
+      let l:refs[len(l:lines) + 1] = s:ref(l:steps[l:i])
+      call add(l:lines, printf('%d. %s:%d%s', l:i + 1, l:steps[l:i].path,
+            \ l:steps[l:i].start, empty(l:why) ? '' : ' — ' . l:why[0]))
+    endfor
+    call add(l:lines, '')
+  endif
+
+  for [l:key, l:title] in [['tests', 'Tests'], ['risks', 'Risks'], ['questions', 'Questions']]
+    call s:section(l:lines, '## ' . l:title,
+          \ map(s:strings(get(l:summary, l:key, [])), '"- " . v:val'))
+  endfor
+  call add(l:lines, '<CR> on a file reference opens it beside this summary; q closes.')
+  return {'lines': l:lines, 'refs': l:refs}
+endfunction
+
+" Open the summary of the current repository in a new tab.
+function! reviewcontext#summary() abort
+  let l:context = empty(expand('%:p')) ? s:load(getcwd())
+        \ : s:load(fnamemodify(resolve(expand('%:p')), ':h'))
+  if has_key(l:context, 'message')
+    call s:report(l:context)
+    return
+  endif
+  if !has_key(l:context.data, 'summary')
+    echo 'ReviewContext: no summary in ' . l:context.source
+    return
+  endif
+  if type(l:context.data.summary) != v:t_dict
+    call s:error('expected a summary object in ' . l:context.source)
+    return
+  endif
+  let l:result = s:summary_lines(l:context)
+
+  " Keep a single summary buffer.
+  for l:buffer in getbufinfo()
+    if has_key(l:buffer.variables, 'review_summary_refs')
+      execute 'bwipeout' l:buffer.bufnr
+    endif
+  endfor
+  tabnew
+  setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted
+  silent file Review\ summary
+  call setline(1, l:result.lines)
+  setlocal filetype=markdown nomodifiable readonly
+  let b:review_summary_root = l:context.root
+  let b:review_summary_refs = l:result.refs
+  nnoremap <buffer> <silent> <CR> :call reviewcontext#summary_jump()<CR>
+  " Wiping the buffer also closes its window, and its tab when others remain.
+  nnoremap <buffer> <silent> q :bwipeout<CR>
+endfunction
+
+" Open the reference on the cursor line in the window beside the summary.
+function! reviewcontext#summary_jump() abort
+  let l:ref = get(b:review_summary_refs, line('.'), {})
+  if empty(l:ref)
+    echo 'ReviewContext: no file reference on this line'
+    return
+  endif
+  let l:file = b:review_summary_root . '/' . l:ref.path
+  let l:summary = winnr()
+  if winnr('l') != l:summary
+    wincmd l
+  else
+    rightbelow vsplit
+    execute l:summary . 'wincmd w'
+    execute 'vertical resize ' . float2nr(&columns * 0.35)
+    wincmd l
+  endif
+  execute 'edit ' . fnameescape(l:file)
+  call cursor(l:ref.start, 1)
+  normal! zvzz
 endfunction

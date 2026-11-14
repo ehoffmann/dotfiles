@@ -11,7 +11,7 @@ call assert_equal(1, g:config_test_project_loads)
 call assert_equal(31, len(g:config_test_plugins))
 for s:command in ['Files', 'Rg', 'Review', 'ReviewLast', 'ReviewEnd',
       \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec',
-      \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks']
+      \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks', 'ReviewSummary']
   call assert_equal(2, exists(':' . s:command), s:command)
 endfor
 for s:function in ['ReviewGitGutter', 'GitReview', 'GitQfDiff',
@@ -235,6 +235,7 @@ call assert_false(exists('*reviewcontext#marks'), 'Review context must remain la
 " Review context picks the narrowest annotation covering the cursor line,
 " through symlinks, skips malformed entries, and flags stale line ranges.
 call assert_equal(':ReviewContext<CR>', maparg(' k', 'n'))
+call assert_equal(':ReviewSummary<CR>', maparg(' K', 'n'))
 let s:repo = $VIM_CONFIG_TEST_ROOT . '/review repo'
 let s:git = 'git -C ' . shellescape(s:repo)
 call mkdir(s:repo . '/app', 'p')
@@ -342,6 +343,78 @@ call assert_equal([
       \ ['other.rb', 1, 'Other file']],
       \ map(getloclist(0), '[fnamemodify(bufname(v:val.bufnr), ":t"), v:val.lnum, v:val.text]'))
 lclose
+
+" The summary orders the contract by impact, links references to the code,
+" and skips malformed entries.
+let s:review_data.summary = {
+      \ 'intent': "Validate before saving.\nKeeps callers unchanged.",
+      \ 'goals': ['Reject invalid models'],
+      \ 'non_goals': ['Change the schema', 4],
+      \ 'contract': [
+      \   {'text': 'Save signature is unchanged', 'status': 'unchanged'},
+      \   {'text': 'Invalid models now raise', 'status': 'breaking',
+      \    'ref': {'path': 'app/model.rb', 'start': 3}},
+      \   {'text': 'Validation runs first', 'status': 'changed',
+      \    'ref': {'path': 'app/model.rb', 'start': '3'}},
+      \   'not an object'],
+      \ 'reading_order': [
+      \   {'path': 'app/model.rb', 'start': 6, 'why': 'Start here'},
+      \   {'path': 'app/model.rb'},
+      \   {'path': 'app/model.rb', 'start': 1}],
+      \ 'tests': ['Confirmé : covered'],
+      \ 'risks': [],
+      \ 'questions': ['Backfill?']}
+call writefile([json_encode(s:review_data)], s:review_json)
+let s:review_tab = tabpagenr()
+ReviewSummary
+call assert_equal(['nofile', 'markdown', 0], [&buftype, &filetype, &modifiable])
+call assert_equal(['# Review summary', '',
+      \ printf('base `%s` → head `%s`', s:review_head[:6], s:review_head[:6]), '',
+      \ '## Intent', 'Validate before saving.', 'Keeps callers unchanged.', '',
+      \ '## Goals', '- Reject invalid models', '',
+      \ '## Non-goals', '- Change the schema', '',
+      \ '## Contract',
+      \ '- [breaking] Invalid models now raise (app/model.rb:3)',
+      \ '- [changed] Validation runs first',
+      \ '- [unchanged] Save signature is unchanged', '',
+      \ '## Reading order', '1. app/model.rb:6 — Start here', '2. app/model.rb:1', '',
+      \ '## Tests', '- Confirmé : covered', '',
+      \ '## Questions', '- Backfill?', '',
+      \ '<CR> on a file reference opens it beside this summary; q closes.'],
+      \ getline(1, '$'))
+
+" <CR> opens references beside the summary and then reuses that window.
+call cursor(1, 1)
+execute "normal \<CR>"
+call assert_equal('Review summary', bufname('%'), 'Lines without a reference stay put')
+call cursor(search('^1\. '), 1)
+execute "normal \<CR>"
+call assert_equal([s:review_file, 6, 2], [resolve(expand('%:p')), line('.'), winnr('$')])
+wincmd h
+call cursor(search('^- \[breaking\]'), 1)
+execute "normal \<CR>"
+call assert_equal([s:review_file, 3, 2], [resolve(expand('%:p')), line('.'), winnr('$')])
+
+" A new summary replaces the previous one, and q closes it with its tab.
+ReviewSummary
+call assert_equal(1, len(filter(getbufinfo(), 'has_key(v:val.variables, "review_summary_refs")')))
+let s:summary_tabs = tabpagenr('$')
+normal q
+call assert_equal(s:summary_tabs - 1, tabpagenr('$'))
+call assert_equal(0, len(filter(getbufinfo(), 'has_key(v:val.variables, "review_summary_refs")')))
+execute 'tabnext' s:review_tab
+tabonly
+
+call remove(s:review_data, 'summary')
+call writefile([json_encode(s:review_data)], s:review_json)
+messages clear
+ReviewSummary
+call assert_equal(s:review_tab, tabpagenr('$'), 'A context without summary must not open a tab')
+let s:review_data.summary = 'not an object'
+call writefile([json_encode(s:review_data)], s:review_json)
+ReviewSummary
+call assert_match('expected a summary object', execute('messages'))
+call assert_equal(s:review_tab, tabpagenr('$'), 'Errors must not open a tab')
 bwipeout!
 
 call writefile(['{"annotations": '], s:review_json)

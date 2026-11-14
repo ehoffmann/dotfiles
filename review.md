@@ -20,6 +20,7 @@ defined here. Step-by-step Fugitive walkthroughs are in
 | One file in depth | `:Gvdiffsplit <rev>` |
 | A specific piece of code | `:AgentExplain` on a line or range |
 | An agent's notes on the code at the cursor | `:ReviewContext` (`<leader>k`) |
+| An agent's pre-reading of the whole change | `:ReviewSummary` (`<leader>K`) |
 | All of an agent's notes on the branch | `:ReviewContextList` |
 | Ruby style of a change | `rubo`, `rubo <n>`, `rubs` |
 
@@ -96,6 +97,10 @@ touching the checkout. Requires `glab` to be authenticated.
   current file's commits with a diff preview.
 - `:Linediff` *(plugin)*: select a block, run `:Linediff`, then do the same on
   a second block to compare two pieces of code, even within one file.
+- `:ReviewSummary` (`<leader>K`): read the agent's summary of the whole
+  change before the code: intent, goals and non-goals, the contract for
+  callers, a reading order whose steps open with `<CR>`, tests, risks, and
+  questions.
 - `:ReviewContext` (`<leader>k`): show in a popup the annotation from
   `.review/context.json` that covers the cursor line: description, change,
   and risks. Annotated lines are marked with `◆` after their text;
