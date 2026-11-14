@@ -708,7 +708,13 @@ endfunction
 function! s:ft_qf() abort
   nnoremap <buffer> gd :call GitQfDiff()<CR>
   nnoremap <buffer> gc :call GitQfReviewCommit()<CR>
-  call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd|silent! nunmap <buffer> gc')
+  " Read marks of review lists: x toggles them, gr shows the files to read.
+  nnoremap <buffer> <silent> x :call gitreview#toggle_read(line('.'), line('.'))<CR>
+  xnoremap <buffer> <silent> x :<C-u>call gitreview#toggle_read(line("'<"), line("'>"))<CR>
+  nnoremap <buffer> <silent> gr :call gitreview#filter_unread()<CR>
+  call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd|silent! nunmap <buffer> gc'
+        \ . '|silent! nunmap <buffer> x|silent! xunmap <buffer> x'
+        \ . '|silent! nunmap <buffer> gr')
 endfunction
 
 function! s:ft_ruby() abort

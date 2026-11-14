@@ -51,6 +51,8 @@ stays in effect for every buffer until then.
 | --- | --- |
 | `gd` | Open the entry as a vertical diff against `<left>`, quickfix below |
 | `gc` | Start a `:GitReview` of the entry's commit (`<commit>^ <commit>`) |
+| `x` | Mark the file as read, or unmark it; works on a Visual selection |
+| `gr` | Show only the files to read, or return to the full list |
 
 Examples:
 
@@ -66,6 +68,13 @@ review drives `gd` and `gc`.
 
 With a range, `gd` opens the right commit's version as a read-only Fugitive
 blob: `origin/main...HEAD` shows `HEAD` as committed.
+
+Read files show `✓`, and the list title counts them, as in
+`— 3/12 read`. A mark records the reviewed version of the file, so it turns
+to `~`, to read again, when the file changes: a new push to an MR, a new
+commit, or an edit during `:ReviewBranch`. Marks are kept per merge base in
+`.review/reviewed.json`, ignored by Git, so they survive restarts and are
+shared by `:GitReview`, `:ReviewBranch`, and `:MR` reviews of the same base.
 
 ### Branch review: `:ReviewBranch`
 

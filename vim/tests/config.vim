@@ -470,6 +470,96 @@ ReviewBranch
 call assert_equal('', g:config_test_git_args, 'A missing origin/main must not start a review')
 call assert_match('ReviewBranch: could not find the merge base with origin/main',
       \ execute('messages'))
+
+" Read marks: x records the reviewed version of a file, gr shows the files
+" left to read, and a mark turns to ~ when the file changes.
+function! ConfigTestDifftool(args) abort
+  let g:config_test_git_args = a:args
+  if get(g:, 'config_test_difftool_fail', 0)
+    return
+  endif
+  call setqflist([], ' ', {'title': ':Git ' . a:args,
+        \ 'items': map(copy(g:config_test_difftool_files), '{"filename": v:val, "text": ""}')})
+endfunction
+command! -nargs=* Git call ConfigTestDifftool(<q-args>)
+call writefile(['extra'], s:repo . '/app/extra.rb')
+call system(s:git . ' add app && ' . s:git
+      \ . ' -c user.name=Test -c user.email=test@example.com commit -qm Third')
+let s:read_head = trim(system(s:git . ' rev-parse HEAD'))
+let s:blob = 'fugitive://' . s:repo . '/.git//' . s:read_head . '/app/'
+let g:config_test_difftool_files = [s:blob . 'model.rb', s:blob . 'extra.rb']
+function! s:review_list() abort
+  let l:list = getqflist({'title': 1, 'items': 1})
+  return [l:list.title, map(l:list.items, 'v:val.text')]
+endfunction
+GitReview base HEAD
+call assert_equal([':Git difftool --name-only base HEAD — 0/2 read', ['', '']],
+      \ s:review_list())
+copen
+normal x
+call assert_equal([':Git difftool --name-only base HEAD — 1/2 read', ['✓', '']],
+      \ s:review_list())
+if has('patch-8.2.0959')
+  call assert_equal(['✓ app/model.rb', '  app/extra.rb'], getline(1, '$'))
+  call assert_equal(['qfReviewRead', 'qfFileName'],
+        \ [synIDattr(synID(1, 3, 1), 'name'), synIDattr(synID(2, 3, 1), 'name')])
+endif
+call assert_equal({s:review_head: {'app/model.rb':
+      \ trim(system(s:git . ' rev-parse HEAD:app/model.rb'))}},
+      \ json_decode(join(readfile(s:repo . '/.review/reviewed.json'))))
+
+" gr lists the files to read, and returns to the full list with new marks.
+normal gr
+call assert_equal([':Git difftool --name-only base HEAD (to read) — 0/1 read', ['']],
+      \ s:review_list())
+normal x
+normal gr
+call assert_equal([':Git difftool --name-only base HEAD — 2/2 read', ['✓', '✓']],
+      \ s:review_list())
+" A selection of read files is unmarked, then marked again.
+execute "normal ggVGx"
+call assert_equal(['', ''], s:review_list()[1])
+execute "normal ggVGx"
+call assert_equal(['✓', '✓'], s:review_list()[1])
+cclose
+
+" A new version of a read file is to read again; marks survive new lists.
+call writefile(['changed'], s:repo . '/app/extra.rb')
+call system(s:git . ' -c user.name=Test -c user.email=test@example.com commit -qam Fourth')
+let s:blob = 'fugitive://' . s:repo . '/.git//' . trim(system(s:git . ' rev-parse HEAD')) . '/app/'
+let g:config_test_difftool_files = [s:blob . 'model.rb', s:blob . 'extra.rb']
+GitReview base HEAD
+call assert_equal([':Git difftool --name-only base HEAD — 1/2 read', ['✓', '~']],
+      \ s:review_list())
+" A three-dot range shares the marks of its merge base.
+GitReview base...HEAD
+call assert_equal(['✓', '~'], s:review_list()[1])
+
+" Work tree reviews hash the files themselves: the same content from the
+" same base is already read, and an edit makes it to read again.
+let g:config_test_difftool_files = [s:repo . '/app/model.rb']
+GitReview base
+call assert_equal(['✓'], s:review_list()[1], 'The same version must stay read')
+copen
+call writefile(['edited'], s:review_file)
+normal gr
+call assert_equal(['~'], s:review_list()[1], 'An edited file must be to read again')
+normal x
+call assert_equal(['✓'], s:review_list()[1])
+cclose
+
+" Other lists, such as search results, have no read marks, even when a
+" failed difftool leaves them current.
+call setqflist([{'filename': s:review_file, 'lnum': 1, 'text': 'match'}])
+let g:config_test_difftool_fail = 1
+GitReview base
+unlet g:config_test_difftool_fail
+copen
+messages clear
+normal x
+call assert_match('not a review list', execute('messages'))
+call assert_equal(['match'], s:review_list()[1])
+cclose
 execute 'cd ' . fnameescape(s:cwd)
 
 call writefile(['{"annotations": '], s:review_json)

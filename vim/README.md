@@ -187,7 +187,8 @@ In the buffer, use `j/k` to navigate, `<CR>` for the full diff, `c` for the
 original commits, `o` to open the browser, `r` to refresh, `n/p` for pages of
 100 MRs, and `q` to close. The list preserves the existing quickfix list.
 Each review opens a new tab and closes the selector; quickfix then follows
-the usual workflow (`gd` for files, `gc` for a commit). Closing only the
+the usual workflow (`gd` for files, `gc` for a commit, `x` to mark a file
+as read, `gr` for the files to read). Closing only the
 selector preserves the other windows and the quickfix list.
 
 ## Review endpoints
