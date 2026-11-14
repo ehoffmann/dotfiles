@@ -80,6 +80,35 @@ bracketed paste so its newlines do not submit it early. If loading or pasting
 the buffer fails, the command reports the tmux error and stops before sending
 Enter.
 
+## Review context
+
+`:ReviewContext`, or `<leader>k`, shows in a popup the review annotation that
+covers the cursor line, read from `.review/context.json` at the root of the
+current file's Git repository. That file is typically written by an agent
+that analyzed the change. When several ranges cover the line, the narrowest
+one wins. Press `q` or `Esc`, or move the cursor, to close the popup. It
+requires Vim with `+popupwin`.
+
+```json
+{"base": "<merge-base sha>", "head": "<HEAD sha>",
+ "annotations": [
+  {"path": "app/models/user.rb", "start": 10, "end": 24,
+   "symbol": "User#save", "kind": "method", "summary": "What the code does",
+   "change": "What the change does", "risks": ["What could break"]}
+]}
+```
+
+Paths are relative to the repository root, and line ranges are inclusive
+integers. Only `path`, `start`, and `end` are required; malformed entries,
+string line numbers, and non-string risks are skipped. The title shows
+`symbol (kind)`.
+
+The ranges describe the files as they were when the review was generated.
+The popup warns that they may be stale when `HEAD` no longer matches `head`
+(a full or abbreviated hash), when the file is newer than `context.json`, or
+when the buffer has unsaved changes. Generate the review again in those
+cases.
+
 ## Markdown preview
 
 `:Glow` renders the current buffer in a new tab with absolute line numbers for

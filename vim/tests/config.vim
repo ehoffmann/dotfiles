@@ -10,7 +10,7 @@ call assert_equal(7, &scrolloff)
 call assert_equal(1, g:config_test_project_loads)
 call assert_equal(31, len(g:config_test_plugins))
 for s:command in ['Files', 'Rg', 'Review', 'ReviewLast', 'ReviewEnd',
-      \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec']
+      \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec', 'ReviewContext']
   call assert_equal(2, exists(':' . s:command), s:command)
 endfor
 for s:function in ['ReviewGitGutter', 'GitReview', 'GitQfDiff',
@@ -18,7 +18,8 @@ for s:function in ['ReviewGitGutter', 'GitReview', 'GitQfDiff',
       \ 'OpenCorrespondingSpec']
   call assert_true(exists('*' . s:function), s:function)
 endfor
-for s:function in ['gitreview#open', 'glow#open', 'navigation#tabs', 'rubytools#api']
+for s:function in ['gitreview#open', 'glow#open', 'navigation#tabs', 'rubytools#api',
+      \ 'reviewcontext#show']
   call assert_false(exists('*' . s:function), 'Must remain lazy: ' . s:function)
 endfor
 " The fixture lives under /tmp, which 'wildignore' excludes; bypass it.
@@ -224,6 +225,83 @@ let $TMUX = ''
 AgentExplain
 call assert_equal([], s:tmux_calls(), 'tmux must not be used outside tmux')
 bwipeout!
+
+" Review context picks the narrowest annotation covering the cursor line,
+" through symlinks, skips malformed entries, and flags stale line ranges.
+call assert_equal(':ReviewContext<CR>', maparg(' k', 'n'))
+let s:repo = $VIM_CONFIG_TEST_ROOT . '/review repo'
+let s:git = 'git -C ' . shellescape(s:repo)
+call mkdir(s:repo . '/app', 'p')
+call mkdir(s:repo . '/.review', 'p')
+let s:review_file = s:repo . '/app/model.rb'
+let s:review_json = s:repo . '/.review/context.json'
+call writefile(map(range(1, 12), '"line " . v:val'), s:review_file)
+call system(s:git . ' init -q && ' . s:git . ' add app && ' . s:git
+      \ . ' -c user.name=Test -c user.email=test@example.com commit -qm Initial')
+call assert_equal(0, v:shell_error)
+let s:review_head = trim(system(s:git . ' rev-parse HEAD'))
+let s:review_data = {'base': s:review_head, 'head': s:review_head, 'annotations': [
+      \ 'not an object',
+      \ {'path': 'app/model.rb', 'start': '3', 'end': 5, 'symbol': 'Bad range'},
+      \ {'path': 'app/other.rb', 'start': 1, 'end': 12, 'symbol': 'Other file'},
+      \ {'path': 'app/model.rb', 'start': 1, 'end': 10, 'symbol': 'Model'},
+      \ {'path': 'app/model.rb', 'start': 3, 'end': 5, 'symbol': 'Model#save',
+      \  'kind': 'method',
+      \  'summary': "Saves the model.\nReturns false on failure.",
+      \  'change': 'Validates first.', 'risks': ['Slower saves', 3, 'Callbacks']},
+      \ ]}
+call writefile([json_encode(s:review_data)], s:review_json)
+call assert_equal({'lines': ['Model#save (method)', repeat('─', 45), '',
+      \ 'DESCRIPTION', 'Saves the model.', 'Returns false on failure.', '',
+      \ 'CHANGE', 'Validates first.', '',
+      \ 'RISKS', '- Slower saves', '- Callbacks', '',
+      \ 'q / Esc: close']}, reviewcontext#annotation(s:review_file, 4))
+call assert_equal({'lines': ['Model', repeat('─', 45), '', 'q / Esc: close']},
+      \ reviewcontext#annotation(s:review_file, 9))
+call assert_equal({'message': 'no annotation at cursor', 'error': 0},
+      \ reviewcontext#annotation(s:review_file, 11))
+let s:review_link = $VIM_CONFIG_TEST_ROOT . '/model-link.rb'
+call system('ln -s ' . shellescape(s:review_file) . ' ' . shellescape(s:review_link))
+call assert_equal('Model#save (method)',
+      \ reviewcontext#annotation(s:review_link, 4).lines[0])
+
+" Each reason for stale ranges is reported, after the title.
+call assert_equal(['! Unsaved changes in this buffer', 'Line ranges may be stale.', ''],
+      \ reviewcontext#annotation(s:review_file, 9, 1).lines[3:5])
+let s:review_data.head = s:review_head[:11]
+call writefile([json_encode(s:review_data)], s:review_json)
+call assert_equal(4, len(reviewcontext#annotation(s:review_file, 9).lines),
+      \ 'An abbreviated head must still match')
+let s:review_data.head = repeat('0', 40)
+call writefile([json_encode(s:review_data)], s:review_json)
+call assert_equal('! HEAD moved since this review was generated',
+      \ reviewcontext#annotation(s:review_file, 9).lines[3])
+let s:review_data.head = s:review_head
+call writefile([json_encode(s:review_data)], s:review_json)
+call system('touch -d 2000-01-01 ' . shellescape(s:review_json))
+call assert_equal('! File changed after this review was generated',
+      \ reviewcontext#annotation(s:review_file, 9).lines[3])
+call writefile([json_encode(s:review_data)], s:review_json)
+
+execute 'edit ' . fnameescape(s:review_file)
+call cursor(4, 1)
+ReviewContext
+call assert_equal(1, len(popup_list()))
+call assert_equal('Model#save (method)', getbufline(winbufnr(popup_list()[0]), 1)[0])
+call popup_clear()
+call setline(1, 'edited')
+ReviewContext
+call assert_equal('! Unsaved changes in this buffer',
+      \ getbufline(winbufnr(popup_list()[0]), 4)[0])
+call popup_clear()
+bwipeout!
+
+call writefile(['{"annotations": '], s:review_json)
+call assert_equal(1, reviewcontext#annotation(s:review_file, 4).error)
+call writefile(['[]'], s:review_json)
+call assert_equal(1, reviewcontext#annotation(s:review_file, 4).error)
+call delete(s:review_json)
+call assert_equal(0, reviewcontext#annotation(s:review_file, 4).error)
 
 " Source deferred implementations too, without invoking external programs.
 " Earlier steps run Vim's own ftplugins, whose cleanup may set v:errmsg.

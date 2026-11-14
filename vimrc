@@ -898,6 +898,10 @@ command! ReviewEnd
 
 command! -nargs=+ GitReview call GitReview(<f-args>)
 
+" Show the .review/context.json annotation at the cursor in a popup.
+command! ReviewContext call reviewcontext#show()
+nnoremap <silent> <leader>k :ReviewContext<CR>
+
 " GitLab MR selector; reuses GitReview and the quickfix gd/gc mappings above.
 if exists(':GitMRs') == 2
   delcommand GitMRs
