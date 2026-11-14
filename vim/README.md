@@ -89,6 +89,18 @@ that analyzed the change. When several ranges cover the line, the narrowest
 one wins. Press `q` or `Esc`, or move the cursor, to close the popup. It
 requires Vim with `+popupwin`.
 
+Lines where annotations start are marked after their text, such as
+`◆ 2 risks` or `◆ review`, as soon as a file of a repository with a review
+context is opened. Marks follow edits and refresh when the context is
+regenerated. `:ReviewContextMarks` turns them off or on everywhere. Before
+Vim 9.1, or with `g:review_context_signs` set, they use the sign column
+instead, below GitGutter's priority. Both use the `ReviewContextMark`
+highlight group, linked to `Special` by default.
+
+`:ReviewContextList` puts every annotation of the repository in the location
+list, sorted by file and line with enclosing ranges first, showing the
+symbol, kind, number of risks, and the first line of the summary.
+
 ```json
 {"base": "<merge-base sha>", "head": "<HEAD sha>",
  "annotations": [

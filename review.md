@@ -20,6 +20,7 @@ defined here. Step-by-step Fugitive walkthroughs are in
 | One file in depth | `:Gvdiffsplit <rev>` |
 | A specific piece of code | `:AgentExplain` on a line or range |
 | An agent's notes on the code at the cursor | `:ReviewContext` (`<leader>k`) |
+| All of an agent's notes on the branch | `:ReviewContextList` |
 | Ruby style of a change | `rubo`, `rubo <n>`, `rubs` |
 
 ## Vim
@@ -97,7 +98,10 @@ touching the checkout. Requires `glab` to be authenticated.
   a second block to compare two pieces of code, even within one file.
 - `:ReviewContext` (`<leader>k`): show in a popup the annotation from
   `.review/context.json` that covers the cursor line: description, change,
-  and risks. See [vim/README.md](vim/README.md#review-context) for the format.
+  and risks. Annotated lines are marked with `◆` after their text;
+  `:ReviewContextMarks` hides or shows the marks, and `:ReviewContextList`
+  lists every annotation in the location list. See
+  [vim/README.md](vim/README.md#review-context) for the format.
 - `:AgentExplain`: send the current line, a Visual selection, or a range
   (`:10,25AgentExplain`) to an agent in another tmux pane for an explanation.
   `:AgentSelectPane` chooses the pane.

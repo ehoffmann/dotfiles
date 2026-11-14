@@ -10,7 +10,8 @@ call assert_equal(7, &scrolloff)
 call assert_equal(1, g:config_test_project_loads)
 call assert_equal(31, len(g:config_test_plugins))
 for s:command in ['Files', 'Rg', 'Review', 'ReviewLast', 'ReviewEnd',
-      \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec', 'ReviewContext']
+      \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec',
+      \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks']
   call assert_equal(2, exists(':' . s:command), s:command)
 endfor
 for s:function in ['ReviewGitGutter', 'GitReview', 'GitQfDiff',
@@ -218,13 +219,18 @@ let $VIM_CONFIG_TEST_TMUX_FAIL = ''
 
 " Vim's own pane is never offered, so there is nothing to select here.
 unlet g:agent_pane
+messages clear
 AgentExplain
+call assert_match('No other tmux pane in this window', execute('messages'))
 call assert_equal([['list-panes']], map(s:tmux_calls(), 'v:val.args[:0]'))
 call assert_false(exists('g:agent_pane'))
 let $TMUX = ''
 AgentExplain
 call assert_equal([], s:tmux_calls(), 'tmux must not be used outside tmux')
 bwipeout!
+
+" Files outside repositories with a review context must not load it.
+call assert_false(exists('*reviewcontext#marks'), 'Review context must remain lazy')
 
 " Review context picks the narrowest annotation covering the cursor line,
 " through symlinks, skips malformed entries, and flags stale line ranges.
@@ -262,8 +268,8 @@ call assert_equal({'message': 'no annotation at cursor', 'error': 0},
       \ reviewcontext#annotation(s:review_file, 11))
 let s:review_link = $VIM_CONFIG_TEST_ROOT . '/model-link.rb'
 call system('ln -s ' . shellescape(s:review_file) . ' ' . shellescape(s:review_link))
-call assert_equal('Model#save (method)',
-      \ reviewcontext#annotation(s:review_link, 4).lines[0])
+call assert_equal(reviewcontext#annotation(s:review_file, 4),
+      \ reviewcontext#annotation(s:review_link, 4), 'Symlinks must resolve')
 
 " Each reason for stale ranges is reported, after the title.
 call assert_equal(['! Unsaved changes in this buffer', 'Line ranges may be stale.', ''],
@@ -294,6 +300,48 @@ ReviewContext
 call assert_equal('! Unsaved changes in this buffer',
       \ getbufline(winbufnr(popup_list()[0]), 4)[0])
 call popup_clear()
+
+" Marks show where annotations start, and follow the toggle and new contexts.
+edit!
+let s:review_buf = bufnr('%')
+function! s:review_marks() abort
+  return map(prop_list(1, {'bufnr': s:review_buf, 'end_lnum': -1,
+        \ 'types': ['reviewcontext']}), '[v:val.lnum, v:val.text]')
+endfunction
+call assert_equal([[1, '  ◆ review'], [3, '  ◆ 2 risks']], s:review_marks())
+ReviewContextMarks
+call assert_equal([], s:review_marks())
+ReviewContextMarks
+call assert_equal([[1, '  ◆ review'], [3, '  ◆ 2 risks']], s:review_marks())
+call add(s:review_data.annotations, {'path': 'app/model.rb', 'start': 6, 'end': 7,
+      \ 'symbol': 'Extra', 'kind': 'block', 'risks': ['One']})
+call add(s:review_data.annotations, {'path': 'app/model.rb', 'start': 1, 'end': 2,
+      \ 'symbol': 'Header'})
+call writefile([json_encode(s:review_data)], s:review_json)
+call system('touch -d @' . (localtime() + 60) . ' ' . shellescape(s:review_json))
+doautocmd BufEnter
+call assert_equal([[1, '  ◆ review'], [3, '  ◆ 2 risks'], [6, '  ◆ 1 risk']],
+      \ s:review_marks(), 'A regenerated context must refresh the marks')
+let g:review_context_signs = 1
+edit!
+call assert_equal([], s:review_marks())
+call assert_equal([1, 3, 6], map(sign_getplaced(s:review_buf,
+      \ {'group': 'reviewcontext'})[0].signs, 'v:val.lnum'))
+unlet g:review_context_signs
+edit!
+call assert_equal([], sign_getplaced(s:review_buf, {'group': 'reviewcontext'})[0].signs)
+
+" The list holds every annotation, enclosing ranges first.
+ReviewContextList
+call assert_equal('Review context', getloclist(0, {'title': 1}).title)
+call assert_equal([
+      \ ['model.rb', 1, 'Model'],
+      \ ['model.rb', 1, 'Header'],
+      \ ['model.rb', 3, 'Model#save (method) [2 risks]: Saves the model.'],
+      \ ['model.rb', 6, 'Extra (block) [1 risk]'],
+      \ ['other.rb', 1, 'Other file']],
+      \ map(getloclist(0), '[fnamemodify(bufname(v:val.bufnr), ":t"), v:val.lnum, v:val.text]'))
+lclose
 bwipeout!
 
 call writefile(['{"annotations": '], s:review_json)

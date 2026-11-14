@@ -898,9 +898,44 @@ command! ReviewEnd
 
 command! -nargs=+ GitReview call GitReview(<f-args>)
 
-" Show the .review/context.json annotation at the cursor in a popup.
+" Review context from .review/context.json: the annotation at the cursor in
+" a popup, every annotation in the location list, and marks on their lines.
 command! ReviewContext call reviewcontext#show()
+command! ReviewContextList call reviewcontext#list()
+command! ReviewContextMarks call reviewcontext#toggle_marks()
 nnoremap <silent> <leader>k :ReviewContext<CR>
+
+" Refresh marks when a file is read, or on entering it after the context
+" changed. Looking for the file first keeps the implementation unloaded in
+" repositories without a review context. findfile() would skip paths that
+" match 'wildignore', such as */tmp/*.
+function! s:review_context_refresh(force) abort
+  if !empty(&buftype) || !filereadable(expand('%:p'))
+    return
+  endif
+  let l:dir = fnamemodify(resolve(expand('%:p')), ':h')
+  let l:context = ''
+  while empty(l:context)
+    if filereadable(l:dir . '/.review/context.json')
+      let l:context = l:dir . '/.review/context.json'
+    elseif fnamemodify(l:dir, ':h') ==# l:dir
+      break
+    endif
+    let l:dir = fnamemodify(l:dir, ':h')
+  endwhile
+  if empty(l:context) && !exists('b:review_context_mtime')
+    return
+  endif
+  if a:force || getftime(l:context) != get(b:, 'review_context_mtime', -2)
+    call reviewcontext#marks(bufnr('%'))
+  endif
+endfunction
+
+augroup dotfiles_review_context
+  autocmd!
+  autocmd BufReadPost * call s:review_context_refresh(1)
+  autocmd BufEnter * call s:review_context_refresh(0)
+augroup END
 
 " GitLab MR selector; reuses GitReview and the quickfix gd/gc mappings above.
 if exists(':GitMRs') == 2
