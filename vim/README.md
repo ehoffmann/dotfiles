@@ -41,6 +41,13 @@ Plugin installation and prerequisites are unchanged: vim-plug and the listed
 plugins must already be installed. Git review command examples are in
 [git-review.md](git-review.md).
 
+The leader key is Space, defined before plugins and mappings. Use `Space f b`
+for Buffers and `Space f h` for History; Ruby's block toggle stays on `Space b`
+and hash conversions on `Space h c`, `Space h h`, and `Space h r`. The build
+shortcut is `Space 5` in Normal mode and `\5` in Insert mode, so ordinary
+spaces do not trigger or delay a mapping while typing. Restart Vim after
+changing the leader to discard bindings defined with the old leader.
+
 Run configuration checks with `python3 vim/tests/run_config.py` from the
 repository root. They use temporary directories and stubs for vim-plug and
 Gruvbox, with no plugin downloads. Run MR integration checks with

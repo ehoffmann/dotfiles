@@ -67,15 +67,15 @@ call assert_equal(1, len(filter(split(&l:tags, ','),
       \ 'v:val ==# b:gutentags_files.ctags')), 'Legacy symlinks must not duplicate settings')
 call assert_match('rubytag#jump', maparg('<C-]>', 'n'))
 for s:key in ['hc', 'hh', 'hr', 'fr']
-  call assert_equal(1, maparg('\' . s:key, 'n', 0, 1).buffer)
+  call assert_equal(1, maparg(' ' . s:key, 'n', 0, 1).buffer)
 endfor
 call assert_match('lib/', &l:path)
 setlocal filetype=text
-call assert_equal('', maparg('\hc', 'n'))
+call assert_equal('', maparg(' hc', 'n'))
 call assert_equal('', maparg('<C-]>', 'n'))
 call assert_false(exists('b:dotfiles_ruby_settings'))
 setlocal filetype=ruby
-call assert_equal(1, maparg('\hc', 'n', 0, 1).buffer)
+call assert_equal(1, maparg(' hc', 'n', 0, 1).buffer)
 
 enew!
 let s:errorformat = &g:errorformat

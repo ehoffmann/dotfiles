@@ -436,22 +436,148 @@ nnoremap gp `[v`]
 nnoremap <silent> <Leader>e
       \ :Fern . -drawer -toggle -reveal=%<CR>
 
-command! -bang -nargs=? -complete=dir Files
-      \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-nmap <C-P> :Files!<CR>
+" ============================================================================
+"  fzf.vim configuration
+" ============================================================================
+"
+"  COMMANDS                     (add ! for fullscreen, e.g. :Rg!)
+"  --------------------------------------------------------------------------
+"  :Files [dir]   Project files (hidden files included, .gitignore ignored)
+"  :Buffers       Open buffers
+"  :History       Recently opened files, including previous sessions
+"  :BTags         Tags in current buffer (requires universal-ctags)
+"  :BLines        Fuzzy search lines in current buffer (a fuzzy "/")
+"  :Lines         Fuzzy search lines in all open buffers (sees unsaved changes)
+"  :Rg [pattern]  Run rg once, then fuzzy-filter results with fzf
+"                 Extended syntax: 'exact  ^prefix  suffix$  !exclude  a | b
+"  :RG [regex]    Live grep: rg is re-run on every keystroke (real regex)
+"
+"  MAPPINGS
+"  --------------------------------------------------------------------------
+"  <C-P>          :Files! (fullscreen)
+"  <leader>fb     :Buffers
+"  <leader>fh     :History
+"  <leader>ft     :BTags
+"  <leader>fl     :BLines
+"  <leader>fL     :Lines
+"  <leader>f*     :BLines with word under cursor
+"  <leader>rw     :Rg with word under cursor     (<leader>rW fullscreen)
+"  <leader>rg     :RG live grep                  (<leader>rG fullscreen)
+"  <leader>rg     (visual) :Rg with selection
+"
+"  KEYS INSIDE FZF
+"  --------------------------------------------------------------------------
+"  Ctrl-/         Cycle preview: bottom -> right 80% -> hidden -> default
+"  Alt-w          Toggle line wrap in the list (long lines)
+"  Alt-j / Alt-k  Scroll preview half page down / up
+"  Ctrl-G         (Rg) Toggle matching: content only <-> whole line (path too)
+"  Tab            Select line
+"  Alt-a / Alt-d  Select all / deselect all
+"  Enter          With multiple selections (Rg/RG): send to quickfix list
+"                 then e.g.  :cdo s/old/new/g | update
+"  Ctrl-T/X/V     Open in tab / split / vsplit
+"
+" ============================================================================
 
-" Rg
-command! -bang -nargs=* Rg
-      \ call fzf#vim#grep(
-      \   'rg --column --line-number --no-heading --color=always
-      \       --smart-case --hidden --no-ignore-vcs -- '
-      \       . shellescape(<q-args>), 1, fzf#vim#with_preview(),
-      \   <bang>0
-      \ )
-" Open Rg full screen
-nnoremap <silent> <Leader>rg :Rg!<CR>
-" Open Rg full screen, filled with word under cursor
-nnoremap <silent> <Leader>rw :Rg! <C-R><C-W><CR>
+" ---------- Sources ----------
+" Shared rg command
+let s:rg_cmd = 'rg --column --line-number --no-heading --color=always'
+      \ . ' --smart-case --hidden --no-ignore-vcs'
+
+" Make :Files list the same files :Rg searches
+" (hidden files included, .gitignore ignored, .git excluded).
+" Set here, so it only affects Vim, not the shell.
+let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --no-ignore-vcs -g "!.git"'
+
+" ---------- fzf options ----------
+" Shared by all commands
+let s:common_opts = [
+      \ '--hscroll-off', '50',
+      \ '--bind', 'alt-w:toggle-wrap',
+      \ '--bind', 'alt-j:preview-half-page-down,alt-k:preview-half-page-up',
+      \ '--bind', 'alt-a:select-all,alt-d:deselect-all',
+      \ ]
+
+" File lists: Files, Buffers, History
+let s:files_opts = s:common_opts + [
+      \ '--header', 'C-/ preview · A-w wrap · A-j/k scroll · C-t/x/v tab/split/vsplit',
+      \ '--bind', 'ctrl-/:change-preview-window(down,60%,wrap|right,80%,wrap|hidden|)',
+      \ ]
+
+" No preview: BTags, BLines, Lines
+let s:nopreview_opts = s:common_opts + [
+      \ '--header', 'A-w wrap · Tab select',
+      \ ]
+
+" Content search: Rg, RG
+" +{2}-/2 centers the preview on the matching line
+let s:rg_opts = s:common_opts + [
+      \ '--delimiter', ':',
+      \ '--header', 'C-/ preview · A-w wrap · C-g content/all · A-j/k scroll · Tab select · A-a all',
+      \ '--bind', 'ctrl-/:change-preview-window(down,60%,wrap,+{2}-/2|right,80%,wrap,+{2}-/2|hidden|)',
+      \ '--bind', 'ctrl-g:change-nth(4..|)',
+      \ ]
+
+" Default preview: right side, 55%, wrapped lines
+" (no toggle key here: ctrl-/ cycles through layouts instead)
+let g:fzf_vim = {}
+let g:fzf_vim.preview_window = ['right,55%,wrap']
+
+" ---------- Commands ----------
+" Project files
+command! -bang -nargs=? -complete=dir Files call fzf#vim#files(
+      \ <q-args>, fzf#vim#with_preview({'options': s:files_opts}), <bang>0)
+
+" Open buffers
+command! -bar -bang -nargs=? -complete=buffer Buffers call fzf#vim#buffers(
+      \ <q-args>,
+      \ fzf#vim#with_preview({'options': s:files_opts, 'placeholder': '{1}'}),
+      \ <bang>0)
+
+" Recently opened files (including previous sessions)
+command! -bang -nargs=* History call fzf#vim#history(
+      \ fzf#vim#with_preview({'options': s:files_opts}), <bang>0)
+
+" Tags in current buffer (requires universal-ctags)
+command! -bang -nargs=* BTags call fzf#vim#buffer_tags(
+      \ <q-args>, {'options': s:nopreview_opts}, <bang>0)
+
+" Lines in current buffer
+command! -bang -nargs=* BLines call fzf#vim#buffer_lines(
+      \ <q-args>, {'options': s:nopreview_opts}, <bang>0)
+
+" Lines in all open buffers
+command! -bang -nargs=* Lines call fzf#vim#lines(
+      \ <q-args>, {'options': s:nopreview_opts}, <bang>0)
+
+" Run rg once, then fuzzy-filter with fzf
+command! -bang -nargs=* Rg call fzf#vim#grep(
+      \ s:rg_cmd . ' -- ' . fzf#shellescape(<q-args>),
+      \ fzf#vim#with_preview({'options': s:rg_opts}), <bang>0)
+
+" Live grep: rg re-run on every keystroke
+command! -bang -nargs=* RG call fzf#vim#grep2(
+      \ s:rg_cmd . ' -- ', <q-args>,
+      \ fzf#vim#with_preview({'options': s:rg_opts}), <bang>0)
+
+" ---------- Mappings ----------
+" Files / buffers / history
+nnoremap <silent> <C-P>      :Files!<CR>
+nnoremap <silent> <leader>fb  :Buffers<CR>
+nnoremap <silent> <leader>fh  :History<CR>
+
+" Inside buffer(s)
+nnoremap <silent> <leader>ft  :BTags<CR>
+nnoremap <silent> <leader>fl  :BLines<CR>
+nnoremap <silent> <leader>fL  :Lines<CR>
+nnoremap          <leader>f*  :BLines <C-R><C-W><CR>
+
+" Project-wide
+nnoremap <leader>rw :Rg <C-R><C-W><CR>
+nnoremap <leader>rW :Rg! <C-R><C-W><CR>
+nnoremap <leader>rg :RG<CR>
+nnoremap <leader>rG :RG!<CR>
+vnoremap <leader>rg y:Rg <C-R>"<CR>
 
 " nnoremap <F5> :w<CR>:silent! :make<CR>:cwindow<CR>
 nnoremap <leader>5 :update<CR>:silent! make \| redraw! \| cwindow<CR>
