@@ -4,7 +4,7 @@ Every way to review code that this repository implements or configures,
 from a quick look at local changes to a full GitLab merge request. Commands
 marked *(plugin)* come from a plugin installed by the vimrc; everything else is
 defined here. Step-by-step Fugitive walkthroughs are in
-[vim/git-review.md](vim/git-review.md); GitLab endpoint details are in
+the [Fugitive](#fugitive-plugin) section; GitLab endpoint details are in
 [vim/README.md](vim/README.md#gitlab-reviews-in-vim).
 
 ## Choosing a method
@@ -117,14 +117,62 @@ touching the checkout. Requires `glab` to be authenticated.
 
 | Command | Purpose |
 | --- | --- |
-| `:Git` | Status window: `=` inline diff, `dv` side-by-side, `-` stage, `]c` / `[c` hunks |
-| `:Git show HEAD` | Read a commit |
-| `:Git difftool <range>` | Every hunk of a range in quickfix |
+| `:Git` | Status window, for uncommitted work; keys below |
+| `:Git show [--stat] HEAD` | Read a commit, or only the files it changed |
+| `:Git log --oneline --decorate <range>` | The commits of a range |
+| `:Git diff --stat <range>` | The size of a range |
+| `:Git difftool <range>` | Every hunk of a range in quickfix: `:cnext`, `:cprevious`, `:copen` |
 | `:Git difftool -y <range>` | One side-by-side tab per file (`tabpagemax` is 100 for this) |
 | `:Gvdiffsplit [<rev>]` | Deep-review the current file against a revision |
 | `:Gclog [<range>]` | Commits in quickfix; `gc` reviews one |
 | `:Git blame` | Who changed each line, and in which commit |
 | `:GBrowse` | Open the file or selection on GitHub or GitLab, including `gitlab.myjungly.com` |
+
+In the `:Git` status window:
+
+| Key | Action |
+| --- | --- |
+| `=` | Toggle the file's inline diff |
+| `]c` / `[c` | Next / previous hunk |
+| `]m` / `[m` | Next / previous changed file |
+| `dv` | Vertical side-by-side diff |
+| `dq` | Close the diff view |
+| `-` | Stage or unstage the file or hunk |
+
+In the tabs of `:Git difftool -y`, `]c` / `[c` move between hunks, `gt` /
+`gT` between files, `<C-w>w` switches side, and `dq` closes the diff.
+
+Review the last commit:
+
+```vim
+:Git show --stat HEAD            " the files it changed
+:Git show HEAD                   " the whole commit
+:Git difftool HEAD^ HEAD         " every hunk in quickfix
+:Git difftool -y HEAD^ HEAD      " one side-by-side tab per file
+```
+
+Review the whole branch:
+
+```vim
+:Git fetch origin
+:Git log --oneline --decorate origin/staging..HEAD   " the branch's commits
+:Git diff --stat origin/staging...HEAD               " its size
+:Git difftool origin/staging...HEAD                  " every hunk
+:Git difftool -y origin/staging...HEAD               " side-by-side tabs
+```
+
+`..` lists the commits of `HEAD` missing from `origin/staging`; `...` diffs
+from the merge base, so neither includes what landed on `origin/staging`
+since the branch started.
+
+Deep-review the file being edited:
+
+```vim
+:Gvdiffsplit origin/staging...HEAD   " the branch's changes
+:Gvdiffsplit HEAD^                   " the last commit and uncommitted changes
+:Gvdiffsplit HEAD                    " uncommitted changes
+:Gvdiffsplit                         " unstaged changes, against the index
+```
 
 ### Other Vim helpers
 

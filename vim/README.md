@@ -38,9 +38,8 @@ Vim after updating; `:source $MYVIMRC` reloads preferences during normal use.
 Already loaded autoload implementations require a restart to pick up edits.
 
 Plugin installation and prerequisites are unchanged: vim-plug and the listed
-plugins must already be installed. Git review command examples are in
-[git-review.md](git-review.md); [review.md](../review.md) lists every review
-method in the repository.
+plugins must already be installed. [review.md](../review.md) lists every
+review method in the repository, with Git review command examples.
 
 The leader key is Space, defined before plugins and mappings. Use `Space f b`
 for Buffers and `Space f h` for History; Ruby's block toggle stays on `Space b`
