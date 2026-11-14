@@ -20,7 +20,7 @@ Only files that cannot live in the vimrc remain here:
 Set plugin startup variables before `plug#end()`; keep colorscheme variables
 before `colorscheme`. Public commands and compatibility functions are defined
 in the Commands section, before `.vim.custom`, so the project override can use
-them. Their implementations stay in `autoload/`.
+them. Substantial implementations stay in `autoload/`.
 
 Filetype settings are `s:ft_<filetype>()` functions in the Filetypes section.
 One `FileType` handler, defined after `filetype plugin on`, runs them after
@@ -62,6 +62,22 @@ This applies to `:Files`/`<C-P>` and `:Rg` as well as other fzf.vim pickers.
 In zsh, fzf uses its light palette and bat uses the same `gruvbox-light` theme.
 Inside tmux, Vim sets the true-color escape codes that it only enables by
 default for xterm-like terminals.
+
+## Agent explanations
+
+`:AgentExplain` sends the current line, relative file path, and line numbers
+as an explanation prompt to the selected tmux pane, then submits it with Enter.
+On first use, it asks you to select a pane from the current tmux window, other
+than Vim's own, and remembers the target in `g:agent_pane`. Run
+`:AgentSelectPane` to change it; canceling the selection leaves the existing
+target unchanged.
+Select code in Visual mode and run `:AgentExplain` to send the selected lines,
+or use an explicit range such as `:10,25AgentExplain`. Vim must run inside tmux,
+on the same server as the agent. The prompt goes through a temporary
+`vim-agent` tmux buffer, so the paste stack is left as it was, and uses
+bracketed paste so its newlines do not submit it early. If loading or pasting
+the buffer fails, the command reports the tmux error and stops before sending
+Enter.
 
 ## Markdown preview
 

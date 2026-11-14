@@ -778,8 +778,88 @@ augroup dotfiles_ftplugin
 augroup END
 
 " Commands {{{1
-" Thin public entry points; implementations load from vim/autoload/ on first
-" use. They are defined before .vim.custom so project overrides can use them.
+" Public entry points and small helpers. Substantial implementations load
+" from vim/autoload/ on first use. Define commands before .vim.custom so
+" project overrides can use them.
+
+" Agent integration {{{2
+" Send code to an agent running in another pane of the same tmux window.
+function! s:agent_error(message) abort
+  echohl ErrorMsg
+  echomsg a:message
+  echohl None
+endfunction
+
+" Run a tmux command; report its error output and return 0 on failure.
+function! s:agent_tmux(args, ...) abort
+  let l:output = call('system', ['tmux ' . a:args] + a:000)
+  if v:shell_error
+    call s:agent_error(printf('tmux %s failed: %s', split(a:args)[0],
+          \ substitute(l:output, '\n\+$', '', '')))
+    return 0
+  endif
+  return 1
+endfunction
+
+function! s:agent_select_pane() abort
+  if empty($TMUX)
+    call s:agent_error('Vim is not running inside tmux')
+    return 0
+  endif
+
+  let l:panes = systemlist(
+        \ "tmux list-panes -F '#{pane_id} #{pane_index} #{pane_current_command}'")
+  if v:shell_error
+    call s:agent_error('Unable to list tmux panes')
+    return 0
+  endif
+
+  " Vim's own pane cannot be the agent.
+  call filter(l:panes, '!empty(v:val) && split(v:val)[0] !=# $TMUX_PANE')
+  if empty(l:panes)
+    call s:agent_error('No other tmux pane in this window')
+    return 0
+  endif
+
+  let l:menu = ['Select agent pane:']
+  for l:i in range(len(l:panes))
+    call add(l:menu, printf('%d. %s', l:i + 1, l:panes[l:i]))
+  endfor
+
+  let l:choice = inputlist(l:menu)
+  if l:choice < 1 || l:choice > len(l:panes)
+    return 0
+  endif
+
+  let g:agent_pane = split(l:panes[l:choice - 1])[0]
+  echomsg 'Agent pane: ' . g:agent_pane
+  return 1
+endfunction
+
+function! s:agent_explain(first, last) abort
+  if !exists('g:agent_pane') && !s:agent_select_pane()
+    return
+  endif
+
+  let l:file = empty(expand('%')) ? '[No Name]' : expand('%:.')
+  let l:prompt = printf("Explain this code from %s (lines %d-%d):\n\n%s",
+        \ l:file, a:first, a:last, join(getline(a:first, a:last), "\n"))
+  let l:target = ' -t ' . shellescape(g:agent_pane)
+
+  " A named buffer keeps the user's tmux paste stack intact. Bracketed paste
+  " (-p) keeps newlines from submitting each line of the prompt separately.
+  if !s:agent_tmux('load-buffer -b vim-agent -', l:prompt)
+    return
+  endif
+  if !s:agent_tmux('paste-buffer -p -d -b vim-agent' . l:target)
+    call system('tmux delete-buffer -b vim-agent')
+    return
+  endif
+  call s:agent_tmux('send-keys' . l:target . ' Enter')
+endfunction
+
+command! AgentSelectPane call s:agent_select_pane()
+command! -range AgentExplain call s:agent_explain(<line1>, <line2>)
 
 " Git review {{{2
 " Public Git review API, including the entry point used by gitmr.

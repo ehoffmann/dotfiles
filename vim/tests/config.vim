@@ -183,6 +183,48 @@ if has('terminal')
   endfor
 endif
 
+" Agent prompts go through a named tmux buffer with bracketed paste, and
+" Enter is only sent once the paste succeeded.
+function! s:tmux_calls() abort
+  let l:log = $VIM_CONFIG_TEST_TMUX_LOG
+  let l:calls = filereadable(l:log) ? map(readfile(l:log), 'json_decode(v:val)') : []
+  call delete(l:log)
+  return l:calls
+endfunction
+
+call assert_equal(2, exists(':AgentExplain'))
+call assert_equal(2, exists(':AgentSelectPane'))
+call assert_false(exists('*AgentExplain'), 'Agent helpers must be script-local')
+let $TMUX = '/tmp/tmux-test/default,1,0'
+let $TMUX_PANE = '%1'
+enew!
+call setline(1, ['first', 'second', 'third'])
+file agent_sample.txt
+let g:agent_pane = '%9'
+2,3AgentExplain
+call assert_equal([
+      \ {'args': ['load-buffer', '-b', 'vim-agent', '-'],
+      \  'stdin': "Explain this code from agent_sample.txt (lines 2-3):\n\nsecond\nthird"},
+      \ {'args': ['paste-buffer', '-p', '-d', '-b', 'vim-agent', '-t', '%9']},
+      \ {'args': ['send-keys', '-t', '%9', 'Enter']}], s:tmux_calls())
+
+let $VIM_CONFIG_TEST_TMUX_FAIL = 'paste-buffer'
+AgentExplain
+call assert_equal(['load-buffer', 'paste-buffer', 'delete-buffer'],
+      \ map(s:tmux_calls(), 'v:val.args[0]'), 'Enter must not follow a failed paste')
+call assert_match("tmux paste-buffer failed: can't find pane", execute('messages'))
+let $VIM_CONFIG_TEST_TMUX_FAIL = ''
+
+" Vim's own pane is never offered, so there is nothing to select here.
+unlet g:agent_pane
+AgentExplain
+call assert_equal([['list-panes']], map(s:tmux_calls(), 'v:val.args[:0]'))
+call assert_false(exists('g:agent_pane'))
+let $TMUX = ''
+AgentExplain
+call assert_equal([], s:tmux_calls(), 'tmux must not be used outside tmux')
+bwipeout!
+
 " Source deferred implementations too, without invoking external programs.
 " Earlier steps run Vim's own ftplugins, whose cleanup may set v:errmsg.
 let v:errmsg = ''

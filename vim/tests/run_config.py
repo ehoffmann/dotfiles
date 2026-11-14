@@ -33,6 +33,24 @@ print('x' * width)
 print('y' * (width * 2))
 """
 
+TMUX_STUB = """#!/usr/bin/env python3
+import json
+import os
+import sys
+
+args = sys.argv[1:]
+call = {'args': args}
+if args[0] == 'load-buffer':
+    call['stdin'] = sys.stdin.read()
+with open(os.environ['VIM_CONFIG_TEST_TMUX_LOG'], 'a') as log:
+    log.write(json.dumps(call) + '\\n')
+if args[0] == os.environ.get('VIM_CONFIG_TEST_TMUX_FAIL'):
+    print("can't find pane", file=sys.stderr)
+    sys.exit(1)
+if args[0] == 'list-panes':
+    print(os.environ['TMUX_PANE'] + ' 0 vim')
+"""
+
 
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -90,6 +108,9 @@ let b:undo_ftplugin = 'setlocal tags<'
         write(glow, GLOW_STUB)
         glow.chmod(0o755)
         glow_args = root / "glow-args.json"
+        tmux = root / "bin/tmux"
+        write(tmux, TMUX_STUB)
+        tmux.chmod(0o755)
         write(project / ".vim.custom", """let g:config_test_project_loads = get(g:, 'config_test_project_loads', 0) + 1
 call assert_equal(2, exists(':GitReview'))
 call assert_equal(1, exists('*GitReview'))
@@ -99,11 +120,14 @@ set scrolloff=7
         env = {**os.environ, "HOME": str(home), "VIM_CONFIG_TEST_ROOT": str(root),
                "VIM_CONFIG_TEST_RUNTIME": str(checkout / "vim"),
                "VIM_CONFIG_TEST_GLOW_ARGS": str(glow_args),
+               "VIM_CONFIG_TEST_TMUX_LOG": str(root / "tmux.log"),
                "PATH": str(glow.parent) + os.pathsep + os.environ.get("PATH", "")}
         result = subprocess.run(
             [vim, "-N", "-u", str(home / ".vimrc"), "-i", "NONE", "-n", "-es",
              "-V1" + str(root / "vim.log"), "-S", str(repo / "vim/tests/config.vim")],
             cwd=project, env=env, text=True, capture_output=True, timeout=30,
+            # An unexpected prompt must fail at once instead of waiting.
+            stdin=subprocess.DEVNULL,
         )
         if result.returncode:
             print(result.stdout + result.stderr)
@@ -112,7 +136,8 @@ set scrolloff=7
         if not glow_args.exists():
             print("SKIP Glow preview tests: Vim was built without +terminal.")
     print("Vim configuration passed: symlink startup, reloads, lazy commands, "
-          "filetype detection, local settings/mappings, undo and syntax reloads.")
+          "agent tmux prompts, filetype detection, local settings/mappings, "
+          "undo and syntax reloads.")
     return 0
 
 
