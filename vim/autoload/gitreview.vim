@@ -18,12 +18,12 @@ endfunction
 
 " Review the branch, uncommitted changes included, from its merge base with
 " a:base: the quickfix lists work tree files, and gd diffs each one against
-" that merge base. A range such as origin/main...HEAD reviews commits instead.
-function! gitreview#branch(base) abort
+" that merge base. :GitReview origin/main...HEAD reviews the committed versions.
+function! gitreview#files(base) abort
   let l:base = trim(system('git merge-base HEAD ' . shellescape(a:base)))
   if v:shell_error || empty(l:base)
     echohl ErrorMsg
-    echomsg 'ReviewBranch: could not find the merge base with ' . a:base
+    echomsg 'ReviewFiles: could not find the merge base with ' . a:base
     echohl None
     return
   endif
@@ -79,7 +79,7 @@ function! gitreview#qf_diff() abort
 endfunction
 
 " <CR> in the quickfix list opens the entry as usual. In a review of the work
-" tree, such as :ReviewBranch, it also shows GitGutter's signs against the
+" tree, such as :ReviewFiles, it also shows GitGutter's signs against the
 " review's base, moves to the first hunk, and previews it. Range reviews open
 " Fugitive blobs, which GitGutter does not sign, so <CR> only opens them.
 function! gitreview#qf_open() abort
@@ -295,7 +295,7 @@ function! s:current_review() abort
   endif
   let l:id = getqflist({'id': 0}).id
   if !has_key(s:reviews, l:id)
-    call s:error('not a review list; start one with :GitReview, :ReviewBranch, or :MR')
+    call s:error('not a review list; start one with :GitReview, :ReviewFiles, or :MR')
     return {}
   endif
   return extend({'id': l:id}, s:reviews[l:id])

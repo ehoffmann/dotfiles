@@ -101,7 +101,7 @@ Fugitive buffers, such as the blobs that `gd` opens after
 when their content is the same, as for `HEAD` without local changes. Another
 version, such as the merge base in the left diff window, gets no marks, and
 its popup warns that its lines differ from those the annotations describe.
-`:ReviewBranch` opens the working-tree files themselves.
+`:ReviewFiles` opens the working-tree files themselves.
 
 `:ReviewContextList` puts every annotation of the repository in the location
 list, sorted by file and line with enclosing ranges first, showing the

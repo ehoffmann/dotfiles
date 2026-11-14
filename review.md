@@ -14,7 +14,7 @@ the [Fugitive](#fugitive-plugin) section; GitLab endpoint details are in
 | Uncommitted work | `:Git`, then `=` / `dv` on files |
 | Staged changes before committing | `gdca`, `rubs` |
 | The last commit | `:ReviewLast`, or `:GitReview HEAD^ HEAD` |
-| The current branch against main | `:ReviewBranch`, `:Review`, or `:GitReview origin/main...HEAD` |
+| The current branch against main | `:ReviewFiles`, `:Review`, or `:GitReview origin/main...HEAD` |
 | Any two commits or branches | `:GitReview <left> <right>` |
 | A GitLab merge request | `:MR`, `:MR mine`, `:MR merged` |
 | One file in depth | `:Gvdiffsplit <rev>` |
@@ -74,9 +74,9 @@ blob: `origin/main...HEAD` shows `HEAD` as committed.
 Read files show `✓`, and the list title counts them, as in
 `— 3/12 read`. A mark records the reviewed version of the file, so it turns
 to `~`, to read again, when the file changes: a new push to an MR, a new
-commit, or an edit during `:ReviewBranch`. Marks are kept per merge base in
+commit, or an edit during `:ReviewFiles`. Marks are kept per merge base in
 `.review/reviewed.json`, ignored by Git, so they survive restarts and are
-shared by `:GitReview`, `:ReviewBranch`, and `:MR` reviews of the same base.
+shared by `:GitReview`, `:ReviewFiles`, and `:MR` reviews of the same base.
 
 `g/` opens fzf on the entries. Type a query in fzf's extended syntax, and
 `Enter` keeps every match as a new list, which keeps the read marks; `gr`
@@ -92,9 +92,9 @@ lists, such as `:Rg` results, without marks or preview.
 | `^app/ .rb$` | Paths starting with `app/` and ending with `.rb` |
 | `model \| service` | Matches of either term |
 
-### Branch review: `:ReviewBranch`
+### Branch files review: `:ReviewFiles`
 
-`:ReviewBranch [<ref>]` reviews the current branch from its merge base with
+`:ReviewFiles [<ref>]` reviews the current branch from its merge base with
 `<ref>` (default `origin/main`), uncommitted changes included. The quickfix
 lists your working-tree files, including files changed only locally, and
 `gd` opens each one, editable, beside the merge-base version. `<CR>` opens

@@ -12,9 +12,10 @@ call assert_equal(31, len(g:config_test_plugins))
 for s:command in ['Files', 'Rg', 'Review', 'ReviewLast', 'ReviewEnd',
       \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec',
       \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks', 'ReviewSummary',
-      \ 'ReviewBranch']
+      \ 'ReviewFiles']
   call assert_equal(2, exists(':' . s:command), s:command)
 endfor
+call assert_equal(0, exists(':ReviewBranch'), 'Renamed to :ReviewFiles')
 for s:function in ['ReviewGitGutter', 'GitReview', 'GitQfDiff',
       \ 'GitQfReviewCommit', 'Glow', 'Tabs', 'Today', 'OpenRubyAPI',
       \ 'OpenCorrespondingSpec']
@@ -454,21 +455,21 @@ bwipeout!
 
 delfunction FugitiveReal
 
-" ReviewBranch lists work tree files against the merge base, so gd opens them.
+" ReviewFiles lists work tree files against the merge base, so gd opens them.
 let s:cwd = getcwd()
 execute 'cd ' . fnameescape(s:repo)
 call system(s:git . ' branch -q base')
 call system('printf "line 13\n" >> ' . shellescape(s:review_file) . ' && ' . s:git
       \ . ' -c user.name=Test -c user.email=test@example.com commit -qam Second')
 let g:config_test_git_args = ''
-ReviewBranch base
+ReviewFiles base
 call assert_equal('difftool --name-only ' . s:review_head, g:config_test_git_args)
 call assert_equal([s:review_head, ''], [g:git_review_left, g:git_review_right])
 let g:config_test_git_args = ''
 messages clear
-ReviewBranch
+ReviewFiles
 call assert_equal('', g:config_test_git_args, 'A missing origin/main must not start a review')
-call assert_match('ReviewBranch: could not find the merge base with origin/main',
+call assert_match('ReviewFiles: could not find the merge base with origin/main',
       \ execute('messages'))
 
 " Read marks: x records the reviewed version of a file, gr shows the files
@@ -619,7 +620,7 @@ call writefile(s:lines, s:review_file)
 let g:config_test_difftool_files = [s:repo . '/app/extra.rb', s:repo . '/app/model.rb']
 let [g:gitgutter_diff_base, g:gitgutter_async] = ['', 1]
 let g:config_test_gitgutter = []
-ReviewBranch base
+ReviewFiles base
 copen
 2
 execute "normal \<CR>"

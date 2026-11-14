@@ -912,8 +912,8 @@ command! -nargs=+ GitReview call GitReview(<f-args>)
 " The branch and its uncommitted changes, from the merge base with origin/main
 " or the given ref; gd opens work tree files, and <CR> opens them with
 " GitGutter against that merge base.
-command! -nargs=? ReviewBranch
-      \ call gitreview#branch(empty(<q-args>) ? 'origin/main' : <q-args>)
+command! -nargs=? ReviewFiles
+      \ call gitreview#files(empty(<q-args>) ? 'origin/main' : <q-args>)
 
 " Keep the quickfix entries matching an fzf query, such as 'service !spec'.
 command! -nargs=+ ReviewFilter call gitreview#filter(<q-args>)
