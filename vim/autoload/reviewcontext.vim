@@ -50,6 +50,27 @@ function! s:title(item) abort
   return empty(l:kind) ? l:title : l:title . ' (' . l:kind[0] . ')'
 endfunction
 
+" The working-tree path of a buffer name. Fugitive buffers, such as the blobs
+" opened by :GitReview and :MR, are named fugitive://<git dir>//<rev>/<path>.
+function! s:real(name) abort
+  return a:name =~# '^fugitive:' && exists('*FugitiveReal') ? FugitiveReal(a:name) : a:name
+endfunction
+
+" Whether buffer a:bufnr shows another version than its working-tree file,
+" whose line numbers the annotations describe.
+function! s:differs(bufnr) abort
+  let l:name = bufname(a:bufnr)
+  let l:real = s:real(l:name)
+  return l:real !=# l:name && filereadable(l:real)
+        \ && getbufline(a:bufnr, 1, '$') !=# readfile(l:real)
+endfunction
+
+" The directory whose repository the current buffer belongs to.
+function! s:current_dir() abort
+  let l:file = s:real(expand('%:p'))
+  return empty(l:file) ? getcwd() : fnamemodify(resolve(l:file), ':h')
+endfunction
+
 " Load the review context of the repository containing directory a:dir.
 " Return {'root', 'source', 'data', 'annotations'} with only well-formed
 " annotations, or {'message', 'error'} when there is none.
@@ -84,10 +105,11 @@ endfunction
 
 " The context and repository-relative path of a:file, or an error result.
 function! s:context_for(file) abort
-  if empty(a:file) || !filereadable(a:file)
+  let l:file = s:real(a:file)
+  if empty(l:file) || !filereadable(l:file)
     return {'message': 'no file', 'error': 0}
   endif
-  let l:file = resolve(fnamemodify(a:file, ':p'))
+  let l:file = resolve(fnamemodify(l:file, ':p'))
   let l:context = s:load(fnamemodify(l:file, ':h'))
   if has_key(l:context, 'message')
     return l:context
@@ -112,7 +134,7 @@ function! s:head_moved(context) abort
 endfunction
 
 " Reasons why the line ranges may no longer match the code.
-function! s:stale_warnings(context, modified) abort
+function! s:stale_warnings(context, modified, differs) abort
   let l:warnings = []
   if s:head_moved(a:context)
     call add(l:warnings, '! HEAD moved since this review was generated')
@@ -122,6 +144,9 @@ function! s:stale_warnings(context, modified) abort
   endif
   if a:modified
     call add(l:warnings, '! Unsaved changes in this buffer')
+  endif
+  if a:differs
+    call add(l:warnings, '! This version differs from the working-tree file')
   endif
   return empty(l:warnings) ? [] : l:warnings + ['Line ranges may be stale.', '']
 endfunction
@@ -135,7 +160,8 @@ endfunction
 
 " Return {'lines': [...]} for the most specific annotation covering line
 " a:lnum of a:file, or {'message': ..., 'error': 0 or 1} when there is none.
-" Pass a true third argument when the buffer has unsaved changes.
+" Pass a true third argument when the buffer has unsaved changes, and a true
+" fourth one when it shows another version than the working-tree file.
 function! reviewcontext#annotation(file, lnum, ...) abort
   let l:context = s:context_for(a:file)
   if has_key(l:context, 'message')
@@ -157,7 +183,7 @@ function! reviewcontext#annotation(file, lnum, ...) abort
   endif
 
   let l:lines = [s:title(l:best), repeat('─', 45), '']
-  call extend(l:lines, s:stale_warnings(l:context, get(a:000, 0, 0)))
+  call extend(l:lines, s:stale_warnings(l:context, get(a:000, 0, 0), get(a:000, 1, 0)))
   call s:section(l:lines, 'DESCRIPTION', s:text(get(l:best, 'summary', '')))
   call s:section(l:lines, 'CHANGE', s:text(get(l:best, 'change', '')))
   call s:section(l:lines, 'RISKS', map(s:risks(l:best), '"- " . v:val'))
@@ -180,7 +206,8 @@ function! reviewcontext#show() abort
     return 0
   endif
 
-  let l:result = reviewcontext#annotation(expand('%:p'), line('.'), &modified)
+  let l:result = reviewcontext#annotation(expand('%:p'), line('.'), &modified,
+        \ s:differs(bufnr('%')))
   if has_key(l:result, 'message')
     call s:report(l:result)
     return 0
@@ -207,8 +234,7 @@ endfunction
 
 " Put every annotation of the current repository in the location list.
 function! reviewcontext#list() abort
-  let l:context = empty(expand('%:p')) ? s:load(getcwd())
-        \ : s:load(fnamemodify(resolve(expand('%:p')), ':h'))
+  let l:context = s:load(s:current_dir())
   if has_key(l:context, 'message')
     call s:report(l:context)
     return
@@ -249,10 +275,12 @@ endfunction
 " in the sign column. b:review_context_mtime records the context it used.
 function! reviewcontext#marks(bufnr) abort
   call s:clear_marks(a:bufnr)
-  let l:context = s:context_for(fnamemodify(bufname(a:bufnr), ':p'))
+  let l:context = s:context_for(bufname(a:bufnr))
   call setbufvar(a:bufnr, 'review_context_mtime',
         \ has_key(l:context, 'source') ? getftime(l:context.source) : -1)
+  " Marks of another version would land on the wrong lines.
   if !get(g:, 'review_context_marks', 1) || has_key(l:context, 'message')
+        \ || s:differs(a:bufnr)
     return
   endif
 
@@ -418,8 +446,7 @@ endfunction
 
 " Open the summary of the current repository in a new tab.
 function! reviewcontext#summary() abort
-  let l:context = empty(expand('%:p')) ? s:load(getcwd())
-        \ : s:load(fnamemodify(resolve(expand('%:p')), ':h'))
+  let l:context = s:load(s:current_dir())
   if has_key(l:context, 'message')
     call s:report(l:context)
     return

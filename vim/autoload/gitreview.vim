@@ -16,6 +16,20 @@ function! gitreview#gutter(base) abort
   copen
 endfunction
 
+" Review the branch, uncommitted changes included, from its merge base with
+" a:base: the quickfix lists work tree files, and gd diffs each one against
+" that merge base. A range such as origin/main...HEAD reviews commits instead.
+function! gitreview#branch(base) abort
+  let l:base = trim(system('git merge-base HEAD ' . shellescape(a:base)))
+  if v:shell_error || empty(l:base)
+    echohl ErrorMsg
+    echomsg 'ReviewBranch: could not find the merge base with ' . a:base
+    echohl None
+    return
+  endif
+  call gitreview#open(l:base)
+endfunction
+
 function! gitreview#open(...) abort
   let g:git_review_left = a:1
   let g:git_review_right = a:0 >= 2 ? a:2 : ''

@@ -14,7 +14,7 @@ defined here. Step-by-step Fugitive walkthroughs are in
 | Uncommitted work | `:Git`, then `=` / `dv` on files |
 | Staged changes before committing | `gdca`, `rubs` |
 | The last commit | `:ReviewLast`, or `:GitReview HEAD^ HEAD` |
-| The current branch against main | `:Review`, or `:GitReview origin/main...HEAD` |
+| The current branch against main | `:ReviewBranch`, `:Review`, or `:GitReview origin/main...HEAD` |
 | Any two commits or branches | `:GitReview <left> <right>` |
 | A GitLab merge request | `:MR`, `:MR mine`, `:MR merged` |
 | One file in depth | `:Gvdiffsplit <rev>` |
@@ -63,6 +63,17 @@ Examples:
 `gc` works on quickfix entries that carry a commit, such as those from
 `:Gclog` or the `:MR` original-commit list. Only the most recently started
 review drives `gd` and `gc`.
+
+With a range, `gd` opens the right commit's version as a read-only Fugitive
+blob: `origin/main...HEAD` shows `HEAD` as committed.
+
+### Branch review: `:ReviewBranch`
+
+`:ReviewBranch [<ref>]` reviews the current branch from its merge base with
+`<ref>` (default `origin/main`), uncommitted changes included. The quickfix
+lists your working-tree files, including files changed only locally, and
+`gd` opens each one, editable, beside the merge-base version. Use
+`:GitReview origin/main...HEAD` to review exactly what is committed instead.
 
 ### GitLab merge requests: `:MR`
 

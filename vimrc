@@ -898,6 +898,11 @@ command! ReviewEnd
 
 command! -nargs=+ GitReview call GitReview(<f-args>)
 
+" The branch and its uncommitted changes, from the merge base with origin/main
+" or the given ref; gd opens work tree files.
+command! -nargs=? ReviewBranch
+      \ call gitreview#branch(empty(<q-args>) ? 'origin/main' : <q-args>)
+
 " Review context from .review/context.json: the annotation at the cursor in
 " a popup, every annotation in the location list, marks on their lines, and
 " the summary of the whole change in a tab.
@@ -913,10 +918,17 @@ nnoremap <silent> <leader>K :ReviewSummary<CR>
 " repositories without a review context. findfile() would skip paths that
 " match 'wildignore', such as */tmp/*.
 function! s:review_context_refresh(force) abort
-  if !empty(&buftype) || !filereadable(expand('%:p'))
+  " Fugitive blobs, as opened by :GitReview and :MR, map to their work tree file.
+  let l:file = expand('%:p')
+  if l:file =~# '^fugitive:' && exists('*FugitiveReal')
+    let l:file = FugitiveReal(l:file)
+  elseif !empty(&buftype)
     return
   endif
-  let l:dir = fnamemodify(resolve(expand('%:p')), ':h')
+  if !filereadable(l:file)
+    return
+  endif
+  let l:dir = fnamemodify(resolve(l:file), ':h')
   let l:context = ''
   while empty(l:context)
     if filereadable(l:dir . '/.review/context.json')

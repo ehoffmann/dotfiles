@@ -11,7 +11,8 @@ call assert_equal(1, g:config_test_project_loads)
 call assert_equal(31, len(g:config_test_plugins))
 for s:command in ['Files', 'Rg', 'Review', 'ReviewLast', 'ReviewEnd',
       \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec',
-      \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks', 'ReviewSummary']
+      \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks', 'ReviewSummary',
+      \ 'ReviewBranch']
   call assert_equal(2, exists(':' . s:command), s:command)
 endfor
 for s:function in ['ReviewGitGutter', 'GitReview', 'GitQfDiff',
@@ -415,7 +416,61 @@ call writefile([json_encode(s:review_data)], s:review_json)
 ReviewSummary
 call assert_match('expected a summary object', execute('messages'))
 call assert_equal(s:review_tab, tabpagenr('$'), 'Errors must not open a tab')
+
+" Fugitive blobs, as opened by gd after :GitReview, get annotations and marks
+" when they match the working-tree file; other versions get a warning only.
+function! FugitiveReal(...) abort
+  return substitute(a:0 ? a:1 : @%, '^fugitive://\(.*\)/\.git//[^/]\+/', '\1/', '')
+endfunction
+function! s:open_blob(rev, lines) abort
+  execute 'edit ' . fnameescape('fugitive://' . s:repo . '/.git//' . a:rev . '/app/model.rb')
+  call setline(1, a:lines)
+  setlocal nomodified
+  " Fugitive fires BufReadPost once the blob is loaded.
+  doautocmd <nomodeline> BufReadPost
+  let s:review_buf = bufnr('%')
+endfunction
+call s:open_blob(s:review_head, readfile(s:review_file))
+call assert_equal([[1, '  ◆ review'], [3, '  ◆ 2 risks'], [6, '  ◆ 1 risk']],
+      \ s:review_marks(), 'A blob matching the work tree must be marked')
+call cursor(4, 1)
+ReviewContext
+call assert_equal(['Model#save (method)', 'DESCRIPTION'],
+      \ map([1, 4], 'getbufline(winbufnr(popup_list()[0]), v:val)[0]'))
+call popup_clear()
+ReviewContextList
+call assert_equal(5, len(getloclist(0)))
+lclose
+" Without Fugitive, a reloaded blob would come back empty.
 bwipeout!
+call s:open_blob(repeat('1', 40), ['added'] + readfile(s:review_file))
+call assert_equal([], s:review_marks(), 'Another version must not be marked')
+call cursor(4, 1)
+ReviewContext
+call assert_equal('! This version differs from the working-tree file',
+      \ getbufline(winbufnr(popup_list()[0]), 4)[0])
+call popup_clear()
+bwipeout!
+
+delfunction FugitiveReal
+
+" ReviewBranch lists work tree files against the merge base, so gd opens them.
+let s:cwd = getcwd()
+execute 'cd ' . fnameescape(s:repo)
+call system(s:git . ' branch -q base')
+call system('printf "line 13\n" >> ' . shellescape(s:review_file) . ' && ' . s:git
+      \ . ' -c user.name=Test -c user.email=test@example.com commit -qam Second')
+let g:config_test_git_args = ''
+ReviewBranch base
+call assert_equal('difftool --name-only ' . s:review_head, g:config_test_git_args)
+call assert_equal([s:review_head, ''], [g:git_review_left, g:git_review_right])
+let g:config_test_git_args = ''
+messages clear
+ReviewBranch
+call assert_equal('', g:config_test_git_args, 'A missing origin/main must not start a review')
+call assert_match('ReviewBranch: could not find the merge base with origin/main',
+      \ execute('messages'))
+execute 'cd ' . fnameescape(s:cwd)
 
 call writefile(['{"annotations": '], s:review_json)
 call assert_equal(1, reviewcontext#annotation(s:review_file, 4).error)
