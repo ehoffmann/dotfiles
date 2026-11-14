@@ -325,3 +325,138 @@ function! gitreview#filter_unread() abort
         \ {'parent': l:review.id, 'title': l:review.title . ' (to read)'})
   call s:refresh(l:id)
 endfunction
+
+" Fuzzy filter
+" g/ in the quickfix list opens fzf on its entries, with fzf's extended
+" search: 'service !spec' keeps entries matching service but not spec.
+" Enter keeps every match as a new list; in a review, that list keeps the
+" read marks, and gr returns to the full review. Ctrl-O opens the entry under
+" the cursor instead. :ReviewFilter {query} filters without the interface.
+
+" Entries as fzf lines: index, shown text, and path for the preview.
+function! s:fzf_lines(id) abort
+  let l:review = get(s:reviews, a:id, {})
+  let l:items = getqflist({'id': a:id, 'items': 1}).items
+  let l:lines = []
+  for l:i in range(len(l:items))
+    let l:item = l:items[l:i]
+    if empty(l:review)
+      let l:path = fnamemodify(bufname(l:item.bufnr), ':.')
+      let l:shown = l:path . (l:item.lnum ? ':' . l:item.lnum : '')
+            \ . (empty(l:item.text) ? '' : ': ' . trim(l:item.text))
+    else
+      let l:path = s:path(l:review, l:item)
+      let l:shown = (empty(l:item.text) ? ' ' : l:item.text) . ' ' . l:path
+    endif
+    call add(l:lines, (l:i + 1) . "\t" . substitute(l:shown, "\t", ' ', 'g') . "\t" . l:path)
+  endfor
+  return l:lines
+endfunction
+
+" Make a new list of the entries of list a:id at the 1-based a:indices.
+function! s:keep(id, indices, query) abort
+  let l:items = getqflist({'id': a:id, 'items': 1}).items
+  let l:indices = filter(uniq(sort(map(copy(a:indices), 'str2nr(v:val)'), 'n')),
+        \ 'v:val >= 1 && v:val <= len(l:items)')
+  if empty(l:indices)
+    echo 'GitReview: nothing matches ' . a:query
+    return
+  endif
+  let l:kept = map(l:indices, 'l:items[v:val - 1]')
+  let l:suffix = ' (filter: ' . a:query . ')'
+  let l:review = get(s:reviews, a:id, {})
+  if empty(l:review)
+    call setqflist([], ' ', {'items': l:kept,
+          \ 'title': getqflist({'id': a:id, 'title': 1}).title . l:suffix})
+    return
+  endif
+  " Filters of filters still return to the full review.
+  let l:parent = get(l:review, 'parent', a:id)
+  let l:title = get(get(s:reviews, l:parent, {}), 'title', l:review.title) . l:suffix
+  call setqflist([], ' ', {'title': l:title, 'items': l:kept})
+  let l:id = getqflist({'id': 0}).id
+  let s:reviews[l:id] = extend(copy(l:review), {'parent': l:parent, 'title': l:title})
+  call s:refresh(l:id)
+endfunction
+
+" The current quickfix list ID, or 0 after reporting why there is none.
+function! s:filterable() abort
+  if get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+    call s:error('filters work on the quickfix list')
+    return 0
+  endif
+  let l:id = getqflist({'id': 0}).id
+  if !l:id || empty(getqflist({'id': l:id, 'items': 1}).items)
+    call s:error('the quickfix list is empty')
+    return 0
+  endif
+  return l:id
+endfunction
+
+function! gitreview#filter(query) abort
+  let l:id = s:filterable()
+  if !l:id
+    return
+  endif
+  if !executable('fzf')
+    call s:error('ReviewFilter requires fzf')
+    return
+  endif
+  let l:output = systemlist('fzf --no-sort --delimiter=' . shellescape("\t")
+        \ . ' --nth=2 --filter=' . shellescape(a:query), s:fzf_lines(l:id))
+  " fzf exits with 1 when nothing matches, and with 2 on errors.
+  if v:shell_error > 1
+    call s:error('fzf failed: ' . join(l:output))
+    return
+  endif
+  call s:keep(l:id, map(l:output, 'matchstr(v:val, "^\\d\\+")'), a:query)
+endfunction
+
+function! s:fzf_sink(id, lines) abort
+  " --print-query and --expect put the query and the key first.
+  if len(a:lines) < 3 || empty(a:lines[0]) && a:lines[1] !=# 'ctrl-o'
+    return
+  endif
+  let l:indices = map(a:lines[2:], 'matchstr(v:val, "^\\d\\+")')
+  if a:lines[1] !=# 'ctrl-o'
+    call s:keep(a:id, l:indices, a:lines[0])
+    return
+  endif
+  let l:index = str2nr(l:indices[0])
+  if has_key(s:reviews, a:id)
+    copen
+    call cursor(l:index, 1)
+    call gitreview#qf_diff()
+  else
+    execute l:index . 'cc'
+  endif
+endfunction
+
+function! gitreview#fzf() abort
+  let l:id = s:filterable()
+  if !l:id
+    return
+  endif
+  " Only the shown text is searched; the index and the path stay hidden.
+  let l:options = ['--multi', '--delimiter', "\t", '--with-nth', '2',
+        \ '--print-query', '--expect', 'ctrl-o', '--bind', 'enter:select-all+accept',
+        \ '--prompt', 'Filter> ']
+  let l:header = 'Enter: keep matches · C-o: open'
+  let l:review = get(s:reviews, l:id, {})
+  if !empty(l:review)
+    " Preview the file's diff in the review, colored like the Git pager.
+    let l:diff = 'git -C ' . shellescape(l:review.root) . ' diff --color=always '
+          \ . l:review.base . (empty(l:review.head) ? '' : ' ' . l:review.head) . ' -- {3}'
+    call extend(l:options, ['--preview', l:diff . (executable('diffr') ? ' | diffr' : ''),
+          \ '--preview-window', 'right,60%,wrap', '--bind', 'ctrl-/:toggle-preview'])
+    let l:header .= ' · C-/: preview'
+  endif
+  call extend(l:options, ['--header', l:header])
+  let l:spec = {'source': s:fzf_lines(l:id), 'sink*': function('s:fzf_sink', [l:id]),
+        \ 'options': l:options}
+  try
+    call fzf#run(exists('*fzf#wrap') ? fzf#wrap('review-filter', l:spec) : l:spec)
+  catch /^Vim\%((\a\+)\)\=:E117:/
+    call s:error('g/ requires fzf.vim')
+  endtry
+endfunction

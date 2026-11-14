@@ -51,6 +51,37 @@ if args[0] == 'list-panes':
     print(os.environ['TMUX_PANE'] + ' 0 vim')
 """
 
+# Enough of fzf --filter for the quickfix filter: fuzzy terms, 'exact terms,
+# and !excluded terms, matched case-insensitively against one field.
+FZF_STUB = r"""#!/usr/bin/env python3
+import sys
+
+args = dict(arg[2:].split('=', 1) for arg in sys.argv[1:] if '=' in arg)
+field = int(args.get('nth', '0')) - 1
+
+def fuzzy(term, text):
+    position = 0
+    for char in term:
+        position = text.find(char, position) + 1
+        if not position:
+            return False
+    return True
+
+def matches(line):
+    text = (line.split(args.get('delimiter', '\t'))[field] if field >= 0 else line).lower()
+    for term in args['filter'].lower().split():
+        if term.startswith('!'):
+            if term[1:] in text:
+                return False
+        elif not (term[1:] in text if term.startswith("'") else fuzzy(term, text)):
+            return False
+    return True
+
+kept = [line for line in sys.stdin.read().splitlines() if matches(line)]
+print('\n'.join(kept))
+sys.exit(0 if kept else 1)
+"""
+
 
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,6 +112,7 @@ def main():
 endfunction
 """)
         write(runtime / "autoload/fzf.vim", """function! fzf#run(options) abort
+  let g:config_test_fzf = a:options
   let g:config_test_tabs = a:options.source
 endfunction
 """)
@@ -111,6 +143,9 @@ let b:undo_ftplugin = 'setlocal tags<'
         tmux = root / "bin/tmux"
         write(tmux, TMUX_STUB)
         tmux.chmod(0o755)
+        fzf = root / "bin/fzf"
+        write(fzf, FZF_STUB)
+        fzf.chmod(0o755)
         write(project / ".vim.custom", """let g:config_test_project_loads = get(g:, 'config_test_project_loads', 0) + 1
 call assert_equal(2, exists(':GitReview'))
 call assert_equal(1, exists('*GitReview'))

@@ -53,6 +53,7 @@ stays in effect for every buffer until then.
 | `gc` | Start a `:GitReview` of the entry's commit (`<commit>^ <commit>`) |
 | `x` | Mark the file as read, or unmark it; works on a Visual selection |
 | `gr` | Show only the files to read, or return to the full list |
+| `g/` | Filter the files with fzf, previewing each file's diff |
 
 Examples:
 
@@ -75,6 +76,20 @@ to `~`, to read again, when the file changes: a new push to an MR, a new
 commit, or an edit during `:ReviewBranch`. Marks are kept per merge base in
 `.review/reviewed.json`, ignored by Git, so they survive restarts and are
 shared by `:GitReview`, `:ReviewBranch`, and `:MR` reviews of the same base.
+
+`g/` opens fzf on the entries. Type a query in fzf's extended syntax, and
+`Enter` keeps every match as a new list, which keeps the read marks; `gr`
+then returns to the full review. `Ctrl-O` opens the entry under the cursor
+instead, and `Ctrl-/` toggles the diff preview. `:ReviewFilter {query}`
+applies a query without the interface. Both also filter other quickfix
+lists, such as `:Rg` results, without marks or preview.
+
+| Query | Keeps |
+| --- | --- |
+| `service !spec` | Fuzzy matches of `service`, without `spec` |
+| `'service` | Exact matches of `service` |
+| `^app/ .rb$` | Paths starting with `app/` and ending with `.rb` |
+| `model \| service` | Matches of either term |
 
 ### Branch review: `:ReviewBranch`
 

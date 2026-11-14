@@ -560,6 +560,55 @@ normal x
 call assert_match('not a review list', execute('messages'))
 call assert_equal(['match'], s:review_list()[1])
 cclose
+
+" Filters keep the entries matching fzf's extended search, as new lists that
+" keep the review's read marks and return to the full review with gr.
+call setqflist([{'filename': s:review_file, 'lnum': 1, 'text': 'match'},
+      \ {'filename': s:review_file, 'lnum': 2, 'text': 'other'}])
+ReviewFilter other
+call assert_equal(['other'], s:review_list()[1], 'Plain lists can be filtered too')
+let s:blob = 'fugitive://' . s:repo . '/.git//' . trim(system(s:git . ' rev-parse HEAD')) . '/'
+let s:filter_paths = ['app/services/order_sync.rb', 'spec/services/order_sync_spec.rb',
+      \ 'app/services/inventory_sync.rb', 'app/models/order.rb']
+let g:config_test_difftool_files = map(copy(s:filter_paths), 's:blob . v:val')
+function! s:filtered() abort
+  return map(getqflist(), 'matchstr(bufname(v:val.bufnr), "//\\x\\+/\\zs.*")')
+endfunction
+GitReview base HEAD
+ReviewFilter service !spec
+call assert_equal(['app/services/order_sync.rb', 'app/services/inventory_sync.rb'],
+      \ s:filtered())
+call assert_match('(filter: service !spec) — 0/2 read$', getqflist({'title': 1}).title)
+copen
+normal x
+call assert_equal(['✓', ''], s:review_list()[1])
+ReviewFilter inventory
+call assert_equal(['app/services/inventory_sync.rb'], s:filtered())
+normal gr
+call assert_equal(s:filter_paths, s:filtered(), 'gr must return to the full review')
+call assert_equal(['✓', '', '', ''], s:review_list()[1])
+
+" g/ hands the entries to fzf with a diff preview; Enter keeps the matches.
+normal g/
+let s:fzf = g:config_test_fzf
+call assert_equal("1\t✓ app/services/order_sync.rb\tapp/services/order_sync.rb",
+      \ s:fzf.source[0])
+call assert_match('diff --color=always ' . s:review_head . ' '
+      \ . trim(system(s:git . ' rev-parse HEAD')) . ' -- {3}',
+      \ s:fzf.options[index(s:fzf.options, '--preview') + 1])
+call s:fzf['sink*'](['order', '', s:fzf.source[3], s:fzf.source[0]])
+call assert_equal(['app/services/order_sync.rb', 'app/models/order.rb'], s:filtered())
+call assert_match('(filter: order) — 1/2 read$', getqflist({'title': 1}).title)
+" Ctrl-O opens the entry under the cursor in the review diff.
+normal gr
+command! -nargs=* Gvdiffsplit let g:config_test_gvdiff = [expand('%:p'), <q-args>]
+normal g/
+call g:config_test_fzf['sink*'](['', 'ctrl-o', g:config_test_fzf.source[2]])
+call assert_equal(s:blob . 'app/services/inventory_sync.rb', bufname('%'))
+call assert_equal(4, len(getqflist()), 'Opening must keep the full list')
+delcommand Gvdiffsplit
+only
+cclose
 execute 'cd ' . fnameescape(s:cwd)
 
 call writefile(['{"annotations": '], s:review_json)

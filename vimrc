@@ -712,9 +712,11 @@ function! s:ft_qf() abort
   nnoremap <buffer> <silent> x :call gitreview#toggle_read(line('.'), line('.'))<CR>
   xnoremap <buffer> <silent> x :<C-u>call gitreview#toggle_read(line("'<"), line("'>"))<CR>
   nnoremap <buffer> <silent> gr :call gitreview#filter_unread()<CR>
+  " Fuzzy filter with fzf's extended search, such as 'service !spec'.
+  nnoremap <buffer> <silent> g/ :call gitreview#fzf()<CR>
   call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd|silent! nunmap <buffer> gc'
         \ . '|silent! nunmap <buffer> x|silent! xunmap <buffer> x'
-        \ . '|silent! nunmap <buffer> gr')
+        \ . '|silent! nunmap <buffer> gr|silent! nunmap <buffer> g/')
 endfunction
 
 function! s:ft_ruby() abort
@@ -908,6 +910,9 @@ command! -nargs=+ GitReview call GitReview(<f-args>)
 " or the given ref; gd opens work tree files.
 command! -nargs=? ReviewBranch
       \ call gitreview#branch(empty(<q-args>) ? 'origin/main' : <q-args>)
+
+" Keep the quickfix entries matching an fzf query, such as 'service !spec'.
+command! -nargs=+ ReviewFilter call gitreview#filter(<q-args>)
 
 " Review context from .review/context.json: the annotation at the cursor in
 " a popup, every annotation in the location list, marks on their lines, and
