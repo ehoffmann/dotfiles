@@ -15,6 +15,8 @@ ln -sbf ~/code/dotfiles/zsh/aliases.zsh ~/.zsh/aliases.zsh
 ln -sbf ~/code/dotfiles/zsh/functions.zsh ~/.zsh/functions.zsh
 ln -sbf ~/code/dotfiles/zsh/prompt.zsh ~/.zsh/prompt.zsh
 ln -sbf ~/code/dotfiles/alacritty.toml ~/.alacritty.toml
+mkdir -p ~/.config/vifm
+ln -sbf ~/code/dotfiles/vifmrc ~/.config/vifm/vifmrc
 mkdir -p ~/.config/git/hooks
 ln -sbf ~/code/dotfiles/git_hooks/prepare-commit-msg ~/.config/git/hooks/prepare-commit-msg
 ln -sbf ~/code/dotfiles/gdbinit ~/.gdbinit
