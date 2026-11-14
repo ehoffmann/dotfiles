@@ -12,7 +12,7 @@ call assert_equal(31, len(g:config_test_plugins))
 for s:command in ['Files', 'Rg', 'Review', 'ReviewLast', 'ReviewEnd',
       \ 'GitReview', 'MR', 'Tabs', 'Glow', 'Today', 'OpenSpec',
       \ 'ReviewContext', 'ReviewContextList', 'ReviewContextMarks', 'ReviewSummary',
-      \ 'ReviewFiles']
+      \ 'ReviewFiles', 'ReviewCommits']
   call assert_equal(2, exists(':' . s:command), s:command)
 endfor
 call assert_equal(0, exists(':ReviewBranch'), 'Renamed to :ReviewFiles')
@@ -620,7 +620,7 @@ call writefile(s:lines, s:review_file)
 let g:config_test_difftool_files = [s:repo . '/app/extra.rb', s:repo . '/app/model.rb']
 let [g:gitgutter_diff_base, g:gitgutter_async] = ['', 1]
 let g:config_test_gitgutter = []
-ReviewFiles base
+GitReview base
 copen
 2
 execute "normal \<CR>"
@@ -655,6 +655,188 @@ execute "normal \<CR>"
 call assert_equal([resolve(s:review_file), 5],
       \ [resolve(expand('%:p')), line('.')])
 call assert_equal([], g:config_test_gitgutter)
+" :ReviewFiles takes over GitGutter's base as it starts.
+let [g:gitgutter_diff_base, g:config_test_gitgutter] = ['', []]
+ReviewFiles base
+call assert_equal([['all', s:review_head, 1]], g:config_test_gitgutter)
+only
+cclose
+
+" :ReviewCommits lists the commits of the branch, then its uncommitted
+" changes; <CR> lists the files of one, and - returns to the commits.
+let s:crepo = $VIM_CONFIG_TEST_ROOT . '/commits repo'
+let s:cgit = 'git -C ' . shellescape(s:crepo)
+function! s:ccommit(day, args) abort
+  call system('GIT_AUTHOR_DATE=2026-01-0' . a:day . 'T12:00:00 ' . s:cgit
+        \ . ' -c user.name=Test -c user.email=test@example.com commit -q ' . a:args)
+endfunction
+call mkdir(s:crepo, 'p')
+call system('git init -q ' . shellescape(s:crepo))
+for s:name in ['a', 'b', 'e']
+  call writefile([s:name], s:crepo . '/' . s:name . '.rb')
+endfor
+call system(s:cgit . ' add .')
+call s:ccommit(1, '-m Base')
+call system(s:cgit . ' branch -q base')
+call writefile(['a2'], s:crepo . '/a.rb')
+call s:ccommit(2, "-am 'Change a'")
+call writefile(['b2'], s:crepo . '/b.rb')
+call writefile(['c'], s:crepo . '/c.rb')
+call system(s:cgit . ' add c.rb')
+call s:ccommit(3, "-am 'Change b, add c'")
+call writefile(['b3'], s:crepo . '/b.rb')
+call s:ccommit(4, "-am 'Change b again'")
+call writefile(['e2'], s:crepo . '/e.rb')
+let s:shas = systemlist(s:cgit . ' rev-list --reverse base..HEAD')
+let s:base_sha = trim(system(s:cgit . ' rev-parse base'))
+function! s:cblob(rev) abort
+  return trim(system(s:cgit . ' rev-parse ' . a:rev))
+endfunction
+function! s:cstore() abort
+  return json_decode(join(readfile(s:crepo . '/.review/reviewed.json')))
+endfunction
+function! s:marks() abort
+  return map(getqflist(), 'v:val.text')
+endfunction
+" Fugitive's file list for the revisions of the review.
+function! ConfigTestRealDifftool(args) abort
+  let g:config_test_git_args = a:args
+  let l:revs = split(matchstr(a:args, '^difftool --name-only \zs.*'))
+  let l:prefix = len(l:revs) == 2
+        \ ? 'fugitive://' . s:crepo . '/.git//' . s:cblob(l:revs[1]) . '/' : s:crepo . '/'
+  call setqflist([], ' ', {'title': ':Git ' . a:args, 'items': map(systemlist(s:cgit
+        \ . ' diff --name-only ' . join(l:revs)), '{"filename": l:prefix . v:val, "text": ""}')})
+endfunction
+command! -nargs=* Git call ConfigTestRealDifftool(<q-args>)
+execute 'cd ' . fnameescape(s:crepo)
+let [g:gitgutter_diff_base, g:config_test_gitgutter] = [s:review_head, []]
+ReviewCommits base
+call assert_equal([['all', '', 1]], g:config_test_gitgutter, 'The commits must reset the base')
+call assert_equal([':ReviewCommits base — 0/4 read', 'qf'],
+      \ [getqflist({'title': 1}).title, &filetype])
+if has('patch-8.2.0959')
+  call assert_equal(['      ' . s:shas[0][:6] . ' 2026-01-02 Change a',
+        \ '      ' . s:shas[1][:6] . ' 2026-01-03 Change b, add c',
+        \ '      ' . s:shas[2][:6] . ' 2026-01-04 Change b again',
+        \ '      Uncommitted changes'], getline(1, '$'))
+endif
+1
+call assert_equal(':call gitreview#message()<CR>', maparg(' k', 'n'))
+" The popup closes when the cursor moves, as at the end of :normal.
+call gitreview#message()
+call assert_equal(1, len(popup_list()), '<leader>k must show the message')
+call assert_equal(['Change a', ''], getbufline(winbufnr(popup_list()[0]), 1, 2))
+call assert_match(' a.rb ', join(getbufline(winbufnr(popup_list()[0]), 1, '$')))
+call popup_clear()
+
+" Marks in the files of a commit follow its parent; a file changed by that
+" commit only is also read in the files of the branch.
+2
+execute "normal \<CR>"
+call assert_equal('difftool --name-only ' . s:shas[1] . '^ ' . s:shas[1], g:config_test_git_args)
+call assert_equal(s:shas[1][:6] . ' 2026-01-03 Change b, add c — 0/2 read',
+      \ getqflist({'title': 1}).title)
+call assert_equal(['', ''], s:marks())
+call gitreview#message()
+call assert_equal(1, len(popup_list()))
+call assert_equal('Change b, add c', getbufline(winbufnr(popup_list()[0]), 1)[0])
+call popup_clear()
+2
+normal x
+call assert_equal({s:shas[0]: {'c.rb': s:cblob(s:shas[1] . ':c.rb')},
+      \ s:base_sha: {'c.rb': s:cblob(s:shas[1] . ':c.rb')}}, s:cstore())
+normal -
+call assert_equal([':ReviewCommits base — 0/4 read', 2, ['', '1/2', '', '']],
+      \ [getqflist({'title': 1}).title, line('.'), s:marks()])
+
+" x marks a commit and its files; its patch ID keeps it read when a rebase
+" rewrites it.
+3
+normal x
+call assert_equal(['', '1/2', '✓', ''], s:marks())
+call assert_equal(':ReviewCommits base — 1/4 read', getqflist({'title': 1}).title)
+let s:patch = split(system(s:cgit . ' show ' . s:shas[2] . ' | git patch-id --stable'))[0]
+let s:store = s:cstore()
+call assert_equal([{s:patch : 1}, {'b.rb': s:cblob(s:shas[2] . ':b.rb')}],
+      \ [s:store.commits, s:store[s:shas[1]]], 'b.rb changes twice, so the branch is unmarked')
+call assert_false(has_key(s:store[s:base_sha], 'b.rb'))
+call remove(s:store, s:shas[1])
+call writefile([json_encode(s:store)], s:crepo . '/.review/reviewed.json')
+call s:ccommit(4, "--amend -m 'Change b once more'")
+let s:shas = systemlist(s:cgit . ' rev-list --reverse base..HEAD')
+ReviewCommits base
+call assert_equal(['', '1/2', '✓', ''], s:marks())
+3
+normal x
+call assert_equal(['', '1/2', '', ''], s:marks())
+call assert_equal({}, s:cstore().commits)
+" Unmarking a file of a read commit unmarks the commit.
+normal x
+execute "normal \<CR>"
+normal x
+call assert_equal([''], s:marks())
+normal -
+call assert_equal(['', '1/2', '', ''], s:marks())
+
+" The uncommitted changes are reviewed from HEAD, so their files open with
+" GitGutter.
+4
+execute "normal \<CR>"
+call assert_equal(['difftool --name-only HEAD', 'Uncommitted changes — 0/1 read'],
+      \ [g:config_test_git_args, getqflist({'title': 1}).title])
+normal x
+let s:store = s:cstore()
+let s:hash = trim(system(s:cgit . ' hash-object e.rb'))
+call assert_equal([s:hash, s:hash], [s:store[s:cblob('HEAD')]['e.rb'], s:store[s:base_sha]['e.rb']],
+      \ 'Files changed only in the work tree are read in the files of the branch too')
+normal -
+call assert_equal(['', '1/2', '', '✓'], s:marks())
+
+" gr lists the commits to read, and returns to all of them.
+normal gr
+call assert_equal([s:shas[0], s:shas[1], s:shas[2]], map(getqflist(), 'v:val.module'))
+call assert_match('(to read) — 0/3 read$', getqflist({'title': 1}).title)
+normal gr
+call assert_equal(4, len(getqflist()))
+
+" The files of the branch show the marks of files changed by one step; the
+" first commit shares the merge base with them.
+let g:config_test_gitgutter = []
+ReviewFiles base
+call assert_equal([['all', s:base_sha, 1]], g:config_test_gitgutter)
+call assert_equal([s:crepo . '/a.rb', s:crepo . '/b.rb', s:crepo . '/c.rb', s:crepo . '/e.rb'],
+      \ map(getqflist(), 'fnamemodify(bufname(v:val.bufnr), ":p")'))
+call assert_equal(['', '', '✓', '✓'], s:marks())
+copen
+1
+normal x
+" c.rb changes in one commit only, which shares its unmark.
+3
+normal x
+ReviewCommits base
+call assert_equal(['✓', '', '', '✓'], s:marks())
+
+" g/ previews commits, and filtered commits still open their files.
+normal g/
+call assert_equal("2\t      " . s:shas[1][:6] . " 2026-01-03 Change b, add c\t" . s:shas[1],
+      \ g:config_test_fzf.source[1])
+call assert_match('show --color=always --stat --patch {3}',
+      \ g:config_test_fzf.options[index(g:config_test_fzf.options, '--preview') + 1])
+ReviewFilter 'more
+call assert_equal([s:shas[2]], map(getqflist(), 'v:val.module'))
+" gc on a commit is <CR>, so - returns to it.
+normal gc
+call assert_equal('difftool --name-only ' . s:shas[2] . '^ ' . s:shas[2], g:config_test_git_args)
+normal -
+call assert_equal([s:shas[2]], map(getqflist(), 'v:val.module'))
+
+" - keeps its usual motion in other lists.
+call setqflist([{'filename': 'a.rb', 'lnum': 1}, {'filename': 'b.rb', 'lnum': 1}])
+copen
+2
+normal -
+call assert_equal(1, line('.'))
+delcommand Git
 delcommand GitGutterAll
 only
 cclose

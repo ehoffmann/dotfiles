@@ -15,6 +15,7 @@ the [Fugitive](#fugitive-plugin) section; GitLab endpoint details are in
 | Staged changes before committing | `gdca`, `rubs` |
 | The last commit | `:ReviewLast`, or `:GitReview HEAD^ HEAD` |
 | The current branch against main | `:ReviewFiles`, `:Review`, or `:GitReview origin/main...HEAD` |
+| The current branch, commit by commit | `:ReviewCommits` |
 | Any two commits or branches | `:GitReview <left> <right>` |
 | A GitLab merge request | `:MR`, `:MR mine`, `:MR merged` |
 | One file in depth | `:Gvdiffsplit <rev>` |
@@ -76,7 +77,8 @@ Read files show `✓`, and the list title counts them, as in
 to `~`, to read again, when the file changes: a new push to an MR, a new
 commit, or an edit during `:ReviewFiles`. Marks are kept per merge base in
 `.review/reviewed.json`, ignored by Git, so they survive restarts and are
-shared by `:GitReview`, `:ReviewFiles`, and `:MR` reviews of the same base.
+shared by `:GitReview`, `:ReviewFiles`, `:ReviewCommits`, and `:MR` reviews
+of the same base.
 
 `g/` opens fzf on the entries. Type a query in fzf's extended syntax, and
 `Enter` keeps every match as a new list, which keeps the read marks; `gr`
@@ -101,10 +103,39 @@ lists your working-tree files, including files changed only locally, and
 the file alone with GitGutter's signs against the merge base, on its first
 hunk with the hunk preview open; `]c` / `[c` then move between hunks and
 update the preview. The same applies to `:GitReview <rev>`, which also
-reviews the working tree. GitGutter's base then stays the review's for every
-buffer, as with `:Review`, until `:ReviewEnd`. Use
-`:GitReview origin/main...HEAD` to review exactly what is committed instead;
-there `<CR>` opens the committed version, without GitGutter signs.
+reviews the working tree. `:ReviewFiles` sets GitGutter's base to the merge
+base as it starts, for every buffer, as with `:Review`, until `:ReviewEnd`
+or `:ReviewCommits`. Use `:GitReview origin/main...HEAD` to review exactly
+what is committed instead; there `<CR>` opens the committed version,
+without GitGutter signs.
+
+### Branch commits review: `:ReviewCommits`
+
+`:ReviewCommits [<ref>]` lists the commits of the current branch since its
+merge base with `<ref>` (default `origin/main`), oldest first, then the
+uncommitted changes, if any. It replaces the quickfix list and resets
+GitGutter's base; switch back and forth with `:ReviewFiles` at will.
+
+| Key | Action |
+| --- | --- |
+| `<CR>`, `gc` | List the commit's files, as a review from its first parent |
+| `-` | In those files, return to the commit list, on the same commit |
+| `<leader>k` | Show the commit's message and stat, also from its files |
+| `x` | Mark the commit and all its files as read, or unmark them |
+| `gr` | Show only the commits to read, or return to all of them |
+| `g/` | Filter the commits with fzf, previewing each one |
+
+The files of a commit work like any review: `gd`, `x`, `gr`, and `g/`. A
+commit is `✓` when it or all its files are marked, and shows the number of
+files read otherwise, as in `2/5`. Commit marks follow the commit's patch
+ID, so a rebase that does not change its diff keeps it read. Merge commits
+show their changes from the first parent. The uncommitted changes are
+reviewed from `HEAD`, so `<CR>` opens their files with GitGutter.
+
+A file changed by a single commit, or only by the uncommitted changes, has
+the same diff there as in `:ReviewFiles`: marking it in either review marks
+it in both. A file changed by several commits is marked separately, since
+each commit shows only part of its changes.
 
 ### GitLab merge requests: `:MR`
 

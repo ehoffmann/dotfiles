@@ -27,7 +27,24 @@ function! gitreview#files(base) abort
     echohl None
     return
   endif
+  " The review takes over GitGutter's base, which :ReviewCommits resets.
+  call s:gutter_base(l:base)
   call gitreview#open(l:base)
+  let l:id = getqflist({'id': 0}).id
+  if has_key(s:reviews, l:id)
+    let s:reviews[l:id].branch = l:base
+    call s:refresh(l:id)
+  endif
+endfunction
+
+function! s:gutter_base(base) abort
+  if get(g:, 'gitgutter_diff_base', '') ==# a:base
+    return
+  endif
+  let g:gitgutter_diff_base = a:base
+  if exists(':GitGutterAll') == 2
+    GitGutterAll
+  endif
 endfunction
 
 function! gitreview#open(...) abort
@@ -84,6 +101,10 @@ endfunction
 " Fugitive blobs, which GitGutter does not sign, so <CR> only opens them.
 function! gitreview#qf_open() abort
   let l:loclist = get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+  if !l:loclist && has_key(s:commit_lists, getqflist({'id': 0}).id)
+    call s:open_step(getqflist({'id': 0}).id, line('.'))
+    return
+  endif
   let l:review = l:loclist ? {} : get(s:reviews, getqflist({'id': 0}).id, {})
   execute "normal! \<CR>"
   if empty(l:review) || !empty(l:review.head) || &buftype ==# 'quickfix'
@@ -120,6 +141,10 @@ function! s:first_hunk(base) abort
 endfunction
 
 function! gitreview#qf_commit() abort
+  if has_key(s:commit_lists, getqflist({'id': 0}).id)
+    call s:open_step(getqflist({'id': 0}).id, line('.'))
+    return
+  endif
   let item = getqflist()[line('.') - 1]
   let commit = item.module
 
@@ -136,11 +161,15 @@ endfunction
 " left to read. A mark records the reviewed version of the file: its blob in
 " the right commit, or its work tree content. When the file changes, the mark
 " turns to ~ and the file is to read again. Marks persist per merge base in
-" .review/reviewed.json at the repository root:
-"   {"<base commit>": {"<path>": "<blob hash>"}}
+" .review/reviewed.json at the repository root, with the commits marked in
+" :ReviewCommits by patch ID:
+"   {"<base commit>": {"<path>": "<blob hash>"}, "commits": {"<patch ID>": 1}}
 
-" Review lists by quickfix list ID: {root, base, head, title[, parent]}.
-" head is empty when the right side is the work tree.
+" Review lists by quickfix list ID: {root, base, head, title[, parent]
+" [, branch][, commits, step]}. head is empty when the right side is the work
+" tree. branch is the merge base of :ReviewFiles and of the reviews opened
+" from :ReviewCommits, whose list ID is commits, and step the patch ID of
+" their commit.
 let s:reviews = get(s:, 'reviews', {})
 
 function! s:error(message) abort
@@ -237,6 +266,63 @@ function! s:store_file(review) abort
   return a:review.root . '/.review/reviewed.json'
 endfunction
 
+function! s:write_store(review, store) abort
+  call mkdir(fnamemodify(s:store_file(a:review), ':h'), 'p')
+  call writefile([json_encode(a:store)], s:store_file(a:review))
+endfunction
+
+" Mark or unmark a:paths, with a:hashes, in the review and in the twin
+" reviews where the files have the same diff.
+function! s:mark(store, review, paths, hashes, on) abort
+  for [l:base, l:paths] in [[a:review.base, a:paths]] + s:twins(a:review, a:paths)
+    let l:marks = get(a:store, l:base, {})
+    for l:path in l:paths
+      if a:on
+        let l:marks[l:path] = get(a:hashes, l:path, '')
+      else
+        silent! call remove(l:marks, l:path)
+      endif
+    endfor
+    let a:store[l:base] = l:marks
+  endfor
+endfunction
+
+" A file changed by a single step of the branch, a commit or the uncommitted
+" changes, has the same diff in the branch's review, from the merge base, as
+" in that step's review, from the step's parent: [[base, paths]...] of the
+" other review.
+function! s:twins(review, paths) abort
+  let l:branch = get(a:review, 'branch', '')
+  if empty(l:branch)
+    return []
+  endif
+  let l:steps = {}
+  for l:step in s:steps(a:review.root, l:branch)
+    for l:path in keys(l:step.files)
+      let l:steps[l:path] = add(get(l:steps, l:path, []), l:step)
+    endfor
+  endfor
+  let l:twins = {}
+  for l:path in a:paths
+    let l:touching = get(l:steps, l:path, [])
+    if len(l:touching) != 1
+      continue
+    endif
+    let l:step = l:touching[0]
+    if a:review.base ==# l:branch && empty(a:review.head)
+      let l:base = l:step.parent
+    elseif l:step.sha ==# a:review.head && l:step.parent ==# a:review.base
+      let l:base = l:branch
+    else
+      continue
+    endif
+    if l:base !=# a:review.base
+      let l:twins[l:base] = add(get(l:twins, l:base, []), l:path)
+    endif
+  endfor
+  return items(l:twins)
+endfunction
+
 " The stored marks of every review, or v:null when the file is invalid.
 function! s:read_store(review) abort
   let l:file = s:store_file(a:review)
@@ -277,6 +363,9 @@ endfunction
 
 " Quickfix lines of review lists: the mark, then the file path.
 function! gitreview#qftext(info) abort
+  if has_key(s:commit_lists, a:info.id)
+    return s:commit_lines(a:info.id, a:info.start_idx, a:info.end_idx)
+  endif
   let l:review = get(s:reviews, a:info.id, {})
   let l:items = getqflist({'id': a:info.id, 'items': 1}).items
   let l:lines = []
@@ -304,6 +393,11 @@ endfunction
 " Toggle the read mark of items a:first to a:last: mark them all as read,
 " or unmark them when they all are read already.
 function! gitreview#toggle_read(first, last) abort
+  if has_key(s:commit_lists, getqflist({'id': 0}).id)
+        \ && !get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+    call s:toggle_steps(getqflist({'id': 0}).id, a:first, a:last)
+    return
+  endif
   let l:review = s:current_review()
   if empty(l:review)
     return
@@ -319,16 +413,13 @@ function! gitreview#toggle_read(first, last) abort
   let l:marks = get(l:store, l:review.base, {})
   let l:read = filter(copy(l:paths),
         \ 'get(l:marks, v:val, "-") ==# get(l:hashes, v:val, "")')
-  for l:path in l:paths
-    if len(l:read) == len(l:paths)
-      silent! call remove(l:marks, l:path)
-    else
-      let l:marks[l:path] = get(l:hashes, l:path, '')
-    endif
-  endfor
-  let l:store[l:review.base] = l:marks
-  call mkdir(fnamemodify(s:store_file(l:review), ':h'), 'p')
-  call writefile([json_encode(l:store)], s:store_file(l:review))
+  let l:on = len(l:read) != len(l:paths)
+  call s:mark(l:store, l:review, l:paths, l:hashes, l:on)
+  " A commit with a file to read again is no longer read as a whole.
+  if !l:on && has_key(l:review, 'step')
+    silent! call remove(get(l:store, 'commits', {}), l:review.step)
+  endif
+  call s:write_store(l:review, l:store)
 
   let l:line = line('.')
   call s:refresh(l:review.id)
@@ -337,19 +428,19 @@ endfunction
 
 " Switch between all files of the review and those left to read.
 function! gitreview#filter_unread() abort
+  if has_key(s:commit_lists, getqflist({'id': 0}).id)
+        \ && !get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+    call s:filter_steps(getqflist({'id': 0}).id)
+    return
+  endif
   let l:review = s:current_review()
   if empty(l:review)
     return
   endif
-  let l:nr = getqflist({'nr': 0}).nr
   if has_key(l:review, 'parent')
-    let l:parent = getqflist({'id': l:review.parent, 'nr': 0}).nr
-    if !l:parent
-      call s:error('the full review list is no longer available')
-      return
+    if s:goto_list(l:review.parent, 'the full review list')
+      call s:refresh(l:review.parent)
     endif
-    call s:refresh(l:review.parent)
-    execute 'silent' (l:nr > l:parent ? (l:nr - l:parent) . 'colder' : (l:parent - l:nr) . 'cnewer')
     return
   endif
 
@@ -367,6 +458,21 @@ function! gitreview#filter_unread() abort
   call s:refresh(l:id)
 endfunction
 
+" Make the list a:id current, moving in the quickfix history; report when
+" Vim no longer keeps it, as a:name.
+function! s:goto_list(id, name) abort
+  let l:nr = getqflist({'nr': 0}).nr
+  let l:target = getqflist({'id': a:id, 'nr': 0}).nr
+  if !l:target
+    call s:error(a:name . ' is no longer available')
+    return 0
+  endif
+  if l:target != l:nr
+    execute 'silent' (l:nr > l:target ? (l:nr - l:target) . 'colder' : (l:target - l:nr) . 'cnewer')
+  endif
+  return 1
+endfunction
+
 " Fuzzy filter
 " g/ in the quickfix list opens fzf on its entries, with fzf's extended
 " search: 'service !spec' keeps entries matching service but not spec.
@@ -379,6 +485,11 @@ function! s:fzf_lines(id) abort
   let l:review = get(s:reviews, a:id, {})
   let l:items = getqflist({'id': a:id, 'items': 1}).items
   let l:lines = []
+  if has_key(s:commit_lists, a:id)
+    let l:shown = s:commit_lines(a:id, 1, len(l:items))
+    return map(range(len(l:items)),
+          \ '(v:val + 1) . "\t" . l:shown[v:val] . "\t" . l:items[v:val].module')
+  endif
   for l:i in range(len(l:items))
     let l:item = l:items[l:i]
     if empty(l:review)
@@ -405,6 +516,10 @@ function! s:keep(id, indices, query) abort
   endif
   let l:kept = map(l:indices, 'l:items[v:val - 1]')
   let l:suffix = ' (filter: ' . a:query . ')'
+  if has_key(s:commit_lists, a:id)
+    call s:keep_steps(a:id, l:kept, l:suffix)
+    return
+  endif
   let l:review = get(s:reviews, a:id, {})
   if empty(l:review)
     call setqflist([], ' ', {'items': l:kept,
@@ -464,7 +579,9 @@ function! s:fzf_sink(id, lines) abort
     return
   endif
   let l:index = str2nr(l:indices[0])
-  if has_key(s:reviews, a:id)
+  if has_key(s:commit_lists, a:id)
+    call s:open_step(a:id, l:index)
+  elseif has_key(s:reviews, a:id)
     copen
     call cursor(l:index, 1)
     call gitreview#qf_diff()
@@ -483,11 +600,16 @@ function! gitreview#fzf() abort
         \ '--print-query', '--expect', 'ctrl-o', '--bind', 'enter:select-all+accept',
         \ '--prompt', 'Filter> ']
   let l:header = 'Enter: keep matches · C-o: open'
-  let l:review = get(s:reviews, l:id, {})
+  let l:review = get(s:reviews, l:id, get(s:commit_lists, l:id, {}))
   if !empty(l:review)
-    " Preview the file's diff in the review, colored like the Git pager.
-    let l:diff = 'git -C ' . shellescape(l:review.root) . ' diff --color=always '
-          \ . l:review.base . (empty(l:review.head) ? '' : ' ' . l:review.head) . ' -- {3}'
+    " Preview the file's diff in the review, or the commit, colored like the
+    " Git pager; the uncommitted changes have no commit.
+    let l:git = 'git -C ' . shellescape(l:review.root)
+    let l:diff = has_key(s:commit_lists, l:id)
+          \ ? '{ [ -n {3} ] && ' . l:git . ' show --color=always --stat --patch {3}'
+          \   . ' || ' . l:git . ' diff --color=always --stat --patch HEAD; }'
+          \ : l:git . ' diff --color=always ' . l:review.base
+          \   . (empty(l:review.head) ? '' : ' ' . l:review.head) . ' -- {3}'
     call extend(l:options, ['--preview', l:diff . (executable('diffr') ? ' | diffr' : ''),
           \ '--preview-window', 'right,60%,wrap', '--bind', 'ctrl-/:toggle-preview'])
     let l:header .= ' · C-/: preview'
@@ -500,4 +622,280 @@ function! gitreview#fzf() abort
   catch /^Vim\%((\a\+)\)\=:E117:/
     call s:error('g/ requires fzf.vim')
   endtry
+endfunction
+
+" Commits
+" :ReviewCommits lists the commits of the branch from its merge base, oldest
+" first, then the uncommitted changes. <CR> lists the files of a commit as a
+" review of that commit, from its first parent, and - returns to the
+" commits. x marks commits and all their files as read; a commit is read
+" when all its files are, and shows how many are otherwise. Marks follow the
+" commit's patch ID, so they survive a rebase that keeps its diff.
+
+" Commit lists by quickfix list ID: {root, branch, title, steps[, parent]},
+" where steps are the commits by hash, and the uncommitted changes by ''.
+let s:commit_lists = get(s:, 'commit_lists', {})
+
+function! gitreview#commits(ref) abort
+  let l:root = get(systemlist('git rev-parse --show-toplevel'), 0, '')
+  let l:branch = v:shell_error ? ''
+        \ : get(s:git(l:root, 'merge-base HEAD ' . shellescape(a:ref)), 0, '')
+  if empty(l:branch)
+    echohl ErrorMsg
+    echomsg 'ReviewCommits: could not find the merge base with ' . a:ref
+    echohl None
+    return
+  endif
+  " Commit reviews compare commits, which GitGutter does not sign.
+  call s:gutter_base('')
+  let l:steps = s:steps(l:root, l:branch)
+  if empty(l:steps)
+    echo 'ReviewCommits: nothing to review since ' . a:ref
+    return
+  endif
+  let l:title = ':ReviewCommits ' . a:ref
+  call setqflist([], ' ', {'title': l:title,
+        \ 'items': map(copy(l:steps), '{"module": v:val.sha, "text": ""}')})
+  let l:id = getqflist({'id': 0}).id
+  let s:commit_lists[l:id] = {'root': l:root, 'branch': l:branch, 'title': l:title}
+  call s:refresh_commits(l:id)
+  copen
+endfunction
+
+" The steps of the branch: its commits, oldest first, then the uncommitted
+" changes, as {sha, parent, subject, files: {path: blob hash}}. A merge
+" commit's files are those changed from its first parent; '' stands for a
+" deleted file.
+function! s:steps(root, branch) abort
+  let l:steps = []
+  for l:line in s:git(a:root, '-c core.quotepath=off log --reverse --no-color'
+        \ . ' --no-abbrev --no-ext-diff --diff-merges=first-parent --raw --date=short'
+        \ . ' --format=' . shellescape('%x01%H%x09%P%x09%ad %s') . ' ' . a:branch . '..HEAD')
+    if l:line[0] ==# "\x01"
+      let l:fields = split(l:line[1:], "\t", 1)
+      call add(l:steps, {'sha': l:fields[0], 'parent': matchstr(l:fields[1], '^\x\+'),
+            \ 'subject': join(l:fields[2:], "\t"), 'files': {}})
+    elseif l:line[0] ==# ':' && !empty(l:steps)
+      let l:fields = split(l:line, "\t")
+      let l:hash = get(split(l:fields[0]), 3, '')
+      let l:steps[-1].files[l:fields[-1]] = l:hash =~# '^0*$' ? '' : l:hash
+    endif
+  endfor
+  let l:paths = s:git(a:root, '-c core.quotepath=off diff --no-ext-diff --name-only HEAD --')
+  if !empty(l:paths)
+    let l:hashes = s:hashes({'root': a:root, 'head': ''}, l:paths)
+    let l:files = {}
+    for l:path in l:paths
+      let l:files[l:path] = get(l:hashes, l:path, '')
+    endfor
+    call add(l:steps, {'sha': '', 'parent': s:commit(a:root, 'HEAD'),
+          \ 'subject': 'Uncommitted changes', 'files': l:files})
+  endif
+  return l:steps
+endfunction
+
+" Patch IDs of the commits of the branch, by hash.
+function! s:patch_ids(root, branch) abort
+  let l:ids = {}
+  for l:line in systemlist('git -C ' . shellescape(a:root) . ' log --patch --pretty=medium'
+        \ . ' --no-color --no-ext-diff --no-decorate --diff-merges=first-parent '
+        \ . a:branch . '..HEAD | git patch-id --stable')
+    let l:fields = split(l:line)
+    if len(l:fields) == 2
+      let l:ids[l:fields[1]] = l:fields[0]
+    endif
+  endfor
+  return l:ids
+endfunction
+
+" The mark of a step: ✓ when it or all its files are read, the number of
+" read files otherwise.
+function! s:step_status(store, step, ids) abort
+  let l:marks = get(a:store, a:step.parent, {})
+  let l:total = len(a:step.files)
+  let l:read = len(filter(items(a:step.files), 'get(l:marks, v:val[0], "-") ==# v:val[1]'))
+  if l:total && l:read == l:total || !empty(a:step.sha)
+        \ && has_key(get(a:store, 'commits', {}), get(a:ids, a:step.sha, a:step.sha))
+    return '✓'
+  endif
+  return l:read ? l:read . '/' . l:total : ''
+endfunction
+
+function! s:refresh_commits(id) abort
+  let l:list = s:commit_lists[a:id]
+  let l:list.steps = {}
+  for l:step in s:steps(l:list.root, l:list.branch)
+    let l:list.steps[l:step.sha] = l:step
+  endfor
+  let l:list.ids = s:patch_ids(l:list.root, l:list.branch)
+  let l:store = s:read_store(l:list)
+  let l:store = type(l:store) == v:t_dict ? l:store : {}
+  let l:qf = getqflist({'id': a:id, 'items': 1, 'idx': 0})
+  let l:read = 0
+  for l:item in l:qf.items
+    " A commit rewritten since the list was made is no longer on the branch.
+    let l:step = get(l:list.steps, l:item.module, {})
+    let l:item.text = empty(l:step) ? '?' : s:step_status(l:store, l:step, l:list.ids)
+    let l:read += l:item.text ==# '✓'
+  endfor
+  let l:what = {'id': a:id, 'items': l:qf.items, 'idx': l:qf.idx,
+        \ 'title': printf('%s — %d/%d read', l:list.title, l:read, len(l:qf.items))}
+  if has('patch-8.2.0959')
+    let l:what.quickfixtextfunc = 'gitreview#qftext'
+  endif
+  call setqflist([], 'r', l:what)
+endfunction
+
+" Lines of commit list items: the mark, the short hash, the date and subject.
+function! s:commit_lines(id, start, end) abort
+  let l:list = s:commit_lists[a:id]
+  let l:lines = []
+  for l:item in getqflist({'id': a:id, 'items': 1}).items[a:start - 1 : a:end - 1]
+    let l:step = get(l:list.steps, l:item.module, {})
+    let l:mark = empty(l:item.text) ? ' ' : l:item.text
+    call add(l:lines, l:mark . repeat(' ', 6 - strdisplaywidth(l:mark))
+          \ . (empty(l:item.module) ? '' : l:item.module[:6] . ' ')
+          \ . get(l:step, 'subject', 'no longer on the branch'))
+  endfor
+  return l:lines
+endfunction
+
+" List the files of the step at a:index as a review of that step.
+function! s:open_step(id, index) abort
+  let l:list = s:commit_lists[a:id]
+  let l:item = get(getqflist({'id': a:id, 'items': 1}).items, a:index - 1, {})
+  let l:step = get(l:list.steps, get(l:item, 'module', '?'), {})
+  if empty(l:step)
+    call s:error('this commit is no longer on the branch; run :ReviewCommits again')
+    return
+  endif
+  " - returns to this entry.
+  call setqflist([], 'a', {'id': a:id, 'idx': a:index})
+  if empty(l:step.sha)
+    call gitreview#open('HEAD')
+  else
+    call gitreview#open(l:step.sha . '^', l:step.sha)
+  endif
+  let l:review = getqflist({'id': 0}).id
+  if !has_key(s:reviews, l:review)
+    return
+  endif
+  call extend(s:reviews[l:review], {'branch': l:list.branch, 'commits': a:id,
+        \ 'step': get(l:list.ids, l:step.sha, l:step.sha),
+        \ 'title': (empty(l:step.sha) ? '' : l:step.sha[:6] . ' ') . l:step.subject})
+  call s:refresh(l:review)
+  copen
+endfunction
+
+" Mark the steps a:first to a:last and all their files as read, or unmark
+" them when they all are read already.
+function! s:toggle_steps(id, first, last) abort
+  let l:list = s:commit_lists[a:id]
+  let l:store = s:read_store(l:list)
+  if type(l:store) != v:t_dict
+    call s:error('invalid JSON in ' . s:store_file(l:list))
+    return
+  endif
+  call s:refresh_commits(a:id)
+  let l:items = getqflist({'id': a:id, 'items': 1}).items[a:first - 1 : a:last - 1]
+  call filter(l:items, 'has_key(l:list.steps, v:val.module)')
+  let l:on = !empty(filter(copy(l:items), 'v:val.text !=# "✓"'))
+  let l:commits = get(l:store, 'commits', {})
+  for l:item in l:items
+    let l:step = l:list.steps[l:item.module]
+    if !empty(l:step.sha)
+      let l:key = get(l:list.ids, l:step.sha, l:step.sha)
+      if l:on
+        let l:commits[l:key] = 1
+      else
+        silent! call remove(l:commits, l:key)
+      endif
+    endif
+    call s:mark(l:store, {'root': l:list.root, 'base': l:step.parent, 'head': l:step.sha,
+          \ 'branch': l:list.branch}, keys(l:step.files), l:step.files, l:on)
+  endfor
+  let l:store.commits = l:commits
+  call s:write_store(l:list, l:store)
+  let l:line = line('.')
+  call s:refresh_commits(a:id)
+  call cursor(l:line, 1)
+endfunction
+
+" Register a:items of the commit list a:id as a new list.
+function! s:keep_steps(id, items, suffix) abort
+  let l:list = s:commit_lists[a:id]
+  let l:parent = get(l:list, 'parent', a:id)
+  let l:title = get(get(s:commit_lists, l:parent, {}), 'title', l:list.title) . a:suffix
+  call setqflist([], ' ', {'title': l:title, 'items': a:items})
+  let s:commit_lists[getqflist({'id': 0}).id] = extend(copy(l:list),
+        \ {'parent': l:parent, 'title': l:title})
+  call s:refresh_commits(getqflist({'id': 0}).id)
+endfunction
+
+" Switch between all commits and those left to read.
+function! s:filter_steps(id) abort
+  let l:list = s:commit_lists[a:id]
+  if has_key(l:list, 'parent')
+    if s:goto_list(l:list.parent, 'the full commit list')
+      call s:refresh_commits(l:list.parent)
+    endif
+    return
+  endif
+  call s:refresh_commits(a:id)
+  let l:items = filter(getqflist({'id': a:id, 'items': 1}).items, 'v:val.text !=# "✓"')
+  if empty(l:items)
+    echo 'GitReview: every commit is read'
+    return
+  endif
+  call s:keep_steps(a:id, l:items, ' (to read)')
+endfunction
+
+" - in the files of a commit returns to the commit list.
+function! gitreview#up() abort
+  let l:loclist = get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+  let l:review = l:loclist ? {} : get(s:reviews, getqflist({'id': 0}).id, {})
+  if !has_key(l:review, 'commits')
+    execute 'normal!' v:count1 . '-'
+    return
+  endif
+  if s:goto_list(l:review.commits, 'the commit list')
+    call s:refresh_commits(l:review.commits)
+  endif
+endfunction
+
+" <leader>k on a commit, or in its files, shows its message; elsewhere it
+" shows the review context as usual.
+function! gitreview#message() abort
+  let l:loclist = get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+  let l:id = l:loclist ? 0 : getqflist({'id': 0}).id
+  if has_key(s:commit_lists, l:id)
+    let l:root = s:commit_lists[l:id].root
+    let l:sha = get(get(getqflist({'id': l:id, 'items': 1}).items, line('.') - 1, {}),
+          \ 'module', '?')
+  elseif has_key(get(s:reviews, l:id, {}), 'commits')
+    let l:root = s:reviews[l:id].root
+    let l:sha = s:reviews[l:id].head
+  else
+    ReviewContext
+    return
+  endif
+  if empty(l:sha)
+    let l:lines = ['Uncommitted changes', ''] + s:git(l:root, 'diff --stat HEAD --')
+  else
+    let l:lines = s:git(l:root, 'show --no-color --stat --format=%B ' . shellescape(l:sha))
+  endif
+  if !has('popupwin') || empty(l:lines)
+    return
+  endif
+  call popup_atcursor(l:lines + ['', 'q / Esc: close'], {'border': [], 'padding': [1, 2, 1, 2],
+        \ 'maxwidth': 85, 'maxheight': 25, 'wrap': 1, 'moved': 'any',
+        \ 'filter': function('s:popup_filter')})
+endfunction
+
+function! s:popup_filter(id, key) abort
+  if a:key ==# 'q' || a:key ==# "\<Esc>"
+    call popup_close(a:id)
+    return 1
+  endif
+  return 0
 endfunction

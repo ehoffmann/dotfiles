@@ -714,12 +714,16 @@ function! s:ft_qf() abort
   nnoremap <buffer> <silent> x :call gitreview#toggle_read(line('.'), line('.'))<CR>
   xnoremap <buffer> <silent> x :<C-u>call gitreview#toggle_read(line("'<"), line("'>"))<CR>
   nnoremap <buffer> <silent> gr :call gitreview#filter_unread()<CR>
+  " :ReviewCommits: - returns from a commit's files, <leader>k shows its message.
+  nnoremap <buffer> <silent> - :<C-u>call gitreview#up()<CR>
+  nnoremap <buffer> <silent> <leader>k :call gitreview#message()<CR>
   " Fuzzy filter with fzf's extended search, such as 'service !spec'.
   nnoremap <buffer> <silent> g/ :call gitreview#fzf()<CR>
   call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd|silent! nunmap <buffer> gc'
         \ . '|silent! nunmap <buffer> <CR>'
         \ . '|silent! nunmap <buffer> x|silent! xunmap <buffer> x'
-        \ . '|silent! nunmap <buffer> gr|silent! nunmap <buffer> g/')
+        \ . '|silent! nunmap <buffer> gr|silent! nunmap <buffer> g/'
+        \ . '|silent! nunmap <buffer> -|silent! nunmap <buffer> <leader>k')
 endfunction
 
 function! s:ft_ruby() abort
@@ -914,6 +918,11 @@ command! -nargs=+ GitReview call GitReview(<f-args>)
 " GitGutter against that merge base.
 command! -nargs=? ReviewFiles
       \ call gitreview#files(empty(<q-args>) ? 'origin/main' : <q-args>)
+
+" The commits of the branch since the merge base, then its uncommitted
+" changes; <CR> lists the files of one, and - returns to the commits.
+command! -nargs=? ReviewCommits
+      \ call gitreview#commits(empty(<q-args>) ? 'origin/main' : <q-args>)
 
 " Keep the quickfix entries matching an fzf query, such as 'service !spec'.
 command! -nargs=+ ReviewFilter call gitreview#filter(<q-args>)
