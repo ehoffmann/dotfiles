@@ -5,6 +5,9 @@
 
 " Runtime path {{{1
 set nocompatible
+" Define the leader before any mappings or plugin setup.
+let mapleader = " "
+
 " Restart detection on reload. At startup it is not on yet, and turning it off
 " would fail on the missing filetypedetect group.
 if exists('#filetypedetect')
@@ -452,7 +455,8 @@ nnoremap <silent> <Leader>rw :Rg! <C-R><C-W><CR>
 
 " nnoremap <F5> :w<CR>:silent! :make<CR>:cwindow<CR>
 nnoremap <leader>5 :update<CR>:silent! make \| redraw! \| cwindow<CR>
-inoremap <leader>5 <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>
+" Keep the Insert-mode shortcut on backslash so typing Space stays immediate.
+inoremap <Bslash>5 <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>
 " inoremap <F5> <Esc>:update<CR>:silent! make \| redraw! \| cwindow<CR>a
 
 " Autocommands {{{1
