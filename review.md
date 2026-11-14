@@ -50,6 +50,7 @@ stays in effect for every buffer until then.
 | Key | Action |
 | --- | --- |
 | `gd` | Open the entry as a vertical diff against `<left>`, quickfix below |
+| `<CR>` | Open the entry; in work tree reviews, with GitGutter on its first hunk, previewed |
 | `gc` | Start a `:GitReview` of the entry's commit (`<commit>^ <commit>`) |
 | `x` | Mark the file as read, or unmark it; works on a Visual selection |
 | `gr` | Show only the files to read, or return to the full list |
@@ -96,8 +97,14 @@ lists, such as `:Rg` results, without marks or preview.
 `:ReviewBranch [<ref>]` reviews the current branch from its merge base with
 `<ref>` (default `origin/main`), uncommitted changes included. The quickfix
 lists your working-tree files, including files changed only locally, and
-`gd` opens each one, editable, beside the merge-base version. Use
-`:GitReview origin/main...HEAD` to review exactly what is committed instead.
+`gd` opens each one, editable, beside the merge-base version. `<CR>` opens
+the file alone with GitGutter's signs against the merge base, on its first
+hunk with the hunk preview open; `]c` / `[c` then move between hunks and
+update the preview. The same applies to `:GitReview <rev>`, which also
+reviews the working tree. GitGutter's base then stays the review's for every
+buffer, as with `:Review`, until `:ReviewEnd`. Use
+`:GitReview origin/main...HEAD` to review exactly what is committed instead;
+there `<CR>` opens the committed version, without GitGutter signs.
 
 ### GitLab merge requests: `:MR`
 

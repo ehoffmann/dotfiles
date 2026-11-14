@@ -82,6 +82,40 @@ print('\n'.join(kept))
 sys.exit(0 if kept else 1)
 """
 
+GITGUTTER_STUB = r"""function! gitgutter#all(force) abort
+  call add(g:config_test_gitgutter, ['all', g:gitgutter_diff_base, g:gitgutter_async])
+  call s:diff(bufnr(''))
+endfunction
+
+function! gitgutter#process_buffer(bufnr, force) abort
+  call add(g:config_test_gitgutter, ['buffer', g:gitgutter_diff_base, g:gitgutter_async])
+  call s:diff(a:bufnr)
+endfunction
+
+function! s:diff(bufnr) abort
+  let l:file = fnamemodify(bufname(a:bufnr), ':p')
+  let l:hunks = []
+  for l:line in systemlist('git -C ' . shellescape(fnamemodify(l:file, ':h'))
+        \ . ' diff -U0 ' . g:gitgutter_diff_base . ' -- ' . shellescape(l:file))
+    let l:m = matchlist(l:line, '^@@ -\(\d\+\),\=\(\d*\) +\(\d\+\),\=\(\d*\) @@')
+    if !empty(l:m)
+      call add(l:hunks, [str2nr(l:m[1]), l:m[2] ==# '' ? 1 : str2nr(l:m[2]),
+            \ str2nr(l:m[3]), l:m[4] ==# '' ? 1 : str2nr(l:m[4])])
+    endif
+  endfor
+  call setbufvar(a:bufnr, 'gitgutter', {'hunks': l:hunks})
+endfunction
+"""
+
+GITGUTTER_HUNK_STUB = """function! gitgutter#hunk#hunks(bufnr) abort
+  return get(getbufvar(a:bufnr, 'gitgutter', {}), 'hunks', [])
+endfunction
+
+function! gitgutter#hunk#preview() abort
+  call add(g:config_test_gitgutter, ['preview', line('.')])
+endfunction
+"""
+
 
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -116,6 +150,10 @@ endfunction
   let g:config_test_tabs = a:options.source
 endfunction
 """)
+        # GitGutter's hunks from a real git diff against g:gitgutter_diff_base,
+        # with each call recorded.
+        write(runtime / "autoload/gitgutter.vim", GITGUTTER_STUB)
+        write(runtime / "autoload/gitgutter/hunk.vim", GITGUTTER_HUNK_STUB)
         write(runtime / "colors/gruvbox.vim", """call assert_equal(1, g:gruvbox_italic)
 let g:colors_name = 'gruvbox'
 """)

@@ -609,6 +609,54 @@ call assert_equal(4, len(getqflist()), 'Opening must keep the full list')
 delcommand Gvdiffsplit
 only
 cclose
+
+" <CR> in a work tree review opens the file with GitGutter against the
+" review's base, on the first hunk, previewed; other lists open entries only.
+command! GitGutterAll call gitgutter#all(1)
+let s:lines = systemlist(s:git . ' show base:app/model.rb')
+let s:lines[2] = 'changed'
+call writefile(s:lines, s:review_file)
+let g:config_test_difftool_files = [s:repo . '/app/extra.rb', s:repo . '/app/model.rb']
+let [g:gitgutter_diff_base, g:gitgutter_async] = ['', 1]
+let g:config_test_gitgutter = []
+ReviewBranch base
+copen
+2
+execute "normal \<CR>"
+call assert_equal(resolve(s:review_file), resolve(expand('%:p')))
+call assert_equal([3, s:review_head, 1], [line('.'), g:gitgutter_diff_base, g:gitgutter_async])
+call assert_equal([['all', s:review_head, 0], ['preview', 3]], g:config_test_gitgutter,
+      \ 'A new base must refresh every buffer synchronously, then preview')
+let g:config_test_gitgutter = []
+copen
+2
+execute "normal \<CR>"
+call assert_equal([['buffer', s:review_head, 0], ['preview', 3]], g:config_test_gitgutter)
+" A file without changes from the base has no hunk to preview.
+call writefile(systemlist(s:git . ' show base:app/model.rb'), s:review_file)
+edit!
+let g:config_test_gitgutter = []
+copen
+2
+execute "normal \<CR>"
+call assert_equal(resolve(s:review_file), resolve(expand('%:p')))
+call assert_equal([['buffer', s:review_head, 0]], g:config_test_gitgutter)
+" Range reviews open blobs, and other lists their entries, without GitGutter.
+let g:config_test_gitgutter = []
+let g:config_test_difftool_files = [s:blob . 'app/models/order.rb']
+GitReview base HEAD
+copen
+execute "normal \<CR>"
+call assert_equal(s:blob . 'app/models/order.rb', bufname('%'))
+call setqflist([{'filename': s:review_file, 'lnum': 5, 'text': 'match'}])
+copen
+execute "normal \<CR>"
+call assert_equal([resolve(s:review_file), 5],
+      \ [resolve(expand('%:p')), line('.')])
+call assert_equal([], g:config_test_gitgutter)
+delcommand GitGutterAll
+only
+cclose
 execute 'cd ' . fnameescape(s:cwd)
 
 call writefile(['{"annotations": '], s:review_json)

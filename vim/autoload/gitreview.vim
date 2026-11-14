@@ -78,6 +78,47 @@ function! gitreview#qf_diff() abort
   wincmd l
 endfunction
 
+" <CR> in the quickfix list opens the entry as usual. In a review of the work
+" tree, such as :ReviewBranch, it also shows GitGutter's signs against the
+" review's base, moves to the first hunk, and previews it. Range reviews open
+" Fugitive blobs, which GitGutter does not sign, so <CR> only opens them.
+function! gitreview#qf_open() abort
+  let l:loclist = get(get(getwininfo(win_getid()), 0, {}), 'loclist', 0)
+  let l:review = l:loclist ? {} : get(s:reviews, getqflist({'id': 0}).id, {})
+  execute "normal! \<CR>"
+  if empty(l:review) || !empty(l:review.head) || &buftype ==# 'quickfix'
+        \ || exists(':GitGutterAll') != 2
+    return
+  endif
+  call s:first_hunk(l:review.base)
+endfunction
+
+function! s:first_hunk(base) abort
+  let l:bufnr = bufnr('')
+  let l:moved = get(g:, 'gitgutter_diff_base', '') !=# a:base
+  let g:gitgutter_diff_base = a:base
+  " Compute the hunks now instead of in a background job; a new base also
+  " applies to the other buffers, as with :Review.
+  let [l:async, g:gitgutter_async] = [get(g:, 'gitgutter_async', 1), 0]
+  try
+    if l:moved
+      call gitgutter#all(1)
+    else
+      call gitgutter#process_buffer(l:bufnr, 1)
+    endif
+  finally
+    let g:gitgutter_async = l:async
+  endtry
+  let l:hunks = gitgutter#hunk#hunks(l:bufnr)
+  if empty(l:hunks)
+    echo 'GitReview: no changes from ' . a:base[:6]
+    return
+  endif
+  " A deletion at the top of the file starts at line 0.
+  execute 'normal!' max([l:hunks[0][2], 1]) . 'Gzv'
+  call gitgutter#hunk#preview()
+endfunction
+
 function! gitreview#qf_commit() abort
   let item = getqflist()[line('.') - 1]
   let commit = item.module

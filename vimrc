@@ -708,6 +708,8 @@ endfunction
 function! s:ft_qf() abort
   nnoremap <buffer> gd :call GitQfDiff()<CR>
   nnoremap <buffer> gc :call GitQfReviewCommit()<CR>
+  " In work tree reviews, open with GitGutter on the first hunk, previewed.
+  nnoremap <buffer> <silent> <CR> :call gitreview#qf_open()<CR>
   " Read marks of review lists: x toggles them, gr shows the files to read.
   nnoremap <buffer> <silent> x :call gitreview#toggle_read(line('.'), line('.'))<CR>
   xnoremap <buffer> <silent> x :<C-u>call gitreview#toggle_read(line("'<"), line("'>"))<CR>
@@ -715,6 +717,7 @@ function! s:ft_qf() abort
   " Fuzzy filter with fzf's extended search, such as 'service !spec'.
   nnoremap <buffer> <silent> g/ :call gitreview#fzf()<CR>
   call s:undo_ftplugin('qf', 'silent! nunmap <buffer> gd|silent! nunmap <buffer> gc'
+        \ . '|silent! nunmap <buffer> <CR>'
         \ . '|silent! nunmap <buffer> x|silent! xunmap <buffer> x'
         \ . '|silent! nunmap <buffer> gr|silent! nunmap <buffer> g/')
 endfunction
@@ -907,7 +910,8 @@ command! ReviewEnd
 command! -nargs=+ GitReview call GitReview(<f-args>)
 
 " The branch and its uncommitted changes, from the merge base with origin/main
-" or the given ref; gd opens work tree files.
+" or the given ref; gd opens work tree files, and <CR> opens them with
+" GitGutter against that merge base.
 command! -nargs=? ReviewBranch
       \ call gitreview#branch(empty(<q-args>) ? 'origin/main' : <q-args>)
 
