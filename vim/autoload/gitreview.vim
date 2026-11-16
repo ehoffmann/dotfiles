@@ -663,18 +663,21 @@ function! gitreview#commits(ref) abort
 endfunction
 
 " The steps of the branch: its commits, oldest first, then the uncommitted
-" changes, as {sha, parent, subject, files: {path: blob hash}}. A merge
-" commit's files are those changed from its first parent; '' stands for a
-" deleted file.
+" changes, as {sha, parent, date, author, subject, files: {path: blob
+" hash}}, with the author date in local time. A merge commit's files are
+" those changed from its first parent; '' stands for a deleted file.
 function! s:steps(root, branch) abort
   let l:steps = []
   for l:line in s:git(a:root, '-c core.quotepath=off log --reverse --no-color'
-        \ . ' --no-abbrev --no-ext-diff --diff-merges=first-parent --raw --date=short'
-        \ . ' --format=' . shellescape('%x01%H%x09%P%x09%ad %s') . ' ' . a:branch . '..HEAD')
+        \ . ' --no-abbrev --no-ext-diff --diff-merges=first-parent --raw'
+        \ . ' --date=' . shellescape('format-local:%Y-%m-%d %H:%M')
+        \ . ' --format=' . shellescape('%x01%H%x09%P%x09%ad%x09%an%x09%s')
+        \ . ' ' . a:branch . '..HEAD')
     if l:line[0] ==# "\x01"
       let l:fields = split(l:line[1:], "\t", 1)
       call add(l:steps, {'sha': l:fields[0], 'parent': matchstr(l:fields[1], '^\x\+'),
-            \ 'subject': join(l:fields[2:], "\t"), 'files': {}})
+            \ 'date': get(l:fields, 2, ''), 'author': get(l:fields, 3, ''),
+            \ 'subject': join(l:fields[4:], "\t"), 'files': {}})
     elseif l:line[0] ==# ':' && !empty(l:steps)
       let l:fields = split(l:line, "\t")
       let l:hash = get(split(l:fields[0]), 3, '')
@@ -689,7 +692,7 @@ function! s:steps(root, branch) abort
       let l:files[l:path] = get(l:hashes, l:path, '')
     endfor
     call add(l:steps, {'sha': '', 'parent': s:commit(a:root, 'HEAD'),
-          \ 'subject': 'Uncommitted changes', 'files': l:files})
+          \ 'date': '', 'author': '', 'subject': 'Uncommitted changes', 'files': l:files})
   endif
   return l:steps
 endfunction
@@ -746,18 +749,37 @@ function! s:refresh_commits(id) abort
   call setqflist([], 'r', l:what)
 endfunction
 
-" Lines of commit list items: the mark, the short hash, the date and subject.
+" Lines of commit list items: the mark, the short hash, the date and time,
+" the author, and the subject, in aligned columns.
 function! s:commit_lines(id, start, end) abort
   let l:list = s:commit_lists[a:id]
+  let l:items = getqflist({'id': a:id, 'items': 1}).items
+  " Authors take the width of the longest, up to 20 columns.
+  let l:width = max(map(copy(l:items),
+        \ 'min([20, strdisplaywidth(get(get(l:list.steps, v:val.module, {}), "author", ""))])'))
   let l:lines = []
-  for l:item in getqflist({'id': a:id, 'items': 1}).items[a:start - 1 : a:end - 1]
+  for l:item in l:items[a:start - 1 : a:end - 1]
     let l:step = get(l:list.steps, l:item.module, {})
     let l:mark = empty(l:item.text) ? ' ' : l:item.text
-    call add(l:lines, l:mark . repeat(' ', 6 - strdisplaywidth(l:mark))
-          \ . (empty(l:item.module) ? '' : l:item.module[:6] . ' ')
+    let l:author = s:column(get(l:step, 'author', ''), l:width)
+    let l:columns = empty(l:item.module) ? repeat(' ', 27 + l:width)
+          \ : printf('%s %-16s %s  ', l:item.module[:6], get(l:step, 'date', ''), l:author)
+    call add(l:lines, s:column(l:mark, 6) . l:columns
           \ . get(l:step, 'subject', 'no longer on the branch'))
   endfor
   return l:lines
+endfunction
+
+" a:text in a:width display columns: padded, or cut with an ellipsis.
+function! s:column(text, width) abort
+  let l:text = a:text
+  if strdisplaywidth(l:text) > a:width
+    while strdisplaywidth(l:text) > a:width - 1
+      let l:text = strcharpart(l:text, 0, strchars(l:text) - 1)
+    endwhile
+    let l:text = substitute(l:text, '\s\+$', '', '') . '…'
+  endif
+  return l:text . repeat(' ', a:width - strdisplaywidth(l:text))
 endfunction
 
 " List the files of the step at a:index as a review of that step.

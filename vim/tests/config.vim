@@ -683,7 +683,7 @@ call s:ccommit(2, "-am 'Change a'")
 call writefile(['b2'], s:crepo . '/b.rb')
 call writefile(['c'], s:crepo . '/c.rb')
 call system(s:cgit . ' add c.rb')
-call s:ccommit(3, "-am 'Change b, add c'")
+call s:ccommit(3, "--author='Ann Other <ann@example.com>' -am 'Change b, add c'")
 call writefile(['b3'], s:crepo . '/b.rb')
 call s:ccommit(4, "-am 'Change b again'")
 call writefile(['e2'], s:crepo . '/e.rb')
@@ -715,10 +715,11 @@ call assert_equal([['all', '', 1]], g:config_test_gitgutter, 'The commits must r
 call assert_equal([':ReviewCommits base — 0/4 read', 'qf'],
       \ [getqflist({'title': 1}).title, &filetype])
 if has('patch-8.2.0959')
-  call assert_equal(['      ' . s:shas[0][:6] . ' 2026-01-02 Change a',
-        \ '      ' . s:shas[1][:6] . ' 2026-01-03 Change b, add c',
-        \ '      ' . s:shas[2][:6] . ' 2026-01-04 Change b again',
-        \ '      Uncommitted changes'], getline(1, '$'))
+  " Authors are padded to the longest, so subjects stay aligned.
+  call assert_equal(['      ' . s:shas[0][:6] . ' 2026-01-02 12:00 Test       Change a',
+        \ '      ' . s:shas[1][:6] . ' 2026-01-03 12:00 Ann Other  Change b, add c',
+        \ '      ' . s:shas[2][:6] . ' 2026-01-04 12:00 Test       Change b again',
+        \ repeat(' ', 42) . 'Uncommitted changes'], getline(1, '$'))
 endif
 1
 call assert_equal(':call gitreview#message()<CR>', maparg(' k', 'n'))
@@ -734,7 +735,7 @@ call popup_clear()
 2
 execute "normal \<CR>"
 call assert_equal('difftool --name-only ' . s:shas[1] . '^ ' . s:shas[1], g:config_test_git_args)
-call assert_equal(s:shas[1][:6] . ' 2026-01-03 Change b, add c — 0/2 read',
+call assert_equal(s:shas[1][:6] . ' Change b, add c — 0/2 read',
       \ getqflist({'title': 1}).title)
 call assert_equal(['', ''], s:marks())
 call gitreview#message()
@@ -762,10 +763,15 @@ call assert_equal([{s:patch : 1}, {'b.rb': s:cblob(s:shas[2] . ':b.rb')}],
 call assert_false(has_key(s:store[s:base_sha], 'b.rb'))
 call remove(s:store, s:shas[1])
 call writefile([json_encode(s:store)], s:crepo . '/.review/reviewed.json')
-call s:ccommit(4, "--amend -m 'Change b once more'")
+call s:ccommit(4, "--amend --author='Alexandra Long-Surname <al@example.com>'"
+      \ . " -m 'Change b once more'")
 let s:shas = systemlist(s:cgit . ' rev-list --reverse base..HEAD')
 ReviewCommits base
 call assert_equal(['', '1/2', '✓', ''], s:marks())
+if has('patch-8.2.0959')
+  call assert_equal('✓     ' . s:shas[2][:6] . ' 2026-01-04 12:00 Alexandra Long-Surn…  Change b once more',
+        \ getline(3), 'Long authors are cut at 20 columns')
+endif
 3
 normal x
 call assert_equal(['', '1/2', '', ''], s:marks())
@@ -818,7 +824,8 @@ call assert_equal(['✓', '', '', '✓'], s:marks())
 
 " g/ previews commits, and filtered commits still open their files.
 normal g/
-call assert_equal("2\t      " . s:shas[1][:6] . " 2026-01-03 Change b, add c\t" . s:shas[1],
+call assert_equal("2\t      " . s:shas[1][:6] . " 2026-01-03 12:00 Ann Other             Change b, add c\t"
+      \ . s:shas[1],
       \ g:config_test_fzf.source[1])
 call assert_match('show --color=always --stat --patch {3}',
       \ g:config_test_fzf.options[index(g:config_test_fzf.options, '--preview') + 1])

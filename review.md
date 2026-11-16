@@ -112,8 +112,9 @@ without GitGutter signs.
 ### Branch commits review: `:ReviewCommits`
 
 `:ReviewCommits [<ref>]` lists the commits of the current branch since its
-merge base with `<ref>` (default `origin/main`), oldest first, then the
-uncommitted changes, if any. It replaces the quickfix list and resets
+merge base with `<ref>` (default `origin/main`), oldest first, with their
+author date in local time and their author, then the uncommitted changes,
+if any. It replaces the quickfix list and resets
 GitGutter's base; switch back and forth with `:ReviewFiles` at will.
 
 | Key | Action |
