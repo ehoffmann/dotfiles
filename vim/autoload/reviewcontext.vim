@@ -6,6 +6,11 @@
 "      "symbol": "User#save", "kind": "method", "summary": "...",
 "      "change": "...", "risks": ["...", "..."]}]}
 " Paths are relative to the repository root; line ranges are inclusive.
+"
+" The ranges describe the working-tree file. Another version of it, such as
+" a blob of an intermediate commit opened from :ReviewCommits, gets them
+" mapped through the diff to the working tree: exactly where later changes
+" left the code alone, approximately where they changed it.
 
 " Virtual text after the line needs Vim 9; older versions use signs, below
 " GitGutter's priority so changed-line signs stay visible.
@@ -63,6 +68,87 @@ function! s:differs(bufnr) abort
   let l:real = s:real(l:name)
   return l:real !=# l:name && filereadable(l:real)
         \ && getbufline(a:bufnr, 1, '$') !=# readfile(l:real)
+endfunction
+
+" Hunks of the diff from a:lines, another version of the working-tree file
+" a:file, to that file, as [old start, old count, new start, new count]; or
+" v:null when Git cannot compare them.
+function! s:hunks(lines, file) abort
+  let l:other = tempname()
+  call writefile(a:lines, l:other)
+  let l:output = systemlist('git diff --no-index --no-color --no-ext-diff -U0 -- '
+        \ . shellescape(l:other) . ' ' . shellescape(a:file))
+  let l:status = v:shell_error
+  call delete(l:other)
+  " git diff --no-index exits with 1 when the files differ.
+  if l:status > 1
+    return v:null
+  endif
+  let l:hunks = []
+  for l:line in l:output
+    let l:m = matchlist(l:line, '^@@ -\(\d\+\)\%(,\(\d\+\)\)\= +\(\d\+\)\%(,\(\d\+\)\)\= @@')
+    if !empty(l:m)
+      call add(l:hunks, [str2nr(l:m[1]), l:m[2] ==# '' ? 1 : str2nr(l:m[2]),
+            \ str2nr(l:m[3]), l:m[4] ==# '' ? 1 : str2nr(l:m[4])])
+    endif
+  endfor
+  return l:hunks
+endfunction
+
+" Line a:lnum of the working-tree file in the other version of a:hunks. A
+" changed line maps to the first or last line of the code it replaced, as
+" a:side says: 'start' or 'end'.
+function! s:map_line(hunks, lnum, side) abort
+  let l:delta = 0
+  for [l:a, l:b, l:c, l:d] in a:hunks
+    " A deletion, with no new lines, follows new line c.
+    if a:lnum > (l:d ? l:c + l:d - 1 : l:c)
+      let l:delta += l:b - l:d
+    elseif l:d && a:lnum >= l:c
+      " Additions, with no old lines, follow old line a.
+      return a:side ==# 'start' ? (l:b ? l:a : l:a + 1) : (l:b ? l:a + l:b - 1 : l:a)
+    else
+      break
+    endif
+  endfor
+  return a:lnum + l:delta
+endfunction
+
+" Whether a hunk changes lines a:start to a:end of the working-tree file.
+function! s:touched(hunks, start, end) abort
+  for [l:a, l:b, l:c, l:d] in a:hunks
+    if l:d ? l:c <= a:end && l:c + l:d - 1 >= a:start : l:c >= a:start && l:c < a:end
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
+
+" Annotations a:items mapped onto the other version of a:hunks, with
+" touched set when later changes overlap them. Annotations of code added
+" later are dropped.
+function! s:map_annotations(hunks, items) abort
+  let l:mapped = []
+  for l:item in a:items
+    let l:start = s:map_line(a:hunks, l:item.start, 'start')
+    let l:end = s:map_line(a:hunks, l:item.end, 'end')
+    if l:start <= l:end
+      call add(l:mapped, extend(copy(l:item), {'start': l:start, 'end': l:end,
+            \ 'touched': s:touched(a:hunks, l:item.start, l:item.end)}))
+    endif
+  endfor
+  return l:mapped
+endfunction
+
+" The annotations of a:context for a:file, mapped onto a:lines when they are
+" another version of it; v:null when that version cannot be compared.
+function! s:file_annotations(context, lines) abort
+  let l:items = filter(copy(a:context.annotations), 'v:val.path ==# a:context.path')
+  if type(a:lines) != v:t_list
+    return l:items
+  endif
+  let l:hunks = s:hunks(a:lines, a:context.file)
+  return type(l:hunks) == v:t_list ? s:map_annotations(l:hunks, l:items) : v:null
 endfunction
 
 " The directory whose repository the current buffer belongs to.
@@ -145,7 +231,10 @@ function! s:stale_warnings(context, modified, differs) abort
   if a:modified
     call add(l:warnings, '! Unsaved changes in this buffer')
   endif
-  if a:differs
+  if a:differs ==# 'touched'
+    call add(l:warnings, '! This code changes after this version;'
+          \ . ' the notes describe the final code')
+  elseif a:differs ==# 'unknown'
     call add(l:warnings, '! This version differs from the working-tree file')
   endif
   return empty(l:warnings) ? [] : l:warnings + ['Line ranges may be stale.', '']
@@ -160,18 +249,25 @@ endfunction
 
 " Return {'lines': [...]} for the most specific annotation covering line
 " a:lnum of a:file, or {'message': ..., 'error': 0 or 1} when there is none.
-" Pass a true third argument when the buffer has unsaved changes, and a true
-" fourth one when it shows another version than the working-tree file.
+" Pass a true third argument when the buffer has unsaved changes, and as a
+" fourth one the buffer's lines when it shows another version than the
+" working-tree file, so that a:lnum is a line of that version.
 function! reviewcontext#annotation(file, lnum, ...) abort
   let l:context = s:context_for(a:file)
   if has_key(l:context, 'message')
     return l:context
   endif
+  let l:lines = get(a:000, 1, 0)
+  let l:items = s:file_annotations(l:context, l:lines)
+  let l:version = type(l:lines) != v:t_list ? '' : type(l:items) == v:t_list ? 'mapped' : 'unknown'
+  if l:version ==# 'unknown'
+    let l:items = s:file_annotations(l:context, 0)
+  endif
 
   " The narrowest range covering the line wins.
   let l:best = {}
-  for l:item in l:context.annotations
-    if l:item.path !=# l:context.path || a:lnum < l:item.start || a:lnum > l:item.end
+  for l:item in l:items
+    if a:lnum < l:item.start || a:lnum > l:item.end
       continue
     endif
     if empty(l:best) || l:item.end - l:item.start < l:best.end - l:best.start
@@ -183,7 +279,10 @@ function! reviewcontext#annotation(file, lnum, ...) abort
   endif
 
   let l:lines = [s:title(l:best), repeat('─', 45), '']
-  call extend(l:lines, s:stale_warnings(l:context, get(a:000, 0, 0), get(a:000, 1, 0)))
+  if get(l:best, 'touched', 0)
+    let l:version = 'touched'
+  endif
+  call extend(l:lines, s:stale_warnings(l:context, get(a:000, 0, 0), l:version))
   call s:section(l:lines, 'DESCRIPTION', s:text(get(l:best, 'summary', '')))
   call s:section(l:lines, 'CHANGE', s:text(get(l:best, 'change', '')))
   call s:section(l:lines, 'RISKS', map(s:risks(l:best), '"- " . v:val'))
@@ -207,7 +306,7 @@ function! reviewcontext#show() abort
   endif
 
   let l:result = reviewcontext#annotation(expand('%:p'), line('.'), &modified,
-        \ s:differs(bufnr('%')))
+        \ s:differs(bufnr('%')) ? getline(1, '$') : 0)
   if has_key(l:result, 'message')
     call s:report(l:result)
     return 0
@@ -278,18 +377,25 @@ function! reviewcontext#marks(bufnr) abort
   let l:context = s:context_for(bufname(a:bufnr))
   call setbufvar(a:bufnr, 'review_context_mtime',
         \ has_key(l:context, 'source') ? getftime(l:context.source) : -1)
-  " Marks of another version would land on the wrong lines.
   if !get(g:, 'review_context_marks', 1) || has_key(l:context, 'message')
-        \ || s:differs(a:bufnr)
+    return
+  endif
+  let l:items = s:file_annotations(l:context,
+        \ s:differs(a:bufnr) ? getbufline(a:bufnr, 1, '$') : 0)
+  " Unmapped marks of another version would land on the wrong lines.
+  if type(l:items) != v:t_list
     return
   endif
 
-  " Annotations starting on the same line share one mark.
+  " Annotations starting on the same line share one mark, hollow when later
+  " changes touch all of them.
   let l:marks = {}
   let l:last = getbufinfo(a:bufnr)[0].linecount
-  for l:item in l:context.annotations
-    if l:item.path ==# l:context.path && l:item.start >= 1 && l:item.start <= l:last
-      let l:marks[l:item.start] = get(l:marks, l:item.start, 0) + len(s:risks(l:item))
+  for l:item in l:items
+    if l:item.start >= 1 && l:item.start <= l:last
+      let [l:risks, l:touched] = get(l:marks, l:item.start, [0, 1])
+      let l:marks[l:item.start] = [l:risks + len(s:risks(l:item)),
+            \ l:touched && get(l:item, 'touched', 0)]
     endif
   endfor
 
@@ -301,15 +407,17 @@ function! reviewcontext#marks(bufnr) abort
   elseif empty(prop_type_get('reviewcontext'))
     call prop_type_add('reviewcontext', {'highlight': 'ReviewContextMark'})
   endif
-  for [l:lnum, l:risks] in items(l:marks)
+  for [l:lnum, l:mark] in items(l:marks)
+    let [l:risks, l:touched] = l:mark
     if l:signs
       call sign_place(0, 'reviewcontext', 'ReviewContext', a:bufnr,
             \ {'lnum': str2nr(l:lnum), 'priority': 5})
     else
+      let l:diamond = l:touched ? '◇' : '◆'
       call prop_add(str2nr(l:lnum), 0, {'type': 'reviewcontext', 'bufnr': a:bufnr,
             \ 'text_align': 'after', 'text': l:risks
-            \   ? printf('  ◆ %d risk%s', l:risks, l:risks == 1 ? '' : 's')
-            \   : '  ◆ review'})
+            \   ? printf('  %s %d risk%s', l:diamond, l:risks, l:risks == 1 ? '' : 's')
+            \   : '  ' . l:diamond . ' review'})
     endif
   endfor
 endfunction

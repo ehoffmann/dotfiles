@@ -98,10 +98,15 @@ highlight group, linked to `Special` by default.
 
 Fugitive buffers, such as the blobs that `gd` opens after
 `:GitReview origin/main...HEAD` or `:MR`, count as their working-tree file
-when their content is the same, as for `HEAD` without local changes. Another
-version, such as the merge base in the left diff window, gets no marks, and
-its popup warns that its lines differ from those the annotations describe.
-`:ReviewFiles` opens the working-tree files themselves.
+when their content is the same, as for `HEAD` without local changes.
+`:ReviewFiles` opens the working-tree files themselves. Another version,
+such as an intermediate commit in `:ReviewCommits` or the merge base in the
+left diff window, gets the annotations mapped through `git diff` to the
+working tree. Code that later changes leave alone keeps exact marks and
+popups. Annotations whose lines change later have hollow marks, such as
+`◇ 2 risks`, and their popup warns that the notes describe the final code.
+Annotations of code added later do not appear. Without Git, another
+version gets no marks, and its popup warns that its lines differ.
 
 `:ReviewContextList` puts every annotation of the repository in the location
 list, sorted by file and line with enclosing ranges first, showing the

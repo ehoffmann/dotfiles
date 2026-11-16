@@ -419,7 +419,8 @@ call assert_match('expected a summary object', execute('messages'))
 call assert_equal(s:review_tab, tabpagenr('$'), 'Errors must not open a tab')
 
 " Fugitive blobs, as opened by gd after :GitReview, get annotations and marks
-" when they match the working-tree file; other versions get a warning only.
+" when they match the working-tree file; other versions get them mapped
+" through the diff to the working tree.
 function! FugitiveReal(...) abort
   return substitute(a:0 ? a:1 : @%, '^fugitive://\(.*\)/\.git//[^/]\+/', '\1/', '')
 endfunction
@@ -444,13 +445,46 @@ call assert_equal(5, len(getloclist(0)))
 lclose
 " Without Fugitive, a reloaded blob would come back empty.
 bwipeout!
+" An older version with a line that a later commit removed: every
+" annotation moves down one line, untouched.
 call s:open_blob(repeat('1', 40), ['added'] + readfile(s:review_file))
-call assert_equal([], s:review_marks(), 'Another version must not be marked')
+call assert_equal([[2, '  ◆ review'], [4, '  ◆ 2 risks'], [7, '  ◆ 1 risk']], s:review_marks(),
+      \ 'Annotations must follow the lines of another version')
+call cursor(5, 1)
+ReviewContext
+call assert_equal(1, len(popup_list()))
+call assert_equal(['Model#save (method)', 'DESCRIPTION'],
+      \ map([1, 4], 'getbufline(winbufnr(popup_list()[0]), v:val)[0]'),
+      \ 'Untouched code needs no warning')
+call popup_clear()
+bwipeout!
+" A version whose line 4 changes later: the annotations covering it are
+" approximate, with hollow marks and a warning.
+let s:lines = readfile(s:review_file)
+let s:lines[3] = 'old 4'
+call s:open_blob(repeat('2', 40), s:lines)
+call assert_equal([[1, '  ◆ review'], [3, '  ◇ 2 risks'], [6, '  ◆ 1 risk']], s:review_marks())
 call cursor(4, 1)
 ReviewContext
-call assert_equal('! This version differs from the working-tree file',
-      \ getbufline(winbufnr(popup_list()[0]), 4)[0])
+call assert_equal(1, len(popup_list()))
+call assert_equal(['Model#save (method)',
+      \ '! This code changes after this version; the notes describe the final code'],
+      \ map([1, 4], 'getbufline(winbufnr(popup_list()[0]), v:val)[0]'))
 call popup_clear()
+bwipeout!
+" A line removed later from inside an annotation also makes it approximate.
+call s:open_blob(repeat('4', 40), readfile(s:review_file)[:2] + ['removed later']
+      \ + readfile(s:review_file)[3:])
+call assert_equal([[1, '  ◆ review'], [3, '  ◇ 2 risks'], [7, '  ◆ 1 risk']], s:review_marks())
+bwipeout!
+" A version without lines 6 and 7, added later, has no annotation of them.
+call s:open_blob(repeat('3', 40), readfile(s:review_file)[:4] + readfile(s:review_file)[7:])
+call assert_equal([[1, '  ◆ review'], [3, '  ◆ 2 risks']], s:review_marks())
+call cursor(6, 1)
+call assert_equal('Model', reviewcontext#annotation(s:review_file, 6, 0, getline(1, '$')).lines[0],
+      \ 'Line 6 of this version is line 8 of the work tree')
+call assert_match('changes after this version',
+      \ reviewcontext#annotation(s:review_file, 6, 0, getline(1, '$')).lines[3])
 bwipeout!
 
 delfunction FugitiveReal

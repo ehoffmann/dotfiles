@@ -131,7 +131,9 @@ commit is `✓` when it or all its files are marked, and shows the number of
 files read otherwise, as in `2/5`. Commit marks follow the commit's patch
 ID, so a rebase that does not change its diff keeps it read. Merge commits
 show their changes from the first parent. The uncommitted changes are
-reviewed from `HEAD`, so `<CR>` opens their files with GitGutter.
+reviewed from `HEAD`, so `<CR>` opens their files with GitGutter. Review
+context annotations follow each commit's version of the code, with hollow
+marks (`◇`) where later commits change it.
 
 A file changed by a single commit, or only by the uncommitted changes, has
 the same diff there as in `:ReviewFiles`: marking it in either review marks
