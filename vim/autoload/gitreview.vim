@@ -353,27 +353,111 @@ function! s:refresh(id) abort
     let l:list.items[l:i].text = l:text
     let l:read += l:text ==# '✓'
   endfor
+  " Lines left to read: the added and deleted lines of files not read.
+  let l:stats = s:diff_stats(l:review)
+  let l:review.stats = l:stats
+  let [l:left, l:total] = [0, 0]
+  for l:i in range(len(l:paths))
+    let l:size = s:size(get(l:stats, l:paths[l:i], {}))
+    let l:total += l:size
+    let l:left += l:list.items[l:i].text ==# '✓' ? 0 : l:size
+  endfor
   let l:what = {'id': a:id, 'items': l:list.items, 'idx': l:list.idx,
-        \ 'title': printf('%s — %d/%d read', l:review.title, l:read, len(l:list.items))}
+        \ 'title': printf('%s — %d/%d read', l:review.title, l:read, len(l:list.items))
+        \ . (l:total ? printf(', %d of %d line%s left', l:left, l:total,
+        \   l:total == 1 ? '' : 's') : '')}
   if has('patch-8.2.0959')
     let l:what.quickfixtextfunc = 'gitreview#qftext'
   endif
   call setqflist([], 'r', l:what)
 endfunction
 
-" Quickfix lines of review lists: the mark, then the file path.
+" The changes of a review by path: {status, added, deleted[, from]}, where
+" status is Git's letter (A, M, D, R...), from the path before a rename, and
+" added is -1 for binary files. {} when Git fails.
+function! s:diff_stats(review) abort
+  let l:output = s:git(a:review.root, '-c core.quotepath=off diff --no-ext-diff'
+        \ . ' --no-color --raw --numstat ' . a:review.base
+        \ . (empty(a:review.head) ? '' : ' ' . a:review.head) . ' --')
+  " Git lists every raw line, then the numstat lines in the same order.
+  let l:raw = filter(copy(l:output), 'v:val[0] ==# ":"')
+  let l:numstat = filter(copy(l:output), 'v:val[0] !=# ":"')
+  let l:stats = {}
+  for l:i in range(min([len(l:raw), len(l:numstat)]))
+    let l:fields = split(l:raw[l:i], "\t", 1)
+    let l:counts = split(l:numstat[l:i], "\t")
+    let l:stat = {'status': get(split(l:fields[0]), 4, '?')[0],
+          \ 'added': l:counts[0] ==# '-' ? -1 : str2nr(l:counts[0]),
+          \ 'deleted': str2nr(get(l:counts, 1, '0'))}
+    if len(l:fields) > 2
+      let l:stat.from = l:fields[1]
+    endif
+    let l:stats[l:fields[-1]] = l:stat
+  endfor
+  return l:stats
+endfunction
+
+function! s:size(stat) abort
+  return max([0, get(a:stat, 'added', 0)]) + get(a:stat, 'deleted', 0)
+endfunction
+
+" Quickfix lines of review lists.
 function! gitreview#qftext(info) abort
   if has_key(s:commit_lists, a:info.id)
     return s:commit_lines(a:info.id, a:info.start_idx, a:info.end_idx)
   endif
-  let l:review = get(s:reviews, a:info.id, {})
-  let l:items = getqflist({'id': a:info.id, 'items': 1}).items
+  return s:file_lines(a:info.id, a:info.start_idx, a:info.end_idx)
+endfunction
+
+" Lines of review list items: the read mark, Git's status letter, the added
+" and deleted lines, and the path, with the path before a rename.
+function! s:file_lines(id, start, end) abort
+  let l:review = get(s:reviews, a:id, {})
+  let l:items = getqflist({'id': a:id, 'items': 1}).items
   let l:lines = []
-  for l:item in l:items[a:info.start_idx - 1 : a:info.end_idx - 1]
-    let l:path = empty(l:review) ? bufname(l:item.bufnr) : s:path(l:review, l:item)
-    call add(l:lines, (empty(l:item.text) ? ' ' : l:item.text) . ' ' . l:path)
+  if empty(l:review)
+    for l:item in l:items[a:start - 1 : a:end - 1]
+      call add(l:lines, (empty(l:item.text) ? ' ' : l:item.text) . ' ' . bufname(l:item.bufnr))
+    endfor
+    return l:lines
+  endif
+  let l:stats = get(l:review, 'stats', {})
+  let l:paths = map(copy(l:items), 's:path(l:review, v:val)')
+  let l:all = map(copy(l:paths), 'get(l:stats, v:val, {})')
+  let l:added = max(map(copy(l:all), 'strlen(s:count("+", get(v:val, "added", 0)))'))
+  let l:deleted = max(map(copy(l:all), 'strlen(s:count("-", get(v:val, "deleted", 0)))'))
+  for l:i in range(a:start - 1, a:end - 1)
+    let l:item = l:items[l:i]
+    let l:line = (empty(l:item.text) ? ' ' : l:item.text) . ' '
+    if !empty(l:stats)
+      let l:stat = l:all[l:i]
+      let l:line .= get(l:stat, 'status', ' ') . '  '
+            \ . s:stat_column(l:stat, l:added, l:deleted) . '  '
+    endif
+    let l:line .= l:paths[l:i]
+    if has_key(get(l:all, l:i, {}), 'from')
+      let l:line .= ' ← ' . l:all[l:i].from
+    endif
+    call add(l:lines, l:line)
   endfor
   return l:lines
+endfunction
+
+" '+12' or '-3'; '' for no lines.
+function! s:count(sign, n) abort
+  return a:n > 0 ? a:sign . a:n : ''
+endfunction
+
+" Added and deleted lines, right- and left-aligned on a space in widths
+" a:added and a:deleted; bin for binary files.
+function! s:stat_column(stat, added, deleted) abort
+  let l:width = max([3, a:added + 1 + a:deleted])
+  if get(a:stat, 'added', 0) < 0
+    return printf('%-*s', l:width, 'bin')
+  endif
+  return printf('%-*s', l:width, printf('%*s %-*s', a:added,
+        \ s:count('+', get(a:stat, 'added', 0)), a:deleted,
+        \ s:count('-', get(a:stat, 'deleted', 0))))
 endfunction
 
 " The review of the current quickfix list, or {} after reporting why not.
@@ -490,17 +574,18 @@ function! s:fzf_lines(id) abort
     return map(range(len(l:items)),
           \ '(v:val + 1) . "\t" . l:shown[v:val] . "\t" . l:items[v:val].module')
   endif
+  let l:shown = empty(l:review) ? [] : s:file_lines(a:id, 1, len(l:items))
   for l:i in range(len(l:items))
     let l:item = l:items[l:i]
     if empty(l:review)
       let l:path = fnamemodify(bufname(l:item.bufnr), ':.')
-      let l:shown = l:path . (l:item.lnum ? ':' . l:item.lnum : '')
+      let l:text = l:path . (l:item.lnum ? ':' . l:item.lnum : '')
             \ . (empty(l:item.text) ? '' : ': ' . trim(l:item.text))
     else
       let l:path = s:path(l:review, l:item)
-      let l:shown = (empty(l:item.text) ? ' ' : l:item.text) . ' ' . l:path
+      let l:text = l:shown[l:i]
     endif
-    call add(l:lines, (l:i + 1) . "\t" . substitute(l:shown, "\t", ' ', 'g') . "\t" . l:path)
+    call add(l:lines, (l:i + 1) . "\t" . substitute(l:text, "\t", ' ', 'g') . "\t" . l:path)
   endfor
   return l:lines
 endfunction
@@ -664,12 +749,13 @@ endfunction
 
 " The steps of the branch: its commits, oldest first, then the uncommitted
 " changes, as {sha, parent, date, author, subject, files: {path: blob
-" hash}}, with the author date in local time. A merge commit's files are
-" those changed from its first parent; '' stands for a deleted file.
+" hash}, added, deleted}, with the author date in local time and the
+" numbers of added and deleted lines. A merge commit's files are those
+" changed from its first parent; '' stands for a deleted file.
 function! s:steps(root, branch) abort
   let l:steps = []
   for l:line in s:git(a:root, '-c core.quotepath=off log --reverse --no-color'
-        \ . ' --no-abbrev --no-ext-diff --diff-merges=first-parent --raw'
+        \ . ' --no-abbrev --no-ext-diff --diff-merges=first-parent --raw --numstat'
         \ . ' --date=' . shellescape('format-local:%Y-%m-%d %H:%M')
         \ . ' --format=' . shellescape('%x01%H%x09%P%x09%ad%x09%an%x09%s')
         \ . ' ' . a:branch . '..HEAD')
@@ -677,8 +763,12 @@ function! s:steps(root, branch) abort
       let l:fields = split(l:line[1:], "\t", 1)
       call add(l:steps, {'sha': l:fields[0], 'parent': matchstr(l:fields[1], '^\x\+'),
             \ 'date': get(l:fields, 2, ''), 'author': get(l:fields, 3, ''),
-            \ 'subject': join(l:fields[4:], "\t"), 'files': {}})
-    elseif l:line[0] ==# ':' && !empty(l:steps)
+            \ 'subject': join(l:fields[4:], "\t"), 'files': {}, 'added': 0, 'deleted': 0})
+    elseif empty(l:steps)
+      continue
+    elseif l:line =~# '^[0-9-]\+\t[0-9-]\+\t'
+      call s:add_counts(l:steps[-1], l:line)
+    elseif l:line[0] ==# ':'
       let l:fields = split(l:line, "\t")
       let l:hash = get(split(l:fields[0]), 3, '')
       let l:steps[-1].files[l:fields[-1]] = l:hash =~# '^0*$' ? '' : l:hash
@@ -691,10 +781,22 @@ function! s:steps(root, branch) abort
     for l:path in l:paths
       let l:files[l:path] = get(l:hashes, l:path, '')
     endfor
-    call add(l:steps, {'sha': '', 'parent': s:commit(a:root, 'HEAD'),
-          \ 'date': '', 'author': '', 'subject': 'Uncommitted changes', 'files': l:files})
+    let l:step = {'sha': '', 'parent': s:commit(a:root, 'HEAD'), 'date': '',
+          \ 'author': '', 'subject': 'Uncommitted changes', 'files': l:files,
+          \ 'added': 0, 'deleted': 0}
+    for l:line in s:git(a:root, 'diff --no-ext-diff --numstat HEAD --')
+      call s:add_counts(l:step, l:line)
+    endfor
+    call add(l:steps, l:step)
   endif
   return l:steps
+endfunction
+
+" Add the counts of a --numstat line to a:step; binary files count none.
+function! s:add_counts(step, line) abort
+  let l:counts = split(a:line, '\t')
+  let a:step.added += str2nr(l:counts[0])
+  let a:step.deleted += str2nr(get(l:counts, 1, '0'))
 endfunction
 
 " Patch IDs of the commits of the branch, by hash.
@@ -750,13 +852,17 @@ function! s:refresh_commits(id) abort
 endfunction
 
 " Lines of commit list items: the mark, the short hash, the date and time,
-" the author, and the subject, in aligned columns.
+" the author, the added and deleted lines, and the subject, in aligned
+" columns.
 function! s:commit_lines(id, start, end) abort
   let l:list = s:commit_lists[a:id]
   let l:items = getqflist({'id': a:id, 'items': 1}).items
   " Authors take the width of the longest, up to 20 columns.
   let l:width = max(map(copy(l:items),
         \ 'min([20, strdisplaywidth(get(get(l:list.steps, v:val.module, {}), "author", ""))])'))
+  let l:steps = map(copy(l:items), 'get(l:list.steps, v:val.module, {})')
+  let l:added = max(map(copy(l:steps), 'strlen(s:count("+", get(v:val, "added", 0)))'))
+  let l:deleted = max(map(copy(l:steps), 'strlen(s:count("-", get(v:val, "deleted", 0)))'))
   let l:lines = []
   for l:item in l:items[a:start - 1 : a:end - 1]
     let l:step = get(l:list.steps, l:item.module, {})
@@ -765,6 +871,7 @@ function! s:commit_lines(id, start, end) abort
     let l:columns = empty(l:item.module) ? repeat(' ', 27 + l:width)
           \ : printf('%s %-16s %s  ', l:item.module[:6], get(l:step, 'date', ''), l:author)
     call add(l:lines, s:column(l:mark, 6) . l:columns
+          \ . s:stat_column(l:step, l:added, l:deleted) . '  '
           \ . get(l:step, 'subject', 'no longer on the branch'))
   endfor
   return l:lines

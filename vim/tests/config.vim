@@ -528,14 +528,14 @@ function! s:review_list() abort
   return [l:list.title, map(l:list.items, 'v:val.text')]
 endfunction
 GitReview base HEAD
-call assert_equal([':Git difftool --name-only base HEAD — 0/2 read', ['', '']],
-      \ s:review_list())
+call assert_equal([':Git difftool --name-only base HEAD — 0/2 read, 2 of 2 lines left',
+      \ ['', '']], s:review_list())
 copen
 normal x
-call assert_equal([':Git difftool --name-only base HEAD — 1/2 read', ['✓', '']],
-      \ s:review_list())
+call assert_equal([':Git difftool --name-only base HEAD — 1/2 read, 1 of 2 lines left',
+      \ ['✓', '']], s:review_list())
 if has('patch-8.2.0959')
-  call assert_equal(['✓ app/model.rb', '  app/extra.rb'], getline(1, '$'))
+  call assert_equal(['✓ M  +1   app/model.rb', '  A  +1   app/extra.rb'], getline(1, '$'))
   call assert_equal(['qfReviewRead', 'qfFileName'],
         \ [synIDattr(synID(1, 3, 1), 'name'), synIDattr(synID(2, 3, 1), 'name')])
 endif
@@ -545,12 +545,12 @@ call assert_equal({s:review_head: {'app/model.rb':
 
 " gr lists the files to read, and returns to the full list with new marks.
 normal gr
-call assert_equal([':Git difftool --name-only base HEAD (to read) — 0/1 read', ['']],
-      \ s:review_list())
+call assert_equal([':Git difftool --name-only base HEAD (to read) — 0/1 read, 1 of 1 line left',
+      \ ['']], s:review_list())
 normal x
 normal gr
-call assert_equal([':Git difftool --name-only base HEAD — 2/2 read', ['✓', '✓']],
-      \ s:review_list())
+call assert_equal([':Git difftool --name-only base HEAD — 2/2 read, 0 of 2 lines left',
+      \ ['✓', '✓']], s:review_list())
 " A selection of read files is unmarked, then marked again.
 execute "normal ggVGx"
 call assert_equal(['', ''], s:review_list()[1])
@@ -564,8 +564,9 @@ call system(s:git . ' -c user.name=Test -c user.email=test@example.com commit -q
 let s:blob = 'fugitive://' . s:repo . '/.git//' . trim(system(s:git . ' rev-parse HEAD')) . '/app/'
 let g:config_test_difftool_files = [s:blob . 'model.rb', s:blob . 'extra.rb']
 GitReview base HEAD
-call assert_equal([':Git difftool --name-only base HEAD — 1/2 read', ['✓', '~']],
-      \ s:review_list())
+" A file to read again counts as left to read.
+call assert_equal([':Git difftool --name-only base HEAD — 1/2 read, 1 of 2 lines left',
+      \ ['✓', '~']], s:review_list())
 " A three-dot range shares the marks of its merge base.
 GitReview base...HEAD
 call assert_equal(['✓', '~'], s:review_list()[1])
@@ -626,7 +627,8 @@ call assert_equal(['✓', '', '', ''], s:review_list()[1])
 " g/ hands the entries to fzf with a diff preview; Enter keeps the matches.
 normal g/
 let s:fzf = g:config_test_fzf
-call assert_equal("1\t✓ app/services/order_sync.rb\tapp/services/order_sync.rb",
+" Files outside the diff have no status or counts.
+call assert_equal("1\t✓         app/services/order_sync.rb\tapp/services/order_sync.rb",
       \ s:fzf.source[0])
 call assert_match('diff --color=always ' . s:review_head . ' '
       \ . trim(system(s:git . ' rev-parse HEAD')) . ' -- {3}',
@@ -749,11 +751,11 @@ call assert_equal([['all', '', 1]], g:config_test_gitgutter, 'The commits must r
 call assert_equal([':ReviewCommits base — 0/4 read', 'qf'],
       \ [getqflist({'title': 1}).title, &filetype])
 if has('patch-8.2.0959')
-  " Authors are padded to the longest, so subjects stay aligned.
-  call assert_equal(['      ' . s:shas[0][:6] . ' 2026-01-02 12:00 Test       Change a',
-        \ '      ' . s:shas[1][:6] . ' 2026-01-03 12:00 Ann Other  Change b, add c',
-        \ '      ' . s:shas[2][:6] . ' 2026-01-04 12:00 Test       Change b again',
-        \ repeat(' ', 42) . 'Uncommitted changes'], getline(1, '$'))
+  " Authors are padded to the longest, so counts and subjects stay aligned.
+  call assert_equal(['      ' . s:shas[0][:6] . ' 2026-01-02 12:00 Test       +1 -1  Change a',
+        \ '      ' . s:shas[1][:6] . ' 2026-01-03 12:00 Ann Other  +2 -1  Change b, add c',
+        \ '      ' . s:shas[2][:6] . ' 2026-01-04 12:00 Test       +1 -1  Change b again',
+        \ repeat(' ', 42) . '+1 -1  Uncommitted changes'], getline(1, '$'))
 endif
 1
 call assert_equal(':call gitreview#message()<CR>', maparg(' k', 'n'))
@@ -769,7 +771,7 @@ call popup_clear()
 2
 execute "normal \<CR>"
 call assert_equal('difftool --name-only ' . s:shas[1] . '^ ' . s:shas[1], g:config_test_git_args)
-call assert_equal(s:shas[1][:6] . ' Change b, add c — 0/2 read',
+call assert_equal(s:shas[1][:6] . ' Change b, add c — 0/2 read, 3 of 3 lines left',
       \ getqflist({'title': 1}).title)
 call assert_equal(['', ''], s:marks())
 call gitreview#message()
@@ -803,7 +805,7 @@ let s:shas = systemlist(s:cgit . ' rev-list --reverse base..HEAD')
 ReviewCommits base
 call assert_equal(['', '1/2', '✓', ''], s:marks())
 if has('patch-8.2.0959')
-  call assert_equal('✓     ' . s:shas[2][:6] . ' 2026-01-04 12:00 Alexandra Long-Surn…  Change b once more',
+  call assert_equal('✓     ' . s:shas[2][:6] . ' 2026-01-04 12:00 Alexandra Long-Surn…  +1 -1  Change b once more',
         \ getline(3), 'Long authors are cut at 20 columns')
 endif
 3
@@ -822,7 +824,8 @@ call assert_equal(['', '1/2', '', ''], s:marks())
 " GitGutter.
 4
 execute "normal \<CR>"
-call assert_equal(['difftool --name-only HEAD', 'Uncommitted changes — 0/1 read'],
+call assert_equal(['difftool --name-only HEAD',
+      \ 'Uncommitted changes — 0/1 read, 2 of 2 lines left'],
       \ [g:config_test_git_args, getqflist({'title': 1}).title])
 normal x
 let s:store = s:cstore()
@@ -858,7 +861,7 @@ call assert_equal(['✓', '', '', '✓'], s:marks())
 
 " g/ previews commits, and filtered commits still open their files.
 normal g/
-call assert_equal("2\t      " . s:shas[1][:6] . " 2026-01-03 12:00 Ann Other             Change b, add c\t"
+call assert_equal("2\t      " . s:shas[1][:6] . " 2026-01-03 12:00 Ann Other             +2 -1  Change b, add c\t"
       \ . s:shas[1],
       \ g:config_test_fzf.source[1])
 call assert_match('show --color=always --stat --patch {3}',
@@ -877,6 +880,47 @@ copen
 2
 normal -
 call assert_equal(1, line('.'))
+cclose
+
+" Files show Git's status and their added and deleted lines, aligned, and
+" the title counts the lines left to read; commits show their totals.
+let s:crepo = $VIM_CONFIG_TEST_ROOT . '/stats repo'
+let s:cgit = 'git -C ' . shellescape(s:crepo)
+call mkdir(s:crepo, 'p')
+call system('git init -q ' . shellescape(s:crepo))
+call writefile(range(1, 30), s:crepo . '/a.txt')
+call writefile(range(1, 40), s:crepo . '/old.txt')
+call writefile(range(1, 5), s:crepo . '/gone.txt')
+call system('printf "\\0\\1" > ' . shellescape(s:crepo . '/bin.dat'))
+call system(s:cgit . ' add .')
+call s:ccommit(1, '-m Base')
+call system(s:cgit . ' branch -q base')
+call writefile(range(1, 30, 2), s:crepo . '/a.txt')
+call writefile(range(1, 120), s:crepo . '/big.txt')
+call writefile(range(1, 41), s:crepo . '/new.txt')
+call system('printf "\\0\\2" > ' . shellescape(s:crepo . '/bin.dat'))
+call system(s:cgit . ' rm -q gone.txt old.txt && ' . s:cgit . ' add .')
+call s:ccommit(5, '-m Stats')
+execute 'cd ' . fnameescape(s:crepo)
+ReviewFiles base
+call assert_equal(':Git difftool --name-only ' . s:cblob('base')
+      \ . ' — 0/5 read, 141 of 141 lines left', getqflist({'title': 1}).title)
+if has('patch-8.2.0959')
+  copen
+  call assert_equal(['  M       -15  a.txt',
+        \ '  A  +120      big.txt',
+        \ '  M  bin       bin.dat',
+        \ '  D       -5   gone.txt',
+        \ '  R    +1      new.txt ← old.txt'], getline(1, '$'))
+  2
+  normal x
+  call assert_match(' — 1/5 read, 21 of 141 lines left$', getqflist({'title': 1}).title)
+  normal g/
+  call assert_equal("2\t✓ A  +120      big.txt\tbig.txt", g:config_test_fzf.source[1])
+  ReviewCommits base
+  call assert_equal(['1/5   ' . s:cblob('HEAD')[:6] . ' 2026-01-05 12:00 Test  +121 -20  Stats'],
+        \ getline(1, '$'), 'Binary files add no lines to commits')
+endif
 delcommand Git
 delcommand GitGutterAll
 only

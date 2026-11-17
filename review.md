@@ -72,10 +72,21 @@ review drives `gd` and `gc`.
 With a range, `gd` opens the right commit's version as a read-only Fugitive
 blob: `origin/main...HEAD` shows `HEAD` as committed.
 
-Read files show `✓`, and the list title counts them, as in
-`— 3/12 read`. A mark records the reviewed version of the file, so it turns
-to `~`, to read again, when the file changes: a new push to an MR, a new
-commit, or an edit during `:ReviewFiles`. Marks are kept per merge base in
+Each file shows Git's status letter (`A` added, `M` modified, `D` deleted,
+`R` renamed, with the old path after `←`) and its added and deleted lines,
+or `bin` for a binary file:
+
+```
+✓ M  +12 -3  app/models/user.rb
+  A  +27     app/services/inventory_sync.rb
+~ R   +1 -1  lib/order_sync.rb ← lib/sync.rb
+```
+
+Read files show `✓`. The list title counts them, and the changed lines
+left to read, as in `— 3/12 read, 210 of 540 lines left`. A mark records
+the reviewed version of the file, so it turns to `~`, to read again, when
+the file changes: a new push to an MR, a new commit, or an edit during
+`:ReviewFiles`; such a file counts in full in the lines left. Marks are kept per merge base in
 `.review/reviewed.json`, ignored by Git, so they survive restarts and are
 shared by `:GitReview`, `:ReviewFiles`, `:ReviewCommits`, and `:MR` reviews
 of the same base.
@@ -113,9 +124,10 @@ without GitGutter signs.
 
 `:ReviewCommits [<ref>]` lists the commits of the current branch since its
 merge base with `<ref>` (default `origin/main`), oldest first, with their
-author date in local time and their author, then the uncommitted changes,
-if any. It replaces the quickfix list and resets
-GitGutter's base; switch back and forth with `:ReviewFiles` at will.
+author date in local time, their author, and their added and deleted lines
+(binary files count none), then the uncommitted changes, if any. It
+replaces the quickfix list and resets GitGutter's base; switch back and
+forth with `:ReviewFiles` at will.
 
 | Key | Action |
 | --- | --- |
