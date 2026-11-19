@@ -480,14 +480,17 @@ nnoremap <silent> <Leader>e
 " ============================================================================
 
 " ---------- Sources ----------
-" Shared rg command
-let s:rg_cmd = 'rg --column --line-number --no-heading --color=always'
-      \ . ' --smart-case --hidden --no-ignore-vcs'
+" Shared rg filtering: hidden files included, .gitignore ignored,
+" symlinks followed, .git excluded. ~/.ignore also applies under $HOME.
+let s:rg_base = 'rg --hidden --no-ignore-vcs --follow'
 
-" Make :Files list the same files :Rg searches
-" (hidden files included, .gitignore ignored, .git excluded).
+" Shared rg command
+let s:rg_cmd = s:rg_base
+      \ . ' --column --line-number --no-heading --color=always --smart-case'
+
+" Make :Files list the same files :Rg searches.
 " Set here, so it only affects Vim, not the shell.
-let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --no-ignore-vcs -g "!.git"'
+let $FZF_DEFAULT_COMMAND = s:rg_base . ' --files'
 
 " ---------- fzf options ----------
 " Shared by all commands
