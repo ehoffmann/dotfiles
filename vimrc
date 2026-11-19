@@ -97,6 +97,9 @@ Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
 
+" Vifm
+Plug 'vifm/vifm.vim'
+
 " Fern
 Plug 'lambdalisue/vim-fern'
 Plug 'lambdalisue/vim-fern-git-status'
@@ -433,8 +436,22 @@ nmap <leader>x :s/\[ \]/[X]/<CR>
 nnoremap gp `[v`]
 
 " Toggle Fern and reveal the current file.
-nnoremap <silent> <Leader>e
-      \ :Fern . -drawer -toggle -reveal=%<CR>
+nnoremap <silent> <Leader>e :Fern . -drawer -toggle -reveal=%<CR>
+
+augroup fern_custom_mappings
+  autocmd!
+  autocmd FileType fern call s:fern_mappings()
+augroup END
+
+function! s:fern_mappings() abort
+  " Preview without leaving Fern
+  nmap <silent> <buffer> p <Plug>(fern-action-preview)
+
+  " Open file in editor, then return focus to Fern
+  nmap <silent> <buffer> o <Plug>(fern-action-open:edit)<C-w>p
+endfunction
+
+nnoremap <silent> <leader>v :Vifm %:p:h<CR>
 
 " ============================================================================
 "  fzf.vim configuration
