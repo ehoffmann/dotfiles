@@ -495,6 +495,7 @@ let $FZF_DEFAULT_COMMAND = s:rg_base . ' --files'
 " ---------- fzf options ----------
 " Shared by all commands
 let s:common_opts = [
+      \ '--style', 'full',
       \ '--hscroll-off', '50',
       \ '--bind', 'alt-w:toggle-wrap',
       \ '--bind', 'alt-j:preview-half-page-down,alt-k:preview-half-page-up',

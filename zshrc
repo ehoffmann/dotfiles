@@ -132,9 +132,9 @@ export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --no-ignore-vcs'
 # Match the light Gruvbox terminal theme; Vim overrides fzf colors itself.
 export BAT_THEME='gruvbox-light'
 if [[ -n "$TMUX_IN_POPUP" ]]; then
-  export FZF_DEFAULT_OPTS='--height 40% --color=light'
+  export FZF_DEFAULT_OPTS='--height 40% --style full --color=light'
 else
-  export FZF_DEFAULT_OPTS='--height 40% --tmux top,99% --border --color=light'
+  export FZF_DEFAULT_OPTS='--height 40% --tmux top,99% --border --style full --color=light'
 fi
 export FZF_CTRL_T_OPTS="
   --preview 'bat -n --color=always {}'
