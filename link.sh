@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 ln -sbf ~/code/dotfiles/gitignore ~/.gitignore
+ln -sbf ~/code/dotfiles/ignore ~/.ignore
 ln -sbf ~/code/dotfiles/gitconfig ~/.gitconfig
 ln -sbnf ~/code/dotfiles/tmuxinator ~/.tmuxinator
 ln -sbf ~/code/dotfiles/rubocop.yml ~/.rubocop.yml

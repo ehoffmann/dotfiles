@@ -1,0 +1,7 @@
+# Global ignore rules for rg and fd, linked to ~/.ignore by link.sh.
+# Both tools read .ignore files in parent directories, so these rules
+# apply to every search under $HOME, including the fzf widgets and Vim's
+# :Files and :Rg. Git does not read .ignore files.
+.git/
+node_modules/
+target/
