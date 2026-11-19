@@ -461,9 +461,9 @@ nnoremap <silent> <Leader>e
 "  <leader>fl     :BLines
 "  <leader>fL     :Lines
 "  <leader>f*     :BLines with word under cursor
-"  <leader>rw     :Rg with word under cursor     (<leader>rW fullscreen)
-"  <leader>rg     :RG live grep                  (<leader>rG fullscreen)
-"  <leader>rg     (visual) :Rg with selection
+"  <leader>rw     :Rg! with word under cursor (fullscreen)
+"  <leader>rg     :RG! live grep (fullscreen)
+"  <leader>rg     (visual) :Rg! with selection (fullscreen)
 "
 "  KEYS INSIDE FZF
 "  --------------------------------------------------------------------------
@@ -576,11 +576,9 @@ nnoremap <silent> <leader>fL  :Lines<CR>
 nnoremap          <leader>f*  :BLines <C-R><C-W><CR>
 
 " Project-wide
-nnoremap <leader>rw :Rg <C-R><C-W><CR>
-nnoremap <leader>rW :Rg! <C-R><C-W><CR>
-nnoremap <leader>rg :RG<CR>
-nnoremap <leader>rG :RG!<CR>
-vnoremap <leader>rg y:Rg <C-R>"<CR>
+nnoremap <leader>rw :Rg! <C-R><C-W><CR>
+nnoremap <leader>rg :RG!<CR>
+vnoremap <leader>rg y:Rg! <C-R>"<CR>
 
 " nnoremap <F5> :w<CR>:silent! :make<CR>:cwindow<CR>
 nnoremap <leader>5 :update<CR>:silent! make \| redraw! \| cwindow<CR>
