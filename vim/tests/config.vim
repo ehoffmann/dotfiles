@@ -5,6 +5,8 @@ let s:runtime = $VIM_CONFIG_TEST_RUNTIME
 call assert_equal('', v:errmsg)
 call assert_equal('gruvbox', g:colors_name)
 call assert_equal('light', &background)
+call assert_equal(['fg', 'Normal'], g:fzf_colors.query)
+call assert_equal(['bg', 'Normal'], g:fzf_colors['input-bg'])
 call assert_equal(1024, &synmaxcol)
 call assert_equal(7, &scrolloff)
 call assert_equal(1, g:config_test_project_loads)

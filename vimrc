@@ -380,6 +380,8 @@ let g:fzf_colors = {
       \ 'bg': ['bg', 'Normal'],
       \ 'fg+': ['fg', 'Normal'],
       \ 'bg+': ['bg', 'CursorLine'],
+      \ 'query': ['fg', 'Normal'],
+      \ 'input-bg': ['bg', 'Normal'],
       \ 'preview-fg': ['fg', 'Normal'],
       \ 'preview-bg': ['bg', 'Normal'],
       \ 'hl': ['fg', 'Statement'],

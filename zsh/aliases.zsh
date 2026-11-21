@@ -12,6 +12,14 @@ alias mv='mv -i'
 alias ln='ln -i'
 
 # -----------------------------------------------------------------------------
+# Agentic
+# -----------------------------------------------------------------------------
+
+alias dclaude='docker compose run --rm claude claude --dangerously-skip-permissions'
+alias dcodex='docker compose run --rm codex codex --no-daemon --yolo'
+alias dagy='docker compose run --rm agy agy --dangerously-skip-permissions'
+
+# -----------------------------------------------------------------------------
 # Git
 # -----------------------------------------------------------------------------
 alias g='git'
